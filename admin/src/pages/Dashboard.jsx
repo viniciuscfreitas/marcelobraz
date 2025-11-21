@@ -1,9 +1,9 @@
+import { Building, Home, LayoutDashboard, LogOut, Plus, Users } from 'lucide-react';
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Building, Users, LogOut, Plus, LayoutDashboard, Home } from 'lucide-react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
 import { SITE_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
     const { user, logout } = useAuth();

@@ -24,7 +24,7 @@ export default function RealEstateSite() {
   const [toastMessage, setToastMessage] = useState(null);
 
   const handlePropertyClick = (prop) => {
-    setSelectedProperty(prop);
+      setSelectedProperty(prop);
     openModal('gate');
   };
 
@@ -49,15 +49,15 @@ export default function RealEstateSite() {
           />
           <main>
             <HeroSection navigateTo={nav.navigateTo} />
-            <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} />
+            <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} properties={properties} />
             <AboutSection />
             <ValuationSection />
             <TestimonialsSection />
             <WhatsappCaptureSection />
           </main>
           <Footer navigateTo={nav.navigateTo} />
-        </>
-      ) : (
+            </>
+        ) : (
         <PortfolioView
           properties={properties}
           navigateTo={nav.navigateTo}
