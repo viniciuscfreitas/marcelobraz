@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Building, Users, LogOut, Plus, LayoutDashboard, Home } from 'lucide-react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
+import { SITE_URL } from '../config';
 
 export default function Dashboard() {
     const { user, logout } = useAuth();
@@ -47,7 +48,7 @@ export default function Dashboard() {
                         <Users size={20} aria-hidden="true" />
                         <span className="font-medium">Leads (Em breve)</span>
                     </a>
-                    <a href="http://localhost:5174" target="_blank" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5 hover:text-white rounded-lg transition-colors mt-8">
+                    <a href={SITE_URL} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5 hover:text-white rounded-lg transition-colors mt-8">
                         <Home size={20} aria-hidden="true" />
                         <span className="font-medium">Ver Site</span>
                     </a>

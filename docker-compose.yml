@@ -23,6 +23,7 @@ services:
       context: ./admin
       args:
         - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
+        - VITE_SITE_URL=${VITE_SITE_URL:-${VITE_API_URL:-https://marcelobraz.vinicius.xyz}}
     container_name: marcelobraz-admin
     ports:
       - "${ADMIN_PORT:-5180}:5173"
