@@ -133,19 +133,24 @@ export default function Leads() {
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 min-h-0 pb-20 md:pb-6">
-                    {/* Leads Section */}
-                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0 md:min-h-0" role="region" aria-labelledby="leads-heading">
+                <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 pb-20 md:pb-6">
+                    {/* Desktop: Leads Section */}
+                    <section className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" role="region" aria-labelledby="leads-heading">
                         <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
                             <div>
                                 <h3 id="leads-heading" className="text-lg md:text-xl font-bold text-gray-900">Lista de Leads</h3>
                                 <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">Gerencie os leads capturados no site.</p>
                             </div>
                         </div>
-                        <div className="p-0 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
+                        <div className="p-0 flex-1 min-h-0 overflow-hidden">
                             <LeadsList searchTerm={searchTerm} />
                         </div>
                     </section>
+
+                    {/* Mobile: Cards diretos na tela */}
+                    <div className="md:hidden">
+                        <LeadsList searchTerm={searchTerm} />
+                    </div>
                 </div>
             </main>
 

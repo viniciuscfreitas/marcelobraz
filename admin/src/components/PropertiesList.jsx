@@ -94,15 +94,16 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
 
     return (
-        <div className="flex flex-col h-full min-h-0">
+        <>
             {filteredProperties.length > 0 && (
                 <div className="sr-only" aria-live="polite" aria-atomic="true">
                     {filteredProperties.length} {filteredProperties.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
                 </div>
             )}
 
-            {/* Desktop: Tabela */}
-            <div className="hidden md:block flex-1 min-h-0 overflow-auto">
+            {/* Desktop: Container com tabela */}
+            <div className="hidden md:flex flex-col h-full min-h-0">
+                <div className="flex-1 min-h-0 overflow-auto">
                 <table className="w-full text-left border-collapse">
                     <caption className="sr-only">Lista de imóveis cadastrados</caption>
                     <thead className="sticky top-0 z-10 bg-gray-50 shadow-sm">
@@ -202,10 +203,11 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                         )}
                     </tbody>
                 </table>
+                </div>
             </div>
 
-            {/* Mobile: Cards */}
-            <div className="md:hidden space-y-3 p-4">
+            {/* Mobile: Cards diretos na tela */}
+            <div className="md:hidden space-y-3 px-4 py-4">
                 {filteredProperties.map((property) => (
                     <div key={property.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
                         <div className="flex items-start gap-3 mb-3">
@@ -288,6 +290,6 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                 variant="danger"
             />
             {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
-        </div>
+        </>
     );
 }

@@ -243,7 +243,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Properties Section */}
-                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:flex md:flex-col md:flex-1 md:min-h-0" role="region" aria-labelledby="properties-heading">
+                    <section className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:flex md:flex-col md:flex-1 md:min-h-0" role="region" aria-labelledby="properties-heading">
                         <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
                             <div>
                                 <h3 id="properties-heading" className="text-lg md:text-xl font-bold text-gray-900">Seus Imóveis</h3>
@@ -258,6 +258,15 @@ export default function Dashboard() {
                             />
                         </div>
                     </section>
+
+                    {/* Mobile: Cards diretos na tela */}
+                    <div className="md:hidden">
+                        <PropertiesList
+                            onEdit={handleOpenDrawer}
+                            refreshTrigger={refreshTrigger}
+                            searchTerm={searchTerm}
+                        />
+                    </div>
                 </div>
             </main>
 
@@ -276,7 +285,10 @@ export default function Dashboard() {
                     <span className="text-[10px] font-bold">Home</span>
                 </button>
 
-                <button className="flex flex-col items-center gap-1 text-gray-400">
+                <button 
+                    onClick={() => navigate('/leads')}
+                    className="flex flex-col items-center gap-1 text-gray-400"
+                >
                     <Users className="w-6 h-6" aria-hidden="true" />
                     <span className="text-[10px] font-medium">Leads</span>
                 </button>
