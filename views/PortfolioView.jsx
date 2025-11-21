@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { PROPERTIES, AVAILABLE_NEIGHBORHOODS, AVAILABLE_TYPES } from '../data/properties.js';
 import { BROKER_INFO } from '../data/constants.js';
 import { PortfolioFilters } from '../components/PortfolioFilters.jsx';
 import { PortfolioGrid } from '../components/PortfolioGrid.jsx';
@@ -12,17 +11,22 @@ import { Button } from '../components/Button.jsx';
  * Grug gosta: view simples que orquestra componentes menores
  * 
  * @param {Object} props
+ * @param {Array} props.properties - Lista de imóveis (vinda da API ou estática)
  * @param {Function} props.navigateTo - Função para navegar entre views
  * @param {Function} props.onPropertyClick - Callback quando imóvel é clicado
  */
-export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
+export const PortfolioView = ({ properties = [], navigateTo, onPropertyClick }) => {
     const [filters, setFilters] = useState({ bairro: 'Todos', tipo: 'Todos' });
 
-    const filteredProperties = useMemo(() => PROPERTIES.filter(prop => {
+    // Calcular filtros disponíveis baseado nos imóveis atuais
+    const availableNeighborhoods = useMemo(() => ['Todos', ...new Set(properties.map(p => p.bairro))], [properties]);
+    const availableTypes = useMemo(() => ['Todos', ...new Set(properties.map(p => p.tipo))], [properties]);
+
+    const filteredProperties = useMemo(() => properties.filter(prop => {
         const bairroMatch = filters.bairro === 'Todos' || prop.bairro === filters.bairro;
         const tipoMatch = filters.tipo === 'Todos' || prop.tipo === filters.tipo;
         return bairroMatch && tipoMatch;
-    }), [filters]);
+    }), [properties, filters]);
 
     const handleClearFilters = () => setFilters({ bairro: 'Todos', tipo: 'Todos' });
 
@@ -60,8 +64,8 @@ export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
                         filters={filters}
                         onFilterChange={setFilters}
                         onClearFilters={handleClearFilters}
-                        neighborhoods={AVAILABLE_NEIGHBORHOODS}
-                        types={AVAILABLE_TYPES}
+                        neighborhoods={availableNeighborhoods}
+                        types={availableTypes}
                     />
                 </div>
             </div>
