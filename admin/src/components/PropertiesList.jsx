@@ -82,7 +82,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
     if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full min-h-0">
             {/* Header com contador de Curadoria */}
             {featuredCount > 0 && (
                 <div className="p-4 bg-[#d4af37]/5 border-b border-[#d4af37]/20 flex-shrink-0">
@@ -110,10 +110,10 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-auto">
                 <table className="w-full text-left border-collapse">
                     <caption className="sr-only">Lista de imóveis cadastrados</caption>
-                    <thead className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur-sm">
+                    <thead className="sticky top-0 z-10 bg-gray-50 shadow-sm">
                         <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-600 font-semibold">
                             <th scope="col" className="p-6">Imóvel</th>
                             <th scope="col" className="p-6">Localização</th>

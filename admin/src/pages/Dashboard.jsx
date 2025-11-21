@@ -26,14 +26,14 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex flex-col md:flex-row">
+        <div className="h-screen bg-background flex flex-col md:flex-row overflow-hidden">
             {/* Skip Link for Accessibility */}
             <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-gold-dark text-white px-4 py-2 rounded-lg z-50">
                 Pular para o conteúdo principal
             </a>
 
             {/* Sidebar / Navigation */}
-            <aside className="w-full md:w-72 bg-primary text-white flex-shrink-0 md:min-h-screen" aria-label="Menu Principal">
+            <aside className="w-full md:w-72 bg-primary text-white flex-shrink-0 h-full overflow-y-auto" aria-label="Menu Principal">
                 <div className="p-8 border-b border-white/10">
                     <h1 className="text-2xl font-bold text-gold">Marcelo Braz</h1>
                     <p className="text-gray-300 text-sm mt-1">Painel Administrativo</p>
@@ -74,8 +74,8 @@ export default function Dashboard() {
             </aside>
 
             {/* Main Content */}
-            <main id="main-content" className="flex-1 p-6 md:p-12 flex flex-col overflow-hidden" tabIndex="-1">
-                <header className="flex justify-between items-center mb-10">
+            <main id="main-content" className="flex-1 p-6 md:p-12 flex flex-col overflow-hidden h-full min-h-0" tabIndex="-1">
+                <header className="flex justify-between items-center mb-10 flex-shrink-0">
                     <div>
                         <h2 className="text-3xl font-bold text-primary">Visão Geral</h2>
                         <p className="text-gray-600 mt-1">Bem-vindo ao seu painel de controle.</p>
@@ -89,7 +89,7 @@ export default function Dashboard() {
                     </button>
                 </header>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 flex-shrink-0">
                     {/* Stats Cards */}
                     <div className="card relative overflow-hidden group hover:shadow-2xl transition-all duration-300 border-l-4 border-gold">
                         <div className="absolute right-0 top-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity" aria-hidden="true">
@@ -121,7 +121,7 @@ export default function Dashboard() {
                             <p className="text-sm text-gray-600 mt-1">Gerencie sua lista de propriedades exclusivas.</p>
                         </div>
                     </div>
-                    <div className="p-0 flex-1 min-h-0">
+                    <div className="p-0 flex-1 min-h-0 overflow-hidden">
                         <PropertiesList
                             onEdit={handleOpenDrawer}
                             refreshTrigger={refreshTrigger}
