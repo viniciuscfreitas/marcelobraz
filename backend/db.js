@@ -21,10 +21,19 @@ function initDatabase() {
       tipo TEXT NOT NULL,
       specs TEXT,
       tags TEXT,
+      featured INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+    // Migração: adicionar campo featured se não existir
+    try {
+        db.exec(`ALTER TABLE properties ADD COLUMN featured INTEGER DEFAULT 0`);
+        console.log('✅ Migration: campo featured adicionado');
+    } catch (error) {
+        // Campo já existe, ignora
+    }
 
     // Tabela de leads
     db.exec(`

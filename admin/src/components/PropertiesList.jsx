@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Edit, Trash2, Search, MapPin, Home } from 'lucide-react';
+import { Edit, Trash2, Search, MapPin, Home, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 
@@ -48,6 +48,29 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
         }
     };
 
+    const handleToggleFeatured = async (id, currentFeatured) => {
+        try {
+            const res = await fetch(`${API_URL}/api/properties/${id}/featured`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (res.ok) {
+                const updated = await res.json();
+                setProperties(properties.map(p => p.id === id ? updated : p));
+            } else {
+                const error = await res.json();
+                alert(error.error || 'Erro ao atualizar curadoria');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao atualizar curadoria');
+        }
+    };
+
     const filteredProperties = properties.filter(p =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.bairro.toLowerCase().includes(searchTerm.toLowerCase())
@@ -84,6 +107,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                             <th scope="col" className="p-6">Localização</th>
                             <th scope="col" className="p-6">Valor</th>
                             <th scope="col" className="p-6">Tipo</th>
+                            <th scope="col" className="p-6 text-center">Curadoria</th>
                             <th scope="col" className="p-6 text-right">Ações</th>
                         </tr>
                     </thead>
@@ -123,6 +147,21 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                                         </span>
                                     </div>
                                 </td>
+                                <td className="p-6 text-center">
+                                    <button
+                                        onClick={() => handleToggleFeatured(property.id, property.featured)}
+                                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all border ${
+                                            property.featured
+                                                ? 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/30 hover:bg-[#d4af37]/20'
+                                                : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                                        }`}
+                                        title={property.featured ? 'Remover da Curadoria' : 'Adicionar à Curadoria da Semana'}
+                                        aria-label={property.featured ? 'Remover da Curadoria' : 'Adicionar à Curadoria da Semana'}
+                                    >
+                                        <Star size={16} className={property.featured ? 'fill-current' : ''} aria-hidden="true" />
+                                        <span className="text-xs font-medium">{property.featured ? 'Em destaque' : 'Destacar'}</span>
+                                    </button>
+                                </td>
                                 <td className="p-6 text-right">
                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
                                         <button
@@ -148,7 +187,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
 
                         {filteredProperties.length === 0 && !loading && (
                             <tr>
-                                <td colSpan="5" className="p-12 text-center">
+                                <td colSpan="6" className="p-12 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-400">
                                         <Home size={48} className="mb-4 opacity-20" aria-hidden="true" />
                                         <p className="text-lg font-medium text-gray-600">Nenhum imóvel encontrado</p>

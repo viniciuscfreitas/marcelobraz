@@ -14,17 +14,25 @@ export const CollectionSection = ({ onPropertyClick, navigateTo, properties = []
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#0f172a] mt-3 mb-6">Imóveis Selecionados</h2>
               <p className="text-gray-600 text-lg">Por questões de sigilo, o valor final e endereço exato são revelados apenas para clientes cadastrados.</p>
           </div>
-          {properties.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {properties.slice(0, 4).map((prop) => (
+          {(() => {
+            const featuredProperties = properties.filter(p => p.featured).slice(0, 4);
+            
+            if (featuredProperties.length > 0) {
+              return (
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {featuredProperties.map((prop) => (
                     <PropertyCard key={prop.id} property={prop} onClick={onPropertyClick} />
-                ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              <p>Carregando imóveis...</p>
-            </div>
-          )}
+                  ))}
+                </div>
+              );
+            }
+            
+            return (
+              <div className="text-center py-12 text-gray-500">
+                <p>Nenhum imóvel selecionado para Curadoria da Semana</p>
+              </div>
+            );
+          })()}
           <div className="mt-16 flex justify-center">
               <Button variant="outline" className="rounded-full px-10 hover:shadow-lg text-base" onClick={() => navigateTo('portfolio')}>Ver Portfólio Completo</Button>
           </div>
