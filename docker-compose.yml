@@ -1,14 +1,47 @@
 services:
+  # 1. Backend (API + Database)
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT:-3040}:3001"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/database.sqlite:/app/database.sqlite
+    environment:
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-supersecretkey123}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+    restart: always
+    networks:
+      - broker-network
+
+  # 2. Admin Panel (Gerenciamento)
+  admin:
+    build:
+      context: ./admin
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
+    ports:
+      - "${ADMIN_PORT:-5180}:5173"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - broker-network
+
+  # 3. Main Site (Frontend Público)
   broker-site:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
     container_name: marcelobraz-site
     restart: unless-stopped
     ports:
       - "38291:80"
-    environment:
-      - NODE_ENV=production
+    depends_on:
+      - backend
     networks:
       - broker-network
       - npm_default

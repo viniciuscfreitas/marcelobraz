@@ -20,9 +20,9 @@ export const useProperties = () => {
                 const data = await res.json();
                 setProperties(data);
             } catch (err) {
-                console.error('Erro na API, usando dados estáticos:', err);
+                console.error('Erro na API:', err);
                 setError(err);
-                setProperties(STATIC_PROPERTIES); // Fallback Grug
+                // Grug diz: sem fallback! Se quebrar, quebrou.
             } finally {
                 setLoading(false);
             }
