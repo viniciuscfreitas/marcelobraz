@@ -75,7 +75,7 @@ export default function Dashboard() {
                     onClick={logout}
                 >
                     <div className="w-10 h-10 rounded-full bg-gold-dark flex items-center justify-center text-white font-bold text-sm">
-                        {(user?.name || user?.username)?.[0]?.toUpperCase()}
+                        {user?.name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase()}
                     </div>
                 </button>
             </aside>
@@ -88,7 +88,7 @@ export default function Dashboard() {
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                                Olá, {user?.name || user?.username}! <span className="animate-bounce">👋</span>
+                                Olá, {user?.name}! <span className="animate-bounce">👋</span>
                             </h1>
                             <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
@@ -101,12 +101,12 @@ export default function Dashboard() {
                         }`}>
                             {isSearchOpen ? (
                                 // Barra de busca expandida
-                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
+                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out focus-within:border-gray-200">
                                     <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
                                     <input
                                         type="text"
                                         placeholder="Busque por título, bairro ou tipo..."
-                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
+                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         autoFocus
