@@ -76,8 +76,8 @@ export default function PropertyForm() {
             }
 
             const url = isEditing
-                ? `http://localhost:3001/api/properties/${id}`
-                : 'http://localhost:3001/api/properties';
+                ? `${API_URL}/api/properties/${id}`
+                : `${API_URL}/api/properties`;
 
             const method = isEditing ? 'PUT' : 'POST';
 
