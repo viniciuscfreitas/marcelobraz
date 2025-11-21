@@ -23,6 +23,7 @@ services:
       context: ./admin
       args:
         - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
+    container_name: marcelobraz-admin
     ports:
       - "${ADMIN_PORT:-5180}:5173"
     depends_on:
@@ -30,6 +31,7 @@ services:
     restart: always
     networks:
       - broker-network
+      - npm_default
 
   # 3. Main Site (Frontend Público)
   broker-site:
