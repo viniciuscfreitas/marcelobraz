@@ -1,4 +1,4 @@
-import { Building, Home, LayoutDashboard, LogOut, Plus, Users, Search } from 'lucide-react';
+import { Building, Home, LayoutDashboard, Plus, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
@@ -11,6 +11,7 @@ export default function Dashboard() {
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     const handleOpenDrawer = (id = null) => {
         setSelectedPropertyId(id);
@@ -42,23 +43,23 @@ export default function Dashboard() {
 
                 {/* Navigation */}
                 <nav className="flex-1 flex flex-col gap-6 w-full px-4">
-                    <button 
+                    <button
                         className="w-full aspect-square flex items-center justify-center rounded-xl bg-gold/10 text-gold transition-colors"
                         aria-label="Dashboard"
                         aria-current="page"
                     >
                         <LayoutDashboard className="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <button 
+                    <button
                         className="w-full aspect-square flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gold transition-colors"
                         aria-label="Leads (Em breve)"
                         disabled
                     >
                         <Users className="w-6 h-6" aria-hidden="true" />
                     </button>
-                    <a 
-                        href={SITE_URL} 
-                        target="_blank" 
+                    <a
+                        href={SITE_URL}
+                        target="_blank"
                         rel="noreferrer"
                         className="w-full aspect-square flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gold transition-colors"
                         aria-label="Ver Site"
@@ -68,7 +69,7 @@ export default function Dashboard() {
                 </nav>
 
                 {/* User Avatar */}
-                <button 
+                <button
                     className="mt-auto mb-4 rounded-full border-2 border-gold-dark p-0.5 hover:border-gold transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2"
                     aria-label="Menu do usuário"
                     onClick={logout}
@@ -92,10 +93,16 @@ export default function Dashboard() {
                         </div>
                         <div className="flex items-center gap-4">
                             <button 
-                                className="p-3 bg-white rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2"
-                                aria-label="Buscar imóveis"
+                                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                                className={`p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
+                                    isSearchOpen 
+                                        ? 'bg-gold/10 border-gold text-gold' 
+                                        : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
+                                }`}
+                                aria-label={isSearchOpen ? "Fechar busca" : "Buscar imóveis"}
+                                aria-expanded={isSearchOpen}
                             >
-                                <Search className="w-5 h-5 text-gray-600" aria-hidden="true" />
+                                <Search className="w-5 h-5" aria-hidden="true" />
                             </button>
                             <button
                                 onClick={() => handleOpenDrawer()}
@@ -108,20 +115,23 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Search Bar */}
-                    <div className="flex gap-3">
-                        <div className="flex-1 bg-gray-50 flex items-center px-5 py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
-                            <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                            <input 
-                                type="text" 
-                                placeholder="Busque por título, bairro ou tipo..." 
-                                className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                aria-label="Buscar imóveis"
-                            />
+                    {/* Search Bar - Toggle */}
+                    {isSearchOpen && (
+                        <div className="flex gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div className="flex-1 bg-gray-50 flex items-center px-5 py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
+                                <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                                <input
+                                    type="text"
+                                    placeholder="Busque por título, bairro ou tipo..."
+                                    className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    autoFocus
+                                    aria-label="Buscar imóveis"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </header>
 
                 {/* Content Area */}
