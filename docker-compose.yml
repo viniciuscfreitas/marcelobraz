@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  broker-site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: marcelobraz-site
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - broker-network
+
+networks:
+  broker-network:
+    driver: bridge
+
