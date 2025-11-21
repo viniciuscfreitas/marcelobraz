@@ -160,6 +160,7 @@ export default function Leads() {
                 </button>
 
                 <button
+                    onClick={() => navigate('/leads')}
                     className="flex flex-col items-center gap-1 text-gray-800"
                 >
                     <Users className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
