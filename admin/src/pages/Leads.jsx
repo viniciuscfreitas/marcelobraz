@@ -1,4 +1,5 @@
-import { Building, Home, LayoutDashboard, Users } from 'lucide-react';
+import { Building, Home, LayoutDashboard, Search, Users } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SITE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +9,8 @@ export default function Leads() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     return (
         <div className="h-screen bg-[#FAFAFA] font-sans text-slate-800 overflow-hidden">
@@ -71,11 +74,61 @@ export default function Leads() {
             <main className="md:pl-24 h-full flex flex-col overflow-hidden bg-[#FAFAFA]" tabIndex="-1" role="main">
                 {/* Header */}
                 <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5 flex-shrink-0">
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                            Leads Capturados
-                        </h1>
-                        <p className="text-gray-500 mt-1 text-xs md:text-sm">Visualize todos os leads capturados no site</p>
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        {/* Título - Esconde quando busca expandida */}
+                        <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                                Leads Capturados
+                            </h1>
+                            <p className="text-gray-500 mt-1 text-xs md:text-sm">Visualize todos os leads capturados no site</p>
+                        </div>
+
+                        {/* Botão/Busca - Mesmo elemento que expande */}
+                        <div className={`transition-all duration-300 ease-in-out ${
+                            isSearchOpen
+                                ? 'flex-1 md:flex-[2] min-w-0 md:min-w-[calc(50%+390px)]'
+                                : 'w-auto'
+                        }`}>
+                            {isSearchOpen ? (
+                                // Barra de busca expandida
+                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
+                                    <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                                    <input
+                                        id="search-bar-input"
+                                        type="text"
+                                        placeholder="Busque por nome, telefone, imóvel ou tipo..."
+                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
+                                        style={{ outline: 'none', boxShadow: 'none' }}
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        autoFocus
+                                        aria-label="Buscar leads"
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            setIsSearchOpen(false);
+                                            setSearchTerm('');
+                                        }}
+                                        className="ml-2 p-1.5 rounded-full hover:bg-gray-200 transition-colors"
+                                        aria-label="Fechar busca"
+                                    >
+                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                // Botão de busca (recolhido)
+                                <button
+                                    onClick={() => setIsSearchOpen(true)}
+                                    className="p-3 rounded-full shadow-sm border border-gray-100 bg-white hover:bg-gray-50 text-gray-600 transition-all focus:ring-2 focus:ring-gold focus:ring-offset-2"
+                                    aria-label="Buscar leads"
+                                    aria-expanded={false}
+                                >
+                                    <Search className="w-5 h-5" aria-hidden="true" />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </header>
 
@@ -90,7 +143,7 @@ export default function Leads() {
                             </div>
                         </div>
                         <div className="p-0 flex-1 min-h-0 overflow-hidden">
-                            <LeadsList />
+                            <LeadsList searchTerm={searchTerm} />
                         </div>
                     </section>
                 </div>

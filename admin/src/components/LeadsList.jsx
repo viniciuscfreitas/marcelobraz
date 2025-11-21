@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 import ConfirmDialog from './ConfirmDialog';
 
-export default function LeadsList() {
+export default function LeadsList({ searchTerm = '' }) {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, lead: null });
@@ -73,13 +73,21 @@ export default function LeadsList() {
         return phone.replace(/\D/g, '');
     };
 
+    // Filtrar leads baseado no termo de busca - Grug gosta: simples e direto
+    const filteredLeads = leads.filter(lead =>
+        lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.property_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.type?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading && leads.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando leads...</div>;
 
     return (
         <div className="flex flex-col h-full min-h-0">
-            {leads.length > 0 && (
+            {filteredLeads.length > 0 && (
                 <div className="sr-only" aria-live="polite" aria-atomic="true">
-                    {leads.length} {leads.length === 1 ? 'lead encontrado' : 'leads encontrados'}
+                    {filteredLeads.length} {filteredLeads.length === 1 ? 'lead encontrado' : 'leads encontrados'}
                 </div>
             )}
 
@@ -97,7 +105,7 @@ export default function LeadsList() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {leads.map((lead) => (
+                        {filteredLeads.map((lead) => (
                             <tr key={lead.id} className="group hover:bg-gray-50/80 transition-colors">
                                 <td className="p-3">
                                     <div className="flex items-center gap-2">
@@ -148,13 +156,17 @@ export default function LeadsList() {
                             </tr>
                         ))}
 
-                        {leads.length === 0 && !loading && (
+                        {filteredLeads.length === 0 && !loading && (
                             <tr>
                                 <td colSpan="6" className="p-8 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-400">
                                         <Users size={40} className="mb-3 opacity-20" aria-hidden="true" />
-                                        <p className="text-base font-medium text-gray-600">Nenhum lead encontrado</p>
-                                        <p className="text-xs text-gray-500 mt-1">Os leads capturados no site aparecerão aqui.</p>
+                                        <p className="text-base font-medium text-gray-600">
+                                            {searchTerm ? 'Nenhum lead encontrado' : 'Nenhum lead encontrado'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            {searchTerm ? 'Tente buscar por outro termo.' : 'Os leads capturados no site aparecerão aqui.'}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
