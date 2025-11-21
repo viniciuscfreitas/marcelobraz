@@ -75,7 +75,7 @@ export default function Dashboard() {
                     onClick={logout}
                 >
                     <div className="w-10 h-10 rounded-full bg-gold-dark flex items-center justify-center text-white font-bold text-sm">
-                        {user?.username?.[0]?.toUpperCase()}
+                        {(user?.name || user?.username)?.[0]?.toUpperCase()}
                     </div>
                 </button>
             </aside>
