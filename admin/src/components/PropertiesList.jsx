@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Edit, Trash2, Search, MapPin, Home, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
+import ConfirmDialog from './ConfirmDialog';
 
 export default function PropertiesList({ onEdit, refreshTrigger }) {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, property: null });
     const { token } = useAuth();
 
     // Contar quantos featured temos
@@ -30,11 +32,16 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Tem certeza que deseja excluir este imóvel?')) return;
+    const handleDeleteClick = (property) => {
+        setDeleteConfirm({ isOpen: true, property });
+    };
+
+    const handleDelete = async () => {
+        const { property } = deleteConfirm;
+        if (!property) return;
 
         try {
-            const res = await fetch(`${API_URL}/api/properties/${id}`, {
+            const res = await fetch(`${API_URL}/api/properties/${property.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -42,12 +49,13 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
             });
 
             if (res.ok) {
-                setProperties(properties.filter(p => p.id !== id));
+                setProperties(properties.filter(p => p.id !== property.id));
             } else {
                 alert('Erro ao excluir imóvel');
             }
         } catch (error) {
             console.error('Erro:', error);
+            alert('Erro ao excluir imóvel');
         }
     };
 
@@ -185,7 +193,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                                             <Edit size={18} aria-hidden="true" />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(property.id)}
+                                            onClick={() => handleDeleteClick(property)}
                                             className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200 shadow-sm focus:ring-2 focus:ring-red-500"
                                             title="Excluir"
                                             aria-label={`Excluir ${property.title}`}
@@ -211,6 +219,18 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                     </tbody>
                 </table>
             </div>
+
+            {/* Dialog de Confirmação */}
+            <ConfirmDialog
+                isOpen={deleteConfirm.isOpen}
+                onClose={() => setDeleteConfirm({ isOpen: false, property: null })}
+                onConfirm={handleDelete}
+                title="Excluir Imóvel"
+                message={`Tem certeza que deseja excluir "${deleteConfirm.property?.title}"? Esta ação não pode ser desfeita.`}
+                confirmText="Excluir"
+                cancelText="Cancelar"
+                variant="danger"
+            />
         </div>
     );
 }

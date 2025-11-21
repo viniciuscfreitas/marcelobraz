@@ -128,7 +128,7 @@ router.put('/:id', requireAuth, (req, res) => {
 router.patch('/:id/featured', requireAuth, (req, res) => {
     try {
         const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
-        
+
         if (!property) {
             return res.status(404).json({ error: 'Imóvel não encontrado' });
         }

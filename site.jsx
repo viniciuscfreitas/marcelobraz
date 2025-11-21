@@ -57,8 +57,8 @@ export default function RealEstateSite() {
             <WhatsappCaptureSection />
           </main>
           <Footer navigateTo={nav.navigateTo} />
-        </>
-      ) : (
+            </>
+        ) : (
         <PortfolioView
           properties={properties}
           navigateTo={nav.navigateTo}
