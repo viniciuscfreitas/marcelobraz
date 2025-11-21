@@ -3,12 +3,15 @@ import { Edit, Trash2, Search, MapPin, Home, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 import ConfirmDialog from './ConfirmDialog';
+import { useToast } from '../hooks/useToast';
+import Toast from './Toast';
 
 export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = '' }) {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, property: null });
     const { token } = useAuth();
+    const { toast, showToast, hideToast } = useToast();
 
     useEffect(() => {
         fetchProperties();
@@ -46,12 +49,13 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
 
             if (res.ok) {
                 setProperties(properties.filter(p => p.id !== property.id));
+                showToast('Imóvel excluído com sucesso!', 'success');
             } else {
-                alert('Erro ao excluir imóvel');
+                showToast('Erro ao excluir imóvel', 'error');
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao excluir imóvel');
+            showToast('Erro ao excluir imóvel', 'error');
         }
     };
 
@@ -68,19 +72,23 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
             if (res.ok) {
                 const updated = await res.json();
                 setProperties(properties.map(p => p.id === id ? updated : p));
+                showToast('Curadoria atualizada!', 'success');
             } else {
                 const error = await res.json();
-                alert(error.error || 'Erro ao atualizar curadoria');
+                showToast(error.error || 'Erro ao atualizar curadoria', 'error');
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao atualizar curadoria');
+            showToast('Erro ao atualizar curadoria', 'error');
         }
     };
 
     const filteredProperties = properties.filter(p =>
-        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.bairro.toLowerCase().includes(searchTerm.toLowerCase())
+        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.subtitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.bairro?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.tipo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.price?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
@@ -206,6 +214,7 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                 cancelText="Cancelar"
                 variant="danger"
             />
+            {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );
 }

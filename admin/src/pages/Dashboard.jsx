@@ -155,7 +155,7 @@ export default function Dashboard() {
                                     <input
                                         id="search-bar-input"
                                         type="text"
-                                        placeholder="Busque por título, bairro ou tipo..."
+                                        placeholder="Busque por título, bairro, tipo ou preço..."
                                         className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
                                         style={{ outline: 'none', boxShadow: 'none' }}
                                         value={searchTerm}

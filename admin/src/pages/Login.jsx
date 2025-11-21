@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, User, ArrowRight } from 'lucide-react';
 import { API_URL } from '../config';
+import { useToast } from '../hooks/useToast';
+import Toast from '../components/Toast';
 
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { login } = useAuth();
     const navigate = useNavigate();
+    const { toast, showToast, hideToast } = useToast();
 
     const onSubmit = async (data) => {
         try {
@@ -26,7 +29,7 @@ export default function Login() {
             login(result.user, result.token);
             navigate('/');
         } catch (error) {
-            alert(error.message);
+            showToast(error.message || 'Erro no login', 'error');
         }
     };
 
@@ -116,6 +119,7 @@ export default function Login() {
                     </p>
                 </div>
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );
 }

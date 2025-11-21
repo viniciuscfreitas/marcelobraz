@@ -5,6 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_URL } from '../config';
+import { useImageUpload } from '../hooks/useImageUpload';
+import { useToast } from '../hooks/useToast';
+import Toast from '../components/Toast';
 
 export default function PropertyForm() {
     const { id } = useParams();
@@ -13,10 +16,14 @@ export default function PropertyForm() {
     const navigate = useNavigate();
     const { token } = useAuth();
     const [loading, setLoading] = useState(false);
-    const [uploading, setUploading] = useState(false);
-
-    // Observar o campo de imagem para preview
+    const { toast, showToast, hideToast } = useToast();
     const imageUrl = watch('image');
+
+    const handleUploadSuccess = (url) => {
+        setValue('image', url);
+    };
+
+    const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
 
     useEffect(() => {
         if (isEditing) {
@@ -43,28 +50,11 @@ export default function PropertyForm() {
         const file = e.target.files[0];
         if (!file) return;
 
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('image', file);
-
         try {
-            const res = await fetch(`${API_URL}/api/upload`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            if (!res.ok) throw new Error('Falha no upload');
-
-            const data = await res.json();
-            setValue('image', data.url); // Atualiza o campo do formulário com a URL
+            await uploadImage(file);
         } catch (error) {
-            console.error('Erro no upload:', error);
-            alert('Erro ao fazer upload da imagem. Tente novamente.');
-        } finally {
-            setUploading(false);
+            showToast(error.message || 'Erro ao fazer upload da imagem. Tente novamente.', 'error');
+            e.target.value = '';
         }
     };
 
@@ -91,13 +81,15 @@ export default function PropertyForm() {
             });
 
             if (res.ok) {
-                navigate('/');
+                showToast('Imóvel salvo com sucesso!', 'success');
+                setTimeout(() => navigate('/'), 1000);
             } else {
-                alert('Erro ao salvar imóvel');
+                const errorData = await res.json().catch(() => ({ error: 'Erro ao salvar imóvel' }));
+                showToast(errorData.error || 'Erro ao salvar imóvel', 'error');
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao salvar imóvel');
+            showToast('Erro ao salvar imóvel', 'error');
         } finally {
             setLoading(false);
         }
@@ -298,6 +290,7 @@ export default function PropertyForm() {
                     </form>
                 </div>
             </main>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );
 }
