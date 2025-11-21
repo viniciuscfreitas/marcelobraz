@@ -101,7 +101,8 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                 </div>
             )}
 
-            <div className="flex-1 min-h-0 overflow-auto">
+            {/* Desktop: Tabela */}
+            <div className="hidden md:block flex-1 min-h-0 overflow-auto">
                 <table className="w-full text-left border-collapse">
                     <caption className="sr-only">Lista de imóveis cadastrados</caption>
                     <thead className="sticky top-0 z-10 bg-gray-50 shadow-sm">
@@ -201,6 +202,78 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Mobile: Cards */}
+            <div className="md:hidden space-y-3 p-4">
+                {filteredProperties.map((property) => (
+                    <div key={property.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div className="flex items-start gap-3 mb-3">
+                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shadow-sm flex-shrink-0 border border-gray-200">
+                                <img
+                                    src={property.image}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-bold text-primary text-base leading-tight mb-1">{property.title}</p>
+                                {property.subtitle && (
+                                    <p className="text-xs text-gray-600 truncate">{property.subtitle}</p>
+                                )}
+                                <div className="flex items-center gap-2 mt-2">
+                                    <MapPin size={12} className="text-gold-dark" aria-hidden="true" />
+                                    <span className="font-medium text-xs text-gray-700">{property.bairro}</span>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => onEdit(property.id)}
+                                    className="p-2 text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                                    aria-label={`Editar ${property.title}`}
+                                >
+                                    <Edit size={18} aria-hidden="true" />
+                                </button>
+                                <button
+                                    onClick={() => handleDeleteClick(property)}
+                                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                    aria-label={`Excluir ${property.title}`}
+                                >
+                                    <Trash2 size={18} aria-hidden="true" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <span className="font-bold text-primary text-base">{property.price}</span>
+                            <div className="flex items-center gap-2">
+                                <span className="px-2 py-1 bg-primary/5 text-primary rounded-full text-xs font-bold uppercase">
+                                    {property.tipo}
+                                </span>
+                                <button
+                                    onClick={() => handleToggleFeatured(property.id, property.featured)}
+                                    className={`p-2 rounded-lg transition-all border ${
+                                        property.featured
+                                            ? 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/30'
+                                            : 'bg-gray-50 text-gray-500 border-gray-200'
+                                    }`}
+                                    aria-label={property.featured ? 'Remover da Curadoria' : 'Adicionar à Curadoria'}
+                                >
+                                    <Star size={14} className={property.featured ? 'fill-current' : ''} aria-hidden="true" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                {filteredProperties.length === 0 && !loading && (
+                    <div className="p-8 text-center">
+                        <div className="flex flex-col items-center justify-center text-gray-400">
+                            <Home size={40} className="mb-3 opacity-20" aria-hidden="true" />
+                            <p className="text-base font-medium text-gray-600">Nenhum imóvel encontrado</p>
+                            <p className="text-xs text-gray-500 mt-1">Tente buscar por outro termo ou adicione um novo imóvel.</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Dialog de Confirmação */}

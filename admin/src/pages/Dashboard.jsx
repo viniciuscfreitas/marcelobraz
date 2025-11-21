@@ -130,16 +130,16 @@ export default function Dashboard() {
             </aside>
 
             {/* Main Content */}
-            <main id="main-content" className="md:pl-24 h-full flex flex-col overflow-hidden bg-[#FAFAFA]" tabIndex="-1" role="main">
+            <main id="main-content" className="md:pl-24 h-full flex flex-col overflow-hidden md:overflow-hidden overflow-y-auto bg-[#FAFAFA]" tabIndex="-1" role="main">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5 flex-shrink-0">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-2 md:py-5 flex-shrink-0">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                                Olá, {user?.name}! <span className="animate-bounce">👋</span>
+                            <h1 className="text-lg md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                                Olá, {user?.name}! <span className="animate-bounce hidden md:inline">👋</span>
                             </h1>
-                            <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
+                            <p className="text-gray-500 text-xs md:text-sm hidden md:block">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
 
                         {/* Botão/Busca - Mesmo elemento que expande */}
@@ -205,7 +205,7 @@ export default function Dashboard() {
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 min-h-0 pb-20 md:pb-6">
+                <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 min-h-0 pb-20 md:pb-6">
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 flex-shrink-0">
@@ -243,14 +243,14 @@ export default function Dashboard() {
                     </div>
 
                     {/* Properties Section */}
-                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" role="region" aria-labelledby="properties-heading">
-                        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
+                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0 md:min-h-0" role="region" aria-labelledby="properties-heading">
+                        <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
                             <div>
-                                <h3 id="properties-heading" className="text-xl font-bold text-gray-900">Seus Imóveis</h3>
-                                <p className="text-sm text-gray-500 mt-1">Gerencie sua lista de propriedades exclusivas.</p>
+                                <h3 id="properties-heading" className="text-lg md:text-xl font-bold text-gray-900">Seus Imóveis</h3>
+                                <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">Gerencie sua lista de propriedades exclusivas.</p>
                             </div>
                         </div>
-                        <div className="p-0 flex-1 min-h-0 overflow-hidden">
+                        <div className="p-0 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
                             <PropertiesList
                                 onEdit={handleOpenDrawer}
                                 refreshTrigger={refreshTrigger}

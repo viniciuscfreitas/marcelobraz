@@ -3,12 +3,15 @@ import { Trash2, Users, Phone, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 import ConfirmDialog from './ConfirmDialog';
+import { useToast } from '../hooks/useToast';
+import Toast from './Toast';
 
 export default function LeadsList({ searchTerm = '' }) {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, lead: null });
     const { token } = useAuth();
+    const { toast, showToast, hideToast } = useToast();
 
     useEffect(() => {
         fetchLeads();
@@ -50,12 +53,13 @@ export default function LeadsList({ searchTerm = '' }) {
 
             if (res.ok) {
                 setLeads(leads.filter(l => l.id !== lead.id));
+                showToast('Lead excluído com sucesso!', 'success');
             } else {
-                alert('Erro ao excluir lead');
+                showToast('Erro ao excluir lead', 'error');
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Erro ao excluir lead');
+            showToast('Erro ao excluir lead', 'error');
         }
     };
 
@@ -91,7 +95,8 @@ export default function LeadsList({ searchTerm = '' }) {
                 </div>
             )}
 
-            <div className="flex-1 min-h-0 overflow-auto">
+            {/* Desktop: Tabela */}
+            <div className="hidden md:block flex-1 min-h-0 overflow-auto">
                 <table className="w-full text-left border-collapse">
                     <caption className="sr-only">Lista de leads capturados</caption>
                     <thead className="sticky top-0 z-10 bg-gray-50 shadow-sm">
@@ -175,6 +180,66 @@ export default function LeadsList({ searchTerm = '' }) {
                 </table>
             </div>
 
+            {/* Mobile: Cards */}
+            <div className="md:hidden space-y-3 p-4">
+                {filteredLeads.map((lead) => (
+                    <div key={lead.id} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <Users size={16} className="text-gray-400" aria-hidden="true" />
+                                    <span className="font-bold text-primary text-base">{lead.name}</span>
+                                </div>
+                                <a
+                                    href={`https://wa.me/55${formatPhoneForWhatsApp(lead.phone)}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline font-medium text-sm"
+                                >
+                                    <Phone size={14} className="text-gray-400" aria-hidden="true" />
+                                    {lead.phone}
+                                </a>
+                            </div>
+                            <button
+                                onClick={() => handleDeleteClick(lead)}
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                aria-label={`Excluir lead de ${lead.name}`}
+                            >
+                                <Trash2 size={18} aria-hidden="true" />
+                            </button>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                            {lead.property_title && (
+                                <div>
+                                    <span className="text-gray-500">Imóvel: </span>
+                                    <span className="text-gray-700 font-medium">{lead.property_title}</span>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase">
+                                    {lead.type || 'gate'}
+                                </span>
+                                <span className="text-gray-500 text-xs">{formatDate(lead.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                {filteredLeads.length === 0 && !loading && (
+                    <div className="p-8 text-center">
+                        <div className="flex flex-col items-center justify-center text-gray-400">
+                            <Users size={40} className="mb-3 opacity-20" aria-hidden="true" />
+                            <p className="text-base font-medium text-gray-600">
+                                {searchTerm ? 'Nenhum lead encontrado' : 'Nenhum lead encontrado'}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                {searchTerm ? 'Tente buscar por outro termo.' : 'Os leads capturados no site aparecerão aqui.'}
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {/* Dialog de Confirmação */}
             <ConfirmDialog
                 isOpen={deleteConfirm.isOpen}
@@ -186,6 +251,7 @@ export default function LeadsList({ searchTerm = '' }) {
                 cancelText="Cancelar"
                 variant="danger"
             />
+            {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );
 }
