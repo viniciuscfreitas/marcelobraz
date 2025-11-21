@@ -1,4 +1,4 @@
-import { Building, Home, LayoutDashboard, Plus, Search, Users } from 'lucide-react';
+import { Building, Home, LayoutDashboard, Plus, Search, Users, List, Calendar, BedDouble } from 'lucide-react';
 import { useState } from 'react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
@@ -83,18 +83,35 @@ export default function Dashboard() {
             {/* Main Content */}
             <main id="main-content" className="md:pl-24 h-full flex flex-col overflow-hidden bg-[#FAFAFA]" tabIndex="-1" role="main">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-100 px-6 py-5 flex-shrink-0">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5 flex-shrink-0">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <div className="flex-1">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
                                 Olá, {user?.username}! <span className="animate-bounce">👋</span>
                             </h1>
-                            <p className="text-gray-500 mt-1 text-sm">Aqui está o resumo do seu portfólio hoje</p>
+                            <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <button 
+
+                        {/* Search Bar - Na mesma linha */}
+                        <div className={`flex-1 max-w-md transition-all duration-200 ${isSearchOpen ? 'opacity-100' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto'}`}>
+                            <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
+                                <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                                <input
+                                    type="text"
+                                    placeholder="Busque por título, bairro ou tipo..."
+                                    className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onFocus={() => setIsSearchOpen(true)}
+                                    aria-label="Buscar imóveis"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <button
                                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
+                                className={`md:hidden p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
                                     isSearchOpen 
                                         ? 'bg-gold/10 border-gold text-gold' 
                                         : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
@@ -106,36 +123,19 @@ export default function Dashboard() {
                             </button>
                             <button
                                 onClick={() => handleOpenDrawer()}
-                                className="flex items-center gap-2 bg-gold-dark text-white px-6 py-3 rounded-full font-medium shadow-lg shadow-gold/20 hover:bg-gold transition-all focus:ring-2 focus:ring-offset-2 focus:ring-gold"
+                                className="flex items-center gap-2 bg-gold-dark text-white px-4 md:px-6 py-2.5 md:py-3 rounded-full font-medium shadow-lg shadow-gold/20 hover:bg-gold transition-all focus:ring-2 focus:ring-offset-2 focus:ring-gold text-sm md:text-base"
                                 aria-label="Adicionar novo imóvel"
                             >
-                                <Plus className="w-5 h-5" aria-hidden="true" />
-                                Novo Imóvel
+                                <Plus className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />
+                                <span className="hidden sm:inline">Novo Imóvel</span>
+                                <span className="sm:hidden">Novo</span>
                             </button>
                         </div>
                     </div>
-
-                    {/* Search Bar - Toggle */}
-                    {isSearchOpen && (
-                        <div className="flex gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <div className="flex-1 bg-gray-50 flex items-center px-5 py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
-                                <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                                <input
-                                    type="text"
-                                    placeholder="Busque por título, bairro ou tipo..."
-                                    className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    autoFocus
-                                    aria-label="Buscar imóveis"
-                                />
-                            </div>
-                        </div>
-                    )}
                 </header>
 
                 {/* Content Area */}
-                <div className="flex-1 overflow-hidden flex flex-col px-6 py-6 min-h-0">
+                <div className="flex-1 overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 min-h-0 pb-20 md:pb-6">
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 flex-shrink-0">
@@ -198,6 +198,52 @@ export default function Dashboard() {
                 propertyId={selectedPropertyId}
                 onSuccess={handleSuccess}
             />
+
+            {/* Mobile Bottom Nav */}
+            <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-3 pb-6 flex justify-between items-end z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+                <button className="flex flex-col items-center gap-1 text-gray-800">
+                    <LayoutDashboard className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
+                    <span className="text-[10px] font-bold">Home</span>
+                </button>
+                
+                <button className="flex flex-col items-center gap-1 text-gray-400">
+                    <Users className="w-6 h-6" aria-hidden="true" />
+                    <span className="text-[10px] font-medium">Leads</span>
+                </button>
+
+                {/* FAB Button */}
+                <div className="relative -top-6">
+                    <button
+                        onClick={() => handleOpenDrawer()}
+                        className="w-14 h-14 bg-gold-dark rounded-full flex items-center justify-center text-white shadow-xl shadow-gold/20 active:scale-95 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-gold"
+                        aria-label="Adicionar novo imóvel"
+                    >
+                        <Plus className="w-7 h-7" aria-hidden="true" />
+                    </button>
+                    <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-gold-dark whitespace-nowrap">
+                        Novo
+                    </span>
+                </div>
+
+                <a 
+                    href={SITE_URL} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="flex flex-col items-center gap-1 text-gray-400"
+                >
+                    <Home className="w-6 h-6" aria-hidden="true" />
+                    <span className="text-[10px] font-medium">Site</span>
+                </a>
+
+                <button 
+                    onClick={logout}
+                    className="flex flex-col items-center gap-1 text-gray-400"
+                    aria-label="Sair"
+                >
+                    <Building className="w-6 h-6" aria-hidden="true" />
+                    <span className="text-[10px] font-medium">Sair</span>
+                </button>
+            </div>
         </div>
     );
 }
