@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { BROKER_INFO } from '../data/constants.js';
+import { Button } from '../components/Button.jsx';
+import { PortfolioEmptyState } from '../components/PortfolioEmptyState.jsx';
 import { PortfolioFilters } from '../components/PortfolioFilters.jsx';
 import { PortfolioGrid } from '../components/PortfolioGrid.jsx';
-import { PortfolioEmptyState } from '../components/PortfolioEmptyState.jsx';
-import { Button } from '../components/Button.jsx';
+import { BROKER_INFO } from '../data/constants.js';
 
 /**
  * View principal do portfólio de imóveis
  * Grug gosta: view simples que orquestra componentes menores
- * 
+ *
  * @param {Object} props
  * @param {Array} props.properties - Lista de imóveis (vinda da API ou estática)
  * @param {Function} props.navigateTo - Função para navegar entre views
@@ -33,7 +32,7 @@ export const PortfolioView = ({ properties = [], navigateTo, onPropertyClick }) 
     return (
         <div className="min-h-screen bg-[#f8fafc]">
             {/* Hero Header */}
-            <div className="relative pb-12 pt-32 lg:pt-40">
+            <div className="relative pb-12 pt-24 lg:pt-32">
                 <div className="absolute inset-0 z-0 h-[700px] overflow-hidden">
                     <img
                         src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=2000&q=90"
@@ -45,13 +44,6 @@ export const PortfolioView = ({ properties = [], navigateTo, onPropertyClick }) 
 
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="text-center mb-10">
-                        <button
-                            onClick={() => navigateTo('home')}
-                            className="text-white/80 hover:text-[#d4af37] flex items-center gap-2 mx-auto mb-4 text-sm font-bold uppercase tracking-widest transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4af37] rounded px-2 py-1"
-                            aria-label="Voltar para a página inicial"
-                        >
-                            <ArrowLeft size={16} /> Voltar para Home
-                        </button>
                         <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-4 drop-shadow-md">
                             Portfólio Exclusivo
                         </h1>

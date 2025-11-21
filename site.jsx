@@ -38,15 +38,16 @@ export default function RealEstateSite() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
       `}</style>
 
+      <Header
+        isScrolled={nav.isScrolled}
+        mobileMenuOpen={nav.mobileMenuOpen}
+        setMobileMenuOpen={nav.setMobileMenuOpen}
+        navigateTo={nav.navigateTo}
+        currentView={nav.currentView}
+      />
+
       {nav.currentView === 'home' ? (
         <>
-          <Header
-            isScrolled={nav.isScrolled}
-            mobileMenuOpen={nav.mobileMenuOpen}
-            setMobileMenuOpen={nav.setMobileMenuOpen}
-            navigateTo={nav.navigateTo}
-            currentView={nav.currentView}
-          />
           <main>
             <HeroSection navigateTo={nav.navigateTo} />
             <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} properties={properties} />
@@ -56,8 +57,8 @@ export default function RealEstateSite() {
             <WhatsappCaptureSection />
           </main>
           <Footer navigateTo={nav.navigateTo} />
-            </>
-        ) : (
+        </>
+      ) : (
         <PortfolioView
           properties={properties}
           navigateTo={nav.navigateTo}

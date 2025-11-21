@@ -1,5 +1,5 @@
-import { PropertyCard } from '../components/PropertyCard.jsx';
 import { Button } from '../components/Button.jsx';
+import { PropertyCard } from '../components/PropertyCard.jsx';
 
 /**
  * Seção de Curadoria da Semana
