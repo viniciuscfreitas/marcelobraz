@@ -106,7 +106,7 @@ export default function Dashboard() {
                                     <input
                                         type="text"
                                         placeholder="Busque por título, bairro ou tipo..."
-                                        className="w-full outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
+                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         autoFocus
