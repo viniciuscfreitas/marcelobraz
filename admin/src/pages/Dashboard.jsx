@@ -101,12 +101,14 @@ export default function Dashboard() {
                         }`}>
                             {isSearchOpen ? (
                                 // Barra de busca expandida
-                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out focus-within:border-gray-200">
+                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
                                     <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
                                     <input
+                                        id="search-bar-input"
                                         type="text"
                                         placeholder="Busque por título, bairro ou tipo..."
-                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none"
+                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
+                                        style={{ outline: 'none', boxShadow: 'none' }}
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         autoFocus
