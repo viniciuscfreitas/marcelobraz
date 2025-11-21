@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Save, Upload, X } from 'lucide-react';
+import { ArrowLeft, Save, Star, Upload, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { API_URL } from '../config';
 import { useImageUpload } from '../hooks/useImageUpload';
@@ -64,6 +64,9 @@ export default function PropertyForm() {
             if (data.tags && typeof data.tags === 'string') {
                 data.tags = data.tags.split(',').map(t => t.trim()).filter(t => t);
             }
+
+            // Garantir que featured seja boolean
+            data.featured = !!data.featured;
 
             const url = isEditing
                 ? `${API_URL}/api/properties/${id}`
@@ -271,6 +274,24 @@ export default function PropertyForm() {
                                     className="input-field"
                                     placeholder="Ex: Frente Mar, Exclusivo, Oportunidade"
                                 />
+                            </div>
+
+                            <div className="col-span-2">
+                                <div className="flex items-center gap-3 p-4 bg-gold/5 rounded-lg border border-gold/20">
+                                    <input
+                                        type="checkbox"
+                                        id="featured"
+                                        {...register('featured')}
+                                        className="w-5 h-5 text-gold-dark rounded border-gray-300 focus:ring-gold focus:ring-2"
+                                    />
+                                    <label htmlFor="featured" className="flex-1 text-sm font-medium text-gray-700 cursor-pointer">
+                                        <span className="flex items-center gap-2">
+                                            <Star size={16} className="text-gold-dark" aria-hidden="true" />
+                                            Adicionar à Curadoria da Semana
+                                        </span>
+                                        <span className="block text-xs text-gray-500 mt-1 font-normal">Máximo 4 imóveis podem estar em destaque</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
