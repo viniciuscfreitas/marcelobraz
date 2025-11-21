@@ -53,3 +53,4 @@ networks:
     driver: bridge
   npm_default:
     external: true
+    name: npm_default
