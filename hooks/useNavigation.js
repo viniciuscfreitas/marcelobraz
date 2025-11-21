@@ -1,6 +1,25 @@
 import { useEffect, useState } from 'react';
 import { CONSTANTS } from '../data/constants.js';
 
+/**
+ * Hook para gerenciar navegação e estado do header
+ * Grug gosta: centraliza toda lógica de navegação em um hook
+ * 
+ * Features:
+ * - Gerencia view atual (home/portfolio)
+ * - Detecta scroll para mudar estilo do header
+ * - Controla menu mobile (aberto/fechado)
+ * - Scroll automático para seções
+ * - Performance otimizada com requestAnimationFrame
+ * 
+ * @returns {{
+ *   currentView: 'home'|'portfolio',
+ *   isScrolled: boolean,
+ *   mobileMenuOpen: boolean,
+ *   setMobileMenuOpen: (open: boolean) => void,
+ *   navigateTo: (view: 'home'|'portfolio', sectionId?: string) => void
+ * }}
+ */
 export const useNavigation = () => {
   const [currentView, setCurrentView] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
