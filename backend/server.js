@@ -12,8 +12,17 @@ const uploadRouter = require('./routes/upload');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const morgan = require('morgan');
+const helmet = require('helmet');
+
 // Middleware
-app.use(cors());
+app.use(helmet()); // Security headers
+app.use(morgan('dev')); // Logging (Grug likes logs)
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*', // Allow configuration
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Servir uploads estaticamente
