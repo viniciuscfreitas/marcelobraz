@@ -1,21 +1,24 @@
+version: '3.8'
+
 services:
-  broker-site:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: marcelobraz-site
-    restart: unless-stopped
+  backend:
+    build: ./backend
     ports:
-      - "38291:80"
+      - "3002:3001" # Random port 3002 mapped to internal 3001
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/database.sqlite:/app/database.sqlite
     environment:
-      - NODE_ENV=production
-    networks:
-      - broker-network
-      - npm_default
+      - PORT=3001
+      - JWT_SECRET=supersecretkey123
+    restart: always
 
-networks:
-  broker-network:
-    driver: bridge
-  npm_default:
-    external: true
-
+  admin:
+    build: ./admin
+    ports:
+      - "5175:5173" # Random port 5175 mapped to internal 5173
+    environment:
+      - VITE_API_URL=http://localhost:3002 # Points to the exposed backend port
+    depends_on:
+      - backend
+    restart: always

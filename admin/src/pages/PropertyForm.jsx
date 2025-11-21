@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../config';
 
 export default function PropertyForm() {
     const { id } = useParams();
@@ -25,7 +26,7 @@ export default function PropertyForm() {
 
     const fetchProperty = async () => {
         try {
-            const res = await fetch(`http://localhost:3001/api/properties/${id}`);
+            const res = await fetch(`${API_URL}/api/properties/${id}`);
             const data = await res.json();
 
             if (data.tags && Array.isArray(data.tags)) {
@@ -47,7 +48,7 @@ export default function PropertyForm() {
         formData.append('image', file);
 
         try {
-            const res = await fetch('http://localhost:3001/api/upload', {
+            const res = await fetch(`${API_URL}/api/upload`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

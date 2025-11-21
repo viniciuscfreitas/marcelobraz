@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import { Save, Upload, X } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess }) {
     const isEditing = !!propertyId;
@@ -34,7 +35,7 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
 
     const fetchProperty = async () => {
         try {
-            const res = await fetch(`http://localhost:3001/api/properties/${propertyId}`);
+            const res = await fetch(`${API_URL}/api/properties/${propertyId}`);
             const data = await res.json();
 
             if (data.tags && Array.isArray(data.tags)) {
@@ -56,7 +57,7 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
         formData.append('image', file);
 
         try {
-            const res = await fetch('http://localhost:3001/api/upload', {
+            const res = await fetch(`${API_URL}/api/upload`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -84,8 +85,8 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
             }
 
             const url = isEditing
-                ? `http://localhost:3001/api/properties/${propertyId}`
-                : 'http://localhost:3001/api/properties';
+                ? `${API_URL}/api/properties/${propertyId}`
+                : `${API_URL}/api/properties`;
 
             const method = isEditing ? 'PUT' : 'POST';
 

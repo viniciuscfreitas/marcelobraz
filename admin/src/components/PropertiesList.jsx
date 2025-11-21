@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Edit, Trash2, Search, MapPin, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 export default function PropertiesList({ onEdit, refreshTrigger }) {
     const [properties, setProperties] = useState([]);
@@ -15,7 +16,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
     const fetchProperties = async () => {
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:3001/api/properties');
+            const res = await fetch(`${API_URL}/api/properties`);
             if (!res.ok) throw new Error('Falha na conexão');
             const data = await res.json();
             setProperties(data);
@@ -30,7 +31,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
         if (!confirm('Tem certeza que deseja excluir este imóvel?')) return;
 
         try {
-            const res = await fetch(`http://localhost:3001/api/properties/${id}`, {
+            const res = await fetch(`${API_URL}/api/properties/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

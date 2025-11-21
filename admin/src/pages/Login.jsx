@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, User, ArrowRight } from 'lucide-react';
+import { API_URL } from '../config';
 
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
