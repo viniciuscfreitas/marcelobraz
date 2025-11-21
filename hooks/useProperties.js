@@ -13,7 +13,8 @@ export const useProperties = () => {
     useEffect(() => {
         const fetchProperties = async () => {
             try {
-                const res = await fetch('http://localhost:3001/api/properties');
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+                const res = await fetch(`${apiUrl}/api/properties`);
                 if (!res.ok) throw new Error('Falha ao buscar imóveis');
 
                 const data = await res.json();

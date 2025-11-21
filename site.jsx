@@ -45,10 +45,11 @@ export default function RealEstateSite() {
             mobileMenuOpen={nav.mobileMenuOpen}
             setMobileMenuOpen={nav.setMobileMenuOpen}
             navigateTo={nav.navigateTo}
+            currentView={nav.currentView}
           />
           <main>
             <HeroSection navigateTo={nav.navigateTo} />
-            <CollectionSection navigateTo={nav.navigateTo} />
+            <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} />
             <AboutSection />
             <ValuationSection />
             <TestimonialsSection />
@@ -60,10 +61,7 @@ export default function RealEstateSite() {
         <PortfolioView
           properties={properties}
           navigateTo={nav.navigateTo}
-          onPropertyClick={(prop) => {
-            console.log('Property clicked:', prop);
-            openModal('gate');
-          }}
+          onPropertyClick={handlePropertyClick}
         />
       )} <a href={BROKER_INFO.whatsapp_link} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 group flex items-center justify-end focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400 rounded-full" aria-label="Falar no WhatsApp">
         <div className="absolute right-16 bg-white py-2 px-4 rounded-lg shadow-xl text-xs font-bold text-[#0f172a] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 mr-2 hidden md:block border border-gray-100" aria-hidden="true">Falar com Marcelo</div>

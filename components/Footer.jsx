@@ -10,15 +10,15 @@ export const Footer = () => (
           <p className="text-gray-600 mt-4 text-base">Design, conforto e exclusividade. Sua consultoria imobiliária de alto padrão na baixada santista.</p>
         </div>
         <div className="flex gap-6">
-          <a href="#" className="p-3 bg-gray-100 rounded-full text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all"><Instagram size={24}/></a>
-          <a href="#" className="p-3 bg-gray-100 rounded-full text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all"><Linkedin size={24}/></a>
+          <a href="https://instagram.com/marcelobraz" target="_blank" rel="noreferrer" className="p-3 bg-gray-100 rounded-full text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all" aria-label="Instagram"><Instagram size={24}/></a>
+          <a href="https://linkedin.com/in/marcelobraz" target="_blank" rel="noreferrer" className="p-3 bg-gray-100 rounded-full text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all" aria-label="LinkedIn"><Linkedin size={24}/></a>
         </div>
       </div>
       <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4">
         <p>{BROKER_INFO.creci} • Santos/SP</p>
         <div className="flex gap-4">
-          <a href="#" className="hover:text-[#0f172a]">Política de Privacidade</a>
-          <a href="#" className="hover:text-[#0f172a]">Termos de Uso</a>
+          <a href="/privacidade" className="hover:text-[#0f172a]">Política de Privacidade</a>
+          <a href="/termos" className="hover:text-[#0f172a]">Termos de Uso</a>
         </div>
         <p>© 2025 Marcelo Braz.</p>
       </div>

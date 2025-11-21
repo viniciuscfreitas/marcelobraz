@@ -41,7 +41,7 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
         <div className="p-6">
           {property && type === 'gate' && (
             <div className="flex items-center gap-3 mb-6 p-2 bg-white border border-gray-200 rounded-lg shadow-sm">
-               <img src={property.image} className="w-12 h-12 object-cover rounded-md" alt="" />
+               <img src={property.image} className="w-12 h-12 object-cover rounded-md" alt={property.title} />
                <div>
                   <p className="text-xs font-bold text-[#0f172a]">{property.title}</p>
                   <p className="text-[10px] text-gray-600 uppercase">{property.specs}</p>

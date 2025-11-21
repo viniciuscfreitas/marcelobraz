@@ -1,24 +1,20 @@
 services:
-  backend:
-    build: ./backend
-    ports:
-      - "${BACKEND_PORT:-3040}:3001"
-    volumes:
-      - ./backend/uploads:/app/uploads
-      - ./backend/database.sqlite:/app/database.sqlite
-    environment:
-      - PORT=3001
-      - JWT_SECRET=${JWT_SECRET:-supersecretkey123}
-      - CORS_ORIGIN=${CORS_ORIGIN:-*}
-    restart: always
-
-  admin:
+  broker-site:
     build:
-      context: ./admin
-      args:
-        - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
+      context: .
+      dockerfile: Dockerfile
+    container_name: marcelobraz-site
+    restart: unless-stopped
     ports:
-      - "${ADMIN_PORT:-5180}:5173"
-    depends_on:
-      - backend
-    restart: always
+      - "38291:80"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - broker-network
+      - npm_default
+
+networks:
+  broker-network:
+    driver: bridge
+  npm_default:
+    external: true
