@@ -93,15 +93,15 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
         <div className="flex flex-col h-full min-h-0">
             {/* Header com contador de Curadoria */}
             {featuredCount > 0 && (
-                <div className="p-4 bg-[#d4af37]/5 border-b border-[#d4af37]/20 flex-shrink-0">
-                    <p className="text-sm text-gray-700 text-center">
+                <div className="p-2 bg-[#d4af37]/5 border-b border-[#d4af37]/20 flex-shrink-0" aria-live="polite" aria-atomic="true">
+                    <p className="text-xs text-gray-700 text-center">
                         <span className="font-bold text-[#d4af37]">{featuredCount}</span> de <span className="font-bold">4</span> imóveis selecionados para Curadoria da Semana
                     </p>
                 </div>
             )}
 
             {/* Search Bar */}
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
+            <div className="p-3 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
                 <div className="relative max-w-md">
                     <label htmlFor="search-properties" className="sr-only">Buscar imóveis</label>
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -111,10 +111,16 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                         id="search-properties"
                         type="text"
                         placeholder="Buscar por título, bairro..."
-                        className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-sm text-gray-900"
+                        className="w-full pl-11 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-sm text-gray-900 min-h-[44px]"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        aria-label="Buscar imóveis por título ou bairro"
                     />
+                    {filteredProperties.length > 0 && (
+                        <div className="sr-only" aria-live="polite" aria-atomic="true">
+                            {filteredProperties.length} {filteredProperties.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -123,20 +129,20 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                     <caption className="sr-only">Lista de imóveis cadastrados</caption>
                     <thead className="sticky top-0 z-10 bg-gray-50 shadow-sm">
                         <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-600 font-semibold">
-                            <th scope="col" className="p-6">Imóvel</th>
-                            <th scope="col" className="p-6">Localização</th>
-                            <th scope="col" className="p-6">Valor</th>
-                            <th scope="col" className="p-6">Tipo</th>
-                            <th scope="col" className="p-6 text-center">Curadoria</th>
-                            <th scope="col" className="p-6 text-right">Ações</th>
+                            <th scope="col" className="p-3">Imóvel</th>
+                            <th scope="col" className="p-3">Localização</th>
+                            <th scope="col" className="p-3">Valor</th>
+                            <th scope="col" className="p-3">Tipo</th>
+                            <th scope="col" className="p-3 text-center">Curadoria</th>
+                            <th scope="col" className="p-3 text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredProperties.map((property) => (
                             <tr key={property.id} className="group hover:bg-gray-50/80 transition-colors">
-                                <td className="p-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shadow-sm flex-shrink-0 border border-gray-200">
+                                <td className="p-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 shadow-sm flex-shrink-0 border border-gray-200">
                                             <img
                                                 src={property.image}
                                                 alt=""
@@ -144,33 +150,33 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                                             />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-primary text-lg leading-tight">{property.title}</p>
-                                            <p className="text-xs text-gray-600 mt-1 truncate max-w-[200px]">{property.subtitle}</p>
+                                            <p className="font-bold text-primary text-base leading-tight">{property.title}</p>
+                                            <p className="text-xs text-gray-600 mt-0.5 truncate max-w-[200px]">{property.subtitle}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td className="p-6">
+                                <td className="p-3">
                                     <div className="flex items-center gap-2 text-gray-700">
-                                        <MapPin size={16} className="text-gold-dark" aria-hidden="true" />
-                                        <span className="font-medium">{property.bairro}</span>
+                                        <MapPin size={14} className="text-gold-dark" aria-hidden="true" />
+                                        <span className="font-medium text-sm">{property.bairro}</span>
                                     </div>
                                 </td>
-                                <td className="p-6">
-                                    <span className="font-bold text-primary text-lg">
+                                <td className="p-3">
+                                    <span className="font-bold text-primary text-base">
                                         {property.price}
                                     </span>
                                 </td>
-                                <td className="p-6">
+                                <td className="p-3">
                                     <div className="flex items-center gap-2">
-                                        <span className="px-3 py-1 bg-primary/5 text-primary rounded-full text-xs font-bold uppercase tracking-wide border border-primary/10">
+                                        <span className="px-2 py-1 bg-primary/5 text-primary rounded-full text-xs font-bold uppercase tracking-wide border border-primary/10">
                                             {property.tipo}
                                         </span>
                                     </div>
                                 </td>
-                                <td className="p-6 text-center">
+                                <td className="p-3 text-center">
                                     <button
                                         onClick={() => handleToggleFeatured(property.id, property.featured)}
-                                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all border ${
+                                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-all border min-w-[44px] min-h-[44px] justify-center ${
                                             property.featured
                                                 ? 'bg-[#d4af37]/10 text-[#d4af37] border-[#d4af37]/30 hover:bg-[#d4af37]/20'
                                                 : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
@@ -178,15 +184,15 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                                         title={property.featured ? 'Remover da Curadoria' : 'Adicionar à Curadoria da Semana'}
                                         aria-label={property.featured ? 'Remover da Curadoria' : 'Adicionar à Curadoria da Semana'}
                                     >
-                                        <Star size={16} className={property.featured ? 'fill-current' : ''} aria-hidden="true" />
+                                        <Star size={14} className={property.featured ? 'fill-current' : ''} aria-hidden="true" />
                                         <span className="text-xs font-medium">{property.featured ? 'Em destaque' : 'Destacar'}</span>
                                     </button>
                                 </td>
-                                <td className="p-6 text-right">
+                                <td className="p-3 text-right">
                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
                                         <button
                                             onClick={() => onEdit(property.id)}
-                                            className="p-2 text-gray-600 hover:text-primary hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200 shadow-sm focus:ring-2 focus:ring-gold"
+                                            className="p-2.5 text-gray-600 hover:text-primary hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200 shadow-sm focus:ring-2 focus:ring-gold min-w-[44px] min-h-[44px] flex items-center justify-center"
                                             title="Editar"
                                             aria-label={`Editar ${property.title}`}
                                         >
@@ -194,7 +200,7 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                                         </button>
                                         <button
                                             onClick={() => handleDeleteClick(property)}
-                                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200 shadow-sm focus:ring-2 focus:ring-red-500"
+                                            className="p-2.5 text-gray-500 hover:text-red-600 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200 shadow-sm focus:ring-2 focus:ring-red-500 min-w-[44px] min-h-[44px] flex items-center justify-center"
                                             title="Excluir"
                                             aria-label={`Excluir ${property.title}`}
                                         >
@@ -207,11 +213,11 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
 
                         {filteredProperties.length === 0 && !loading && (
                             <tr>
-                                <td colSpan="6" className="p-12 text-center">
+                                <td colSpan="6" className="p-8 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray-400">
-                                        <Home size={48} className="mb-4 opacity-20" aria-hidden="true" />
-                                        <p className="text-lg font-medium text-gray-600">Nenhum imóvel encontrado</p>
-                                        <p className="text-sm text-gray-500">Tente buscar por outro termo ou adicione um novo imóvel.</p>
+                                        <Home size={40} className="mb-3 opacity-20" aria-hidden="true" />
+                                        <p className="text-base font-medium text-gray-600">Nenhum imóvel encontrado</p>
+                                        <p className="text-xs text-gray-500 mt-1">Tente buscar por outro termo ou adicione um novo imóvel.</p>
                                     </div>
                                 </td>
                             </tr>

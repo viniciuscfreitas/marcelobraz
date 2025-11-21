@@ -25,12 +25,12 @@ export default function ConfirmDialog({ isOpen, onClose, onConfirm, title, messa
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
             {/* Backdrop */}
-            <div 
+            <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
                 aria-hidden="true"
             />
-            
+
             {/* Dialog */}
             <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
                 <button
@@ -45,7 +45,7 @@ export default function ConfirmDialog({ isOpen, onClose, onConfirm, title, messa
                     <div className={`p-3 rounded-full ${styles.icon}/10 border ${styles.border} flex-shrink-0`}>
                         <AlertTriangle size={24} className={styles.icon} aria-hidden="true" />
                     </div>
-                    
+
                     <div className="flex-1 pt-1">
                         <h3 id="confirm-title" className="text-xl font-bold text-primary mb-2">
                             {title}
