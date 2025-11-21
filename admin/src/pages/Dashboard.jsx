@@ -1,4 +1,4 @@
-import { Building, Home, LayoutDashboard, Plus, Search, Users, List, Calendar, BedDouble } from 'lucide-react';
+import { Building, Home, LayoutDashboard, Plus, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
@@ -11,7 +11,7 @@ export default function Dashboard() {
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false); // Grug gosta: começa recolhido
 
     const handleOpenDrawer = (id = null) => {
         setSelectedPropertyId(id);
@@ -85,15 +85,20 @@ export default function Dashboard() {
                 {/* Header */}
                 <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5 flex-shrink-0">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <div className="flex-1">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
+                        {/* Saudação - Esconde quando busca expandida */}
+                        <div className={`flex-1 transition-all duration-200 ${isSearchOpen ? 'opacity-0 md:opacity-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 max-w-full'}`}>
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                                 Olá, {user?.username}! <span className="animate-bounce">👋</span>
                             </h1>
                             <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
 
-                        {/* Search Bar - Na mesma linha */}
-                        <div className={`flex-1 max-w-md transition-all duration-200 ${isSearchOpen ? 'opacity-100' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto'}`}>
+                        {/* Search Bar - Expande para ocupar quase todo espaço */}
+                        <div className={`transition-all duration-300 ease-in-out ${
+                            isSearchOpen 
+                                ? 'flex-1 md:flex-[2] max-w-full opacity-100' 
+                                : 'flex-0 max-w-0 opacity-0 pointer-events-none md:pointer-events-auto md:flex-1 md:opacity-100 md:max-w-md'
+                        }`}>
                             <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
                                 <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
                                 <input
@@ -103,17 +108,33 @@ export default function Dashboard() {
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     onFocus={() => setIsSearchOpen(true)}
+                                    autoFocus={isSearchOpen}
                                     aria-label="Buscar imóveis"
                                 />
+                                {isSearchOpen && (
+                                    <button
+                                        onClick={() => {
+                                            setIsSearchOpen(false);
+                                            setSearchTerm('');
+                                        }}
+                                        className="ml-2 p-1.5 rounded-full hover:bg-gray-200 transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2"
+                                        aria-label="Fechar busca"
+                                    >
+                                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 md:gap-4">
+                        <div className={`flex items-center gap-3 md:gap-4 transition-all duration-200 ${isSearchOpen ? 'opacity-0 md:opacity-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 max-w-full'}`}>
+                            {/* Botão Toggle Search - Desktop */}
                             <button
                                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`md:hidden p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
-                                    isSearchOpen 
-                                        ? 'bg-gold/10 border-gold text-gold' 
+                                className={`hidden md:flex p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
+                                    isSearchOpen
+                                        ? 'bg-gold/10 border-gold text-gold'
                                         : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
                                 }`}
                                 aria-label={isSearchOpen ? "Fechar busca" : "Buscar imóveis"}
@@ -121,6 +142,21 @@ export default function Dashboard() {
                             >
                                 <Search className="w-5 h-5" aria-hidden="true" />
                             </button>
+
+                            {/* Botão Toggle Search - Mobile */}
+                            <button
+                                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                                className={`md:hidden p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
+                                    isSearchOpen
+                                        ? 'bg-gold/10 border-gold text-gold'
+                                        : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
+                                }`}
+                                aria-label={isSearchOpen ? "Fechar busca" : "Buscar imóveis"}
+                                aria-expanded={isSearchOpen}
+                            >
+                                <Search className="w-5 h-5" aria-hidden="true" />
+                            </button>
+
                             <button
                                 onClick={() => handleOpenDrawer()}
                                 className="flex items-center gap-2 bg-gold-dark text-white px-4 md:px-6 py-2.5 md:py-3 rounded-full font-medium shadow-lg shadow-gold/20 hover:bg-gold transition-all focus:ring-2 focus:ring-offset-2 focus:ring-gold text-sm md:text-base"
@@ -205,7 +241,7 @@ export default function Dashboard() {
                     <LayoutDashboard className="w-6 h-6" strokeWidth={2.5} aria-hidden="true" />
                     <span className="text-[10px] font-bold">Home</span>
                 </button>
-                
+
                 <button className="flex flex-col items-center gap-1 text-gray-400">
                     <Users className="w-6 h-6" aria-hidden="true" />
                     <span className="text-[10px] font-medium">Leads</span>
@@ -225,9 +261,9 @@ export default function Dashboard() {
                     </span>
                 </div>
 
-                <a 
-                    href={SITE_URL} 
-                    target="_blank" 
+                <a
+                    href={SITE_URL}
+                    target="_blank"
                     rel="noreferrer"
                     className="flex flex-col items-center gap-1 text-gray-400"
                 >
@@ -235,7 +271,7 @@ export default function Dashboard() {
                     <span className="text-[10px] font-medium">Site</span>
                 </a>
 
-                <button 
+                <button
                     onClick={logout}
                     className="flex flex-col items-center gap-1 text-gray-400"
                     aria-label="Sair"
