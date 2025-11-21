@@ -1,5 +1,6 @@
 import { Building, Home, LayoutDashboard, Plus, Search, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
 import { API_URL, SITE_URL } from '../config';
@@ -7,6 +8,8 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
     const { user, token, logout } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -15,7 +18,7 @@ export default function Dashboard() {
     const [totalProperties, setTotalProperties] = useState(0);
     const [totalLeads, setTotalLeads] = useState(0);
 
-    // Buscar stats ao montar
+    // Buscar stats ao montar e ao focar na janela
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -44,6 +47,14 @@ export default function Dashboard() {
         };
 
         fetchStats();
+
+        // Refresh ao focar na janela
+        const handleFocus = () => {
+            fetchStats();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
     }, [token]);
 
     const handleOpenDrawer = (id = null) => {
@@ -84,9 +95,14 @@ export default function Dashboard() {
                         <LayoutDashboard className="w-6 h-6" aria-hidden="true" />
                     </button>
                     <button
-                        className="w-full aspect-square flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gold transition-colors"
-                        aria-label="Leads (Em breve)"
-                        disabled
+                        onClick={() => navigate('/leads')}
+                        className={`w-full aspect-square flex items-center justify-center rounded-xl transition-colors ${
+                            location.pathname === '/leads'
+                                ? 'bg-gold/10 text-gold'
+                                : 'text-gray-400 hover:bg-gray-50 hover:text-gold'
+                        }`}
+                        aria-label="Leads"
+                        aria-current={location.pathname === '/leads' ? 'page' : undefined}
                     >
                         <Users className="w-6 h-6" aria-hidden="true" />
                     </button>

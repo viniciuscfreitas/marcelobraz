@@ -6,9 +6,26 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
   const modalRef = useRef(null);
   const firstInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [phoneValue, setPhoneValue] = useState('');
+
+  const formatPhone = (value) => {
+    const numbers = value.replace(/\D/g, '').slice(0, 11);
+    if (numbers.length <= 10) {
+      return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    }
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  const handlePhoneChange = (e) => {
+    const formatted = formatPhone(e.target.value);
+    setPhoneValue(formatted);
+  };
 
   useEffect(() => {
-    if (isOpen) setTimeout(() => firstInputRef.current?.focus(), 100);
+    if (isOpen) {
+      setTimeout(() => firstInputRef.current?.focus(), 100);
+      setPhoneValue(''); // Reset phone ao abrir modal
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -24,7 +41,8 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
       // Extrair valores do form usando FormData
       const formData = new FormData(e.target);
       const name = formData.get('name') || '';
-      const phone = formData.get('phone') || '';
+      // Remover formatação do telefone antes de enviar (apenas números)
+      const phone = phoneValue.replace(/\D/g, '') || '';
 
       // Usar mesma lógica de URL do useProperties (dev vs prod)
       const isDev = import.meta.env.DEV;
@@ -94,7 +112,7 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
           )}
           <form onSubmit={handleSubmit} className="space-y-5">
              <input ref={firstInputRef} type="text" name="name" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="Seu nome" required disabled={loading} />
-             <input type="tel" name="phone" inputMode="numeric" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="(11) 99999-9999" required disabled={loading} />
+             <input type="tel" name="phone" inputMode="numeric" value={phoneValue} onChange={handlePhoneChange} className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="(11) 99999-9999" required disabled={loading} />
              <Button variant="gold" fullWidth={true} className="mt-2 shadow-xl shadow-[#d4af37]/20 text-base" disabled={loading}>
                 {loading ? 'Enviando...' : (isExitIntent ? "Sim, Quero a Lista VIP" : "Ver Preço Agora")}
             </Button>
