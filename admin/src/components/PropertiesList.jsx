@@ -4,10 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 import ConfirmDialog from './ConfirmDialog';
 
-export default function PropertiesList({ onEdit, refreshTrigger }) {
+export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = '' }) {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, property: null });
     const { token } = useAuth();
 
@@ -88,29 +87,11 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
 
     return (
         <div className="flex flex-col h-full min-h-0">
-            {/* Search Bar */}
-            <div className="p-3 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
-                <div className="relative max-w-md mx-auto">
-                    <label htmlFor="search-properties" className="sr-only">Buscar imóveis</label>
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search size={18} className="text-gray-500" aria-hidden="true" />
-                    </div>
-                    <input
-                        id="search-properties"
-                        type="text"
-                        placeholder="Buscar por título, bairro..."
-                        className="w-full pl-11 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold/50 focus:border-gold outline-none transition-all text-sm text-gray-900 min-h-[44px]"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        aria-label="Buscar imóveis por título ou bairro"
-                    />
-                    {filteredProperties.length > 0 && (
-                        <div className="sr-only" aria-live="polite" aria-atomic="true">
-                            {filteredProperties.length} {filteredProperties.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
-                        </div>
-                    )}
+            {filteredProperties.length > 0 && (
+                <div className="sr-only" aria-live="polite" aria-atomic="true">
+                    {filteredProperties.length} {filteredProperties.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}
                 </div>
-            </div>
+            )}
 
             <div className="flex-1 min-h-0 overflow-auto">
                 <table className="w-full text-left border-collapse">
