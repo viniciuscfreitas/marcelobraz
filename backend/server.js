@@ -20,7 +20,7 @@ app.use(helmet()); // Security headers
 app.use(morgan('dev')); // Logging (Grug likes logs)
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*', // Allow configuration
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());

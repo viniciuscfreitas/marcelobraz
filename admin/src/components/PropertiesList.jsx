@@ -9,6 +9,9 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
     const [searchTerm, setSearchTerm] = useState('');
     const { token } = useAuth();
 
+    // Contar quantos featured temos
+    const featuredCount = properties.filter(p => p.featured).length;
+
     useEffect(() => {
         fetchProperties();
     }, [refreshTrigger]);
@@ -80,6 +83,15 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
 
     return (
         <div>
+            {/* Header com contador de Curadoria */}
+            {featuredCount > 0 && (
+                <div className="p-4 bg-[#d4af37]/5 border-b border-[#d4af37]/20">
+                    <p className="text-sm text-gray-700 text-center">
+                        <span className="font-bold text-[#d4af37]">{featuredCount}</span> de <span className="font-bold">4</span> imóveis selecionados para Curadoria da Semana
+                    </p>
+                </div>
+            )}
+            
             {/* Search Bar */}
             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
                 <div className="relative max-w-md">
