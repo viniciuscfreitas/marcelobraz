@@ -1,17 +1,50 @@
 import { Building, Home, LayoutDashboard, Plus, Search, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropertiesList from '../components/PropertiesList';
 import PropertyDrawer from '../components/PropertyDrawer';
-import { SITE_URL } from '../config';
+import { API_URL, SITE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
-    const { user, logout } = useAuth();
+    const { user, token, logout } = useAuth();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [selectedPropertyId, setSelectedPropertyId] = useState(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false); // Grug gosta: começa recolhido
+    const [totalProperties, setTotalProperties] = useState(0);
+    const [totalLeads, setTotalLeads] = useState(0);
+
+    // Buscar stats ao montar
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                // Buscar contagem de imóveis
+                const propertiesRes = await fetch(`${API_URL}/api/properties`);
+                if (propertiesRes.ok) {
+                    const properties = await propertiesRes.json();
+                    setTotalProperties(properties.length);
+                }
+
+                // Buscar contagem de leads (precisa token)
+                if (token) {
+                    const leadsRes = await fetch(`${API_URL}/api/leads`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (leadsRes.ok) {
+                        const leads = await leadsRes.json();
+                        setTotalLeads(leads.length);
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao buscar stats:', err);
+            }
+        };
+
+        fetchStats();
+    }, [token]);
 
     const handleOpenDrawer = (id = null) => {
         setSelectedPropertyId(id);
@@ -165,7 +198,7 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-2 mb-4">
                                     <h3 className="font-semibold text-gray-700 text-sm">Total de Imóveis</h3>
                                 </div>
-                                <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">8</div>
+                                <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">{totalProperties}</div>
                                 <div className="flex items-center gap-2 text-sm">
                                     <span className="text-green-500 font-medium flex items-center">↗ Ativos</span>
                                     <span className="text-gray-400">no site</span>
@@ -181,10 +214,10 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-2 mb-4">
                                     <h3 className="font-semibold text-gray-700 text-sm">Leads Capturados</h3>
                                 </div>
-                                <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">0</div>
+                                <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">{totalLeads}</div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="text-gray-400 font-medium">Aguardando</span>
-                                    <span className="text-gray-400">integração</span>
+                                    <span className="text-blue-500 font-medium flex items-center">↗ Capturados</span>
+                                    <span className="text-gray-400">no site</span>
                                 </div>
                             </div>
                             <div className="w-24 h-24 rounded-2xl bg-blue-100 flex items-center justify-center transform rotate-12 group-hover:rotate-0 transition-transform duration-300">

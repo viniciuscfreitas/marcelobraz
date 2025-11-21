@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
 import { Lock, Star, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from './Button.jsx';
 
 export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess }) => {
   const modalRef = useRef(null);
   const firstInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) setTimeout(() => firstInputRef.current?.focus(), 100);
@@ -15,10 +16,53 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
   const isExitIntent = type === "exit";
   const isTimed = type === "timed";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSuccess("Acesso liberado! Enviando detalhes...");
-    onClose();
+    setLoading(true);
+
+    try {
+      // Extrair valores do form usando FormData
+      const formData = new FormData(e.target);
+      const name = formData.get('name') || '';
+      const phone = formData.get('phone') || '';
+
+      // Usar mesma lógica de URL do useProperties (dev vs prod)
+      const isDev = import.meta.env.DEV;
+      const apiUrl = import.meta.env.VITE_API_URL
+          || (isDev ? 'http://localhost:3001' : '');
+      const endpoint = apiUrl ? `${apiUrl}/api/leads` : '/api/leads';
+
+      // Preparar dados para enviar
+      const leadData = {
+        name: name.trim(),
+        phone: phone.trim(),
+        property_id: property?.id || null,
+        property_title: property?.title || null,
+        type: type || 'gate'
+      };
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(leadData)
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao salvar lead');
+      }
+
+      // Sucesso - manter feedback visual via onSuccess
+      onSuccess("Acesso liberado! Enviando detalhes...");
+      onClose();
+    } catch (err) {
+      console.error('Erro ao salvar lead:', err);
+      alert(err.message || 'Erro ao salvar seus dados. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,10 +93,10 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-5">
-             <input ref={firstInputRef} type="text" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="Seu nome" required />
-             <input type="tel" inputMode="numeric" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="(11) 99999-9999" required />
-             <Button variant="gold" fullWidth={true} className="mt-2 shadow-xl shadow-[#d4af37]/20 text-base">
-                {isExitIntent ? "Sim, Quero a Lista VIP" : "Ver Preço Agora"}
+             <input ref={firstInputRef} type="text" name="name" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="Seu nome" required disabled={loading} />
+             <input type="tel" name="phone" inputMode="numeric" className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:border-[#0f172a] focus:ring-2 focus:ring-[#0f172a]/20 outline-none text-base" placeholder="(11) 99999-9999" required disabled={loading} />
+             <Button variant="gold" fullWidth={true} className="mt-2 shadow-xl shadow-[#d4af37]/20 text-base" disabled={loading}>
+                {loading ? 'Enviando...' : (isExitIntent ? "Sim, Quero a Lista VIP" : "Ver Preço Agora")}
             </Button>
              <p className="text-xs text-center text-gray-500 flex items-center justify-center gap-1 mt-2"><Lock size={12} /> Seus dados estão seguros.</p>
           </form>
