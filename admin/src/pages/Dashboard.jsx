@@ -96,12 +96,12 @@ export default function Dashboard() {
                         {/* Botão/Busca - Mesmo elemento que expande */}
                         <div className={`transition-all duration-300 ease-in-out ${
                             isSearchOpen 
-                                ? 'flex-1 md:flex-[2] min-w-0' 
+                                ? 'flex-1 md:flex-[2] min-w-0 md:min-w-[calc(50%+390px)]' 
                                 : 'w-auto'
                         }`}>
                             {isSearchOpen ? (
                                 // Barra de busca expandida
-                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all animate-in fade-in slide-in-from-right-5">
+                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all animate-in fade-in slide-in-from-right-5">
                                     <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
                                     <input
                                         type="text"
