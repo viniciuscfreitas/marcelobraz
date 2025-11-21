@@ -11,11 +11,8 @@ services:
       - NODE_ENV=production
     networks:
       - broker-network
-      - npm_default
 
 networks:
   broker-network:
     driver: bridge
-  npm_default:
-    external: true
 
