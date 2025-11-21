@@ -16,7 +16,7 @@ export const CollectionSection = ({ onPropertyClick, navigateTo, properties = []
           </div>
           {(() => {
             const featuredProperties = properties.filter(p => p.featured).slice(0, 4);
-            
+
             if (featuredProperties.length === 0) {
               return (
                 <div className="text-center py-12 text-gray-500">
@@ -24,7 +24,7 @@ export const CollectionSection = ({ onPropertyClick, navigateTo, properties = []
                 </div>
               );
             }
-            
+
             return (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {featuredProperties.map((prop) => (

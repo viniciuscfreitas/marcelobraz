@@ -74,7 +74,7 @@ export default function Dashboard() {
             </aside>
 
             {/* Main Content */}
-            <main id="main-content" className="flex-1 p-6 md:p-12 overflow-y-auto" tabIndex="-1">
+            <main id="main-content" className="flex-1 p-6 md:p-12 flex flex-col overflow-hidden" tabIndex="-1">
                 <header className="flex justify-between items-center mb-10">
                     <div>
                         <h2 className="text-3xl font-bold text-primary">Visão Geral</h2>
@@ -114,14 +114,14 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                <section className="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 overflow-hidden" aria-labelledby="properties-heading">
-                    <div className="p-8 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <section className="bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" aria-labelledby="properties-heading">
+                    <div className="p-8 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0">
                         <div>
                             <h3 id="properties-heading" className="text-xl font-bold text-primary">Seus Imóveis</h3>
                             <p className="text-sm text-gray-600 mt-1">Gerencie sua lista de propriedades exclusivas.</p>
                         </div>
                     </div>
-                    <div className="p-0">
+                    <div className="p-0 flex-1 min-h-0">
                         <PropertiesList
                             onEdit={handleOpenDrawer}
                             refreshTrigger={refreshTrigger}

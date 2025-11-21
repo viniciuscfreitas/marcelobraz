@@ -82,18 +82,18 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
     if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
 
     return (
-        <div>
+        <div className="flex flex-col h-full">
             {/* Header com contador de Curadoria */}
             {featuredCount > 0 && (
-                <div className="p-4 bg-[#d4af37]/5 border-b border-[#d4af37]/20">
+                <div className="p-4 bg-[#d4af37]/5 border-b border-[#d4af37]/20 flex-shrink-0">
                     <p className="text-sm text-gray-700 text-center">
                         <span className="font-bold text-[#d4af37]">{featuredCount}</span> de <span className="font-bold">4</span> imóveis selecionados para Curadoria da Semana
                     </p>
                 </div>
             )}
-            
+
             {/* Search Bar */}
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+            <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex-shrink-0">
                 <div className="relative max-w-md">
                     <label htmlFor="search-properties" className="sr-only">Buscar imóveis</label>
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -110,10 +110,10 @@ export default function PropertiesList({ onEdit, refreshTrigger }) {
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                     <caption className="sr-only">Lista de imóveis cadastrados</caption>
-                    <thead>
+                    <thead className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur-sm">
                         <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-600 font-semibold">
                             <th scope="col" className="p-6">Imóvel</th>
                             <th scope="col" className="p-6">Localização</th>
