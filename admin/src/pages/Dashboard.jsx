@@ -88,7 +88,7 @@ export default function Dashboard() {
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                                Olá, {user?.username}! <span className="animate-bounce">👋</span>
+                                Olá, {user?.name || user?.username}! <span className="animate-bounce">👋</span>
                             </h1>
                             <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
                         </div>

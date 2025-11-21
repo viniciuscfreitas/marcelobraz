@@ -48,15 +48,24 @@ function initDatabase() {
     )
   `);
 
-    // Tabela de usuário admin (só 1 por enquanto)
+    // Tabela de usuário admin
     db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      name TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+    // Migração: adicionar campo name se não existir
+    try {
+        db.exec(`ALTER TABLE users ADD COLUMN name TEXT`);
+        console.log('✅ Migration: campo name adicionado');
+    } catch (error) {
+        // Campo já existe, ignora
+    }
 
     console.log('✅ Database initialized!');
 }
