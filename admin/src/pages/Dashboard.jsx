@@ -86,32 +86,32 @@ export default function Dashboard() {
                 <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-4 md:py-5 flex-shrink-0">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                         {/* Saudação - Esconde quando busca expandida */}
-                        <div className={`flex-1 transition-all duration-200 ${isSearchOpen ? 'opacity-0 md:opacity-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 max-w-full'}`}>
+                        <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                                 Olá, {user?.username}! <span className="animate-bounce">👋</span>
                             </h1>
                             <p className="text-gray-500 mt-1 text-xs md:text-sm">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
 
-                        {/* Search Bar - Expande para ocupar quase todo espaço */}
+                        {/* Botão/Busca - Mesmo elemento que expande */}
                         <div className={`transition-all duration-300 ease-in-out ${
                             isSearchOpen 
-                                ? 'flex-1 md:flex-[2] max-w-full opacity-100' 
-                                : 'flex-0 max-w-0 opacity-0 pointer-events-none md:pointer-events-auto md:flex-1 md:opacity-100 md:max-w-md'
+                                ? 'flex-1 md:flex-[2] min-w-0' 
+                                : 'w-auto'
                         }`}>
-                            <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all">
-                                <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                                <input
-                                    type="text"
-                                    placeholder="Busque por título, bairro ou tipo..."
-                                    className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    onFocus={() => setIsSearchOpen(true)}
-                                    autoFocus={isSearchOpen}
-                                    aria-label="Buscar imóveis"
-                                />
-                                {isSearchOpen && (
+                            {isSearchOpen ? (
+                                // Barra de busca expandida
+                                <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 focus-within:ring-2 focus-within:ring-gold/50 focus-within:border-gold transition-all animate-in fade-in slide-in-from-right-5">
+                                    <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                                    <input
+                                        type="text"
+                                        placeholder="Busque por título, bairro ou tipo..."
+                                        className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        autoFocus
+                                        aria-label="Buscar imóveis"
+                                    />
                                     <button
                                         onClick={() => {
                                             setIsSearchOpen(false);
@@ -124,39 +124,22 @@ export default function Dashboard() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
-                                )}
-                            </div>
+                                </div>
+                            ) : (
+                                // Botão de busca (recolhido)
+                                <button
+                                    onClick={() => setIsSearchOpen(true)}
+                                    className="p-3 rounded-full shadow-sm border border-gray-100 bg-white hover:bg-gray-50 text-gray-600 transition-all focus:ring-2 focus:ring-gold focus:ring-offset-2"
+                                    aria-label="Buscar imóveis"
+                                    aria-expanded={false}
+                                >
+                                    <Search className="w-5 h-5" aria-hidden="true" />
+                                </button>
+                            )}
                         </div>
 
-                        <div className={`flex items-center gap-3 md:gap-4 transition-all duration-200 ${isSearchOpen ? 'opacity-0 md:opacity-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 max-w-full'}`}>
-                            {/* Botão Toggle Search - Desktop */}
-                            <button
-                                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`hidden md:flex p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
-                                    isSearchOpen
-                                        ? 'bg-gold/10 border-gold text-gold'
-                                        : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
-                                }`}
-                                aria-label={isSearchOpen ? "Fechar busca" : "Buscar imóveis"}
-                                aria-expanded={isSearchOpen}
-                            >
-                                <Search className="w-5 h-5" aria-hidden="true" />
-                            </button>
-
-                            {/* Botão Toggle Search - Mobile */}
-                            <button
-                                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                                className={`md:hidden p-3 rounded-full shadow-sm border transition-colors focus:ring-2 focus:ring-gold focus:ring-offset-2 ${
-                                    isSearchOpen
-                                        ? 'bg-gold/10 border-gold text-gold'
-                                        : 'bg-white border-gray-100 hover:bg-gray-50 text-gray-600'
-                                }`}
-                                aria-label={isSearchOpen ? "Fechar busca" : "Buscar imóveis"}
-                                aria-expanded={isSearchOpen}
-                            >
-                                <Search className="w-5 h-5" aria-hidden="true" />
-                            </button>
-
+                        {/* Botão Novo Imóvel - Esconde quando busca expandida */}
+                        <div className={`flex items-center gap-3 md:gap-4 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
                             <button
                                 onClick={() => handleOpenDrawer()}
                                 className="flex items-center gap-2 bg-gold-dark text-white px-4 md:px-6 py-2.5 md:py-3 rounded-full font-medium shadow-lg shadow-gold/20 hover:bg-gold transition-all focus:ring-2 focus:ring-offset-2 focus:ring-gold text-sm md:text-base"
