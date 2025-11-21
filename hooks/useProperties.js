@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PROPERTIES as STATIC_PROPERTIES } from '../data/properties.js';
 
 /**
@@ -13,16 +13,22 @@ export const useProperties = () => {
     useEffect(() => {
         const fetchProperties = async () => {
             try {
-                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-                const res = await fetch(`${apiUrl}/api/properties`);
+                // Grug gosta: URL relativa em produção, localhost apenas em dev
+                // NPM roteia /api para marcelobraz-backend:3001 (container do backend)
+                const isDev = import.meta.env.DEV;
+                const apiUrl = import.meta.env.VITE_API_URL
+                    || (isDev ? 'http://localhost:3001' : '');
+                const endpoint = apiUrl ? `${apiUrl}/api/properties` : '/api/properties';
+
+                const res = await fetch(endpoint);
                 if (!res.ok) throw new Error('Falha ao buscar imóveis');
 
                 const data = await res.json();
                 setProperties(data);
             } catch (err) {
-                console.error('Erro na API:', err);
+                console.error('Erro na API, usando dados estáticos:', err);
                 setError(err);
-                // Grug diz: sem fallback! Se quebrar, quebrou.
+                setProperties(STATIC_PROPERTIES); // Fallback Grug: dados estáticos se API falhar
             } finally {
                 setLoading(false);
             }
