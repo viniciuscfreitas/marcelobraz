@@ -14,59 +14,87 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     const [leadCaptured, setLeadCaptured] = useState(false);
     const [showLeadModal, setShowLeadModal] = useState(false);
 
-    // Função de compartilhar (Grug gosta: simples e direto)
+    // Função de compartilhar (Grug gosta: simples e direto, sempre funciona)
     const handleShare = async () => {
-        if (!property?.id) return;
+        if (!property?.id) {
+            alert('Erro: Imóvel não encontrado');
+            return;
+        }
         
         const shareUrl = `${window.location.origin}?property=${property.id}`;
         const shareData = {
-            title: property.title,
-            text: `${property.title} - ${property.bairro}, ${property.cidade}`,
+            title: property.title || 'Imóvel',
+            text: `${property.title || 'Imóvel'} - ${property.bairro || ''}, ${property.cidade || ''}`,
             url: shareUrl
         };
 
         // Tenta usar Web Share API se disponível (mobile principalmente)
-        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        if (navigator.share) {
             try {
+                // Verifica se pode compartilhar (opcional)
+                if (navigator.canShare && !navigator.canShare(shareData)) {
+                    throw new Error('Cannot share');
+                }
                 await navigator.share(shareData);
                 if (onShareSuccess) onShareSuccess('Link compartilhado!');
                 return;
             } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error('Erro ao compartilhar:', err);
-                } else {
-                    // Usuário cancelou, não fazer nada
+                // Se usuário cancelou, não fazer nada
+                if (err.name === 'AbortError' || err.name === 'NotAllowedError') {
                     return;
                 }
+                // Se falhar, continua para fallback (não faz nada, só continua)
             }
         }
 
-        // Fallback: copiar para clipboard
+        // Fallback: copiar para clipboard (Grug gosta: sempre funciona)
         try {
             await navigator.clipboard.writeText(shareUrl);
-            if (onShareSuccess) onShareSuccess('Link copiado para área de transferência!');
+            if (onShareSuccess) {
+                onShareSuccess('Link copiado para área de transferência!');
+            } else {
+                alert('Link copiado!');
+            }
         } catch (err) {
-            console.error('Erro ao copiar:', err);
-            // Fallback final: tentar método antigo
+            // Fallback final: método antigo que sempre funciona
             const textArea = document.createElement('textarea');
             textArea.value = shareUrl;
             textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
             textArea.style.opacity = '0';
-            textArea.style.pointerEvents = 'none';
+            textArea.readOnly = true;
             document.body.appendChild(textArea);
+            textArea.focus();
             textArea.select();
+            textArea.setSelectionRange(0, shareUrl.length);
+            
             try {
                 const success = document.execCommand('copy');
-                if (success && onShareSuccess) {
-                    onShareSuccess('Link copiado!');
+                document.body.removeChild(textArea);
+                
+                if (success) {
+                    if (onShareSuccess) {
+                        onShareSuccess('Link copiado!');
+                    } else {
+                        alert('Link copiado!');
+                    }
                 } else {
-                    alert('Erro ao copiar. Tente novamente.');
+                    // Se tudo falhar, mostrar prompt
+                    prompt('Copie o link:', shareUrl);
                 }
             } catch (fallbackErr) {
-                console.error('Erro ao copiar (fallback):', fallbackErr);
-                alert('Erro ao compartilhar. Tente novamente.');
+                document.body.removeChild(textArea);
+                // Último recurso: mostrar prompt
+                prompt('Copie o link:', shareUrl);
             }
-            document.body.removeChild(textArea);
         }
     };
 
