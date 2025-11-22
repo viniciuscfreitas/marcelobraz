@@ -83,7 +83,7 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
                             <h1 className="text-lg md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                                Olá, {user?.name}! <span className="animate-bounce hidden md:inline">👋</span>
+                                Olá, {user?.name}! <span className="animate-bounce inline">👋</span>
                             </h1>
                             <p className="text-gray-500 text-xs md:text-sm hidden md:block">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
