@@ -95,13 +95,13 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
                                     : 'w-auto'
                                 }`}>
                                 {isSearchOpen ? (
-                                    <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
+                                    <div className="bg-gray-50 flex items-center px-4 md:px-5 h-10 md:h-12 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
                                         <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" aria-hidden="true" />
                                         <input
                                             id="search-bar-input"
                                             type="text"
                                             placeholder="Busque por título, bairro, tipo ou preço..."
-                                            className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all"
+                                            className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all h-full"
                                             style={{ outline: 'none', boxShadow: 'none' }}
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm && setSearchTerm(e.target.value)}
