@@ -18,13 +18,48 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     const loadingRef = useRef(false);
     const lastPageLoadedRef = useRef(0); // Rastrear última página carregada
 
-    // Helper para gerar URL do site público (Grug gosta: simples!)
+    // Helper para gerar slug SEO-friendly (mesma lógica do frontend - Grug gosta: consistência!)
+    const generateSlug = (text) => {
+        if (!text) return '';
+        return text
+            .toString()
+            .toLowerCase()
+            .normalize('NFD') // Decompõe caracteres acentuados
+            .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+            .replace(/[^a-z0-9]+/g, '-') // Substitui espaços e caracteres especiais por -
+            .replace(/^-+|-+$/g, ''); // Remove - do início/fim
+    };
+
+    // Helper para gerar URL do site público (mesma lógica do frontend)
     const getPropertyPublicUrl = (property) => {
         if (!property) return SITE_URL;
-        const slug = property.tipo?.toLowerCase().replace(/\s+/g, '-') || 'imovel';
-        const quartos = property.quartos ? `${property.quartos}q-` : '';
-        const bairro = property.bairro?.toLowerCase().replace(/\s+/g, '-') || '';
-        return `${SITE_URL}/imovel/${slug}-${quartos}${bairro}-${property.id}`;
+        
+        const parts = [];
+        
+        // Tipo de imóvel
+        if (property.tipo) {
+            parts.push(generateSlug(property.tipo));
+        }
+        
+        // Quartos (se tiver)
+        if (property.quartos) {
+            parts.push(`${property.quartos}q`);
+        }
+        
+        // Bairro
+        if (property.bairro) {
+            parts.push(generateSlug(property.bairro));
+        }
+        
+        // Cidade (se não for Santos, adiciona)
+        if (property.cidade && property.cidade.toLowerCase() !== 'santos') {
+            parts.push(generateSlug(property.cidade));
+        }
+        
+        // ID sempre no final
+        parts.push(property.id);
+        
+        return `${SITE_URL}/imovel/${parts.join('-')}`;
     };
 
     const fetchProperties = async (pageNum = 1, append = false) => {
