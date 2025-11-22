@@ -3,7 +3,7 @@
  * Gera mensagens contextuais para WhatsApp
  */
 
-import { BROKER_INFO } from '../data/constants.js';
+import { BROKER_INFO, CONSTANTS } from '../data/constants.js';
 import { generateShareUrl } from './urlHelpers.js';
 
 /**
@@ -11,7 +11,7 @@ import { generateShareUrl } from './urlHelpers.js';
  * Grug gosta: Cliente já manda contexto completo!
  */
 export const generateWhatsAppLink = (property, customMessage = null) => {
-    const phone = BROKER_INFO.whatsapp.replace(/\D/g, ''); // Remove formatação
+    const phone = CONSTANTS.WHATSAPP_NUMBER; // Já vem sem formatação
 
     let message;
 
@@ -48,7 +48,7 @@ Podemos agendar uma visita?`;
  * Gera mensagem para agendamento de visita
  */
 export const generateScheduleMessage = (property, date, period) => {
-    const phone = BROKER_INFO.whatsapp.replace(/\D/g, '');
+    const phone = CONSTANTS.WHATSAPP_NUMBER; // Já vem sem formatação
 
     const periodLabels = {
         'manha': 'Manhã (9h-12h)',
