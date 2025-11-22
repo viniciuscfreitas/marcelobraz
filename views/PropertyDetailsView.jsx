@@ -80,11 +80,11 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         if (copied) {
             if (onShareSuccess) {
                 onShareSuccess('Link copiado para área de transferência!');
-            } else {
-                alert('Link copiado!');
-            }
-        } else {
-            prompt('Copie o link:', shareUrl);
+                    } else {
+                        alert('Link copiado!');
+                    }
+                } else {
+                    prompt('Copie o link:', shareUrl);
         }
     };
 
@@ -203,9 +203,9 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         property.images.forEach(addUnique);
     } else {
         // Fallback: usar image principal se não tem array
-        if (property.image) addUnique(property.image);
-        if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
-        if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
+    if (property.image) addUnique(property.image);
+    if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
+    if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
     }
 
     // Garantir pelo menos uma imagem

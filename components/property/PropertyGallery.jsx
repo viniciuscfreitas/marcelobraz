@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Share2, ChevronLeft, ChevronRight, Eye, X, Maximize2 } from 'lucide-react';
 
 /**
@@ -16,9 +17,20 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
     useEffect(() => {
         if (!isLightboxOpen) return;
 
-        // Bloquear scroll do body quando lightbox está aberto
+        // Bloquear scroll do body quando lightbox está aberto (Grug gosta: remove espaço!)
+        const originalBodyOverflow = document.body.style.overflow;
+        const originalHtmlOverflow = document.documentElement.style.overflow;
+        const originalBodyMargin = document.body.style.margin;
+        const originalHtmlMargin = document.documentElement.style.margin;
+        const originalBodyPadding = document.body.style.padding;
+        const originalHtmlPadding = document.documentElement.style.padding;
+
         document.body.style.overflow = 'hidden';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
         document.documentElement.style.overflow = 'hidden';
+        document.documentElement.style.margin = '0';
+        document.documentElement.style.padding = '0';
 
         const handleKeyPress = (e) => {
             if (e.key === 'ArrowLeft') {
@@ -35,9 +47,13 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
         window.addEventListener('keydown', handleKeyPress);
         
         return () => {
-            // Restaurar scroll quando fechar
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
+            // Restaurar estilos originais quando fechar
+            document.body.style.overflow = originalBodyOverflow;
+            document.body.style.margin = originalBodyMargin;
+            document.body.style.padding = originalBodyPadding;
+            document.documentElement.style.overflow = originalHtmlOverflow;
+            document.documentElement.style.margin = originalHtmlMargin;
+            document.documentElement.style.padding = originalHtmlPadding;
             window.removeEventListener('keydown', handleKeyPress);
         };
     }, [isLightboxOpen, images.length]);
@@ -163,11 +179,25 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
                 )}
             </div>
 
-            {/* Lightbox Fullscreen - Estilo Imovelweb */}
-            {isLightboxOpen && (
+            {/* Lightbox Fullscreen - Estilo Imovelweb (Portal direto no body) */}
+            {isLightboxOpen && createPortal(
                 <div
-                    className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
-                    style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
+                    className="fixed bg-black flex items-center justify-center"
+                    style={{ 
+                        position: 'fixed',
+                        top: 0, 
+                        left: 0, 
+                        right: 0, 
+                        bottom: 0, 
+                        width: '100vw', 
+                        height: '100vh',
+                        maxWidth: '100vw',
+                        maxHeight: '100vh',
+                        margin: 0,
+                        padding: 0,
+                        overflow: 'hidden',
+                        zIndex: 9999
+                    }}
                     onClick={() => setIsLightboxOpen(false)}
                     role="dialog"
                     aria-modal="true"
@@ -183,13 +213,13 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
                     </button>
 
                     {/* Imagem em Fullscreen */}
-                    <div className="relative w-full h-full flex items-center justify-center p-4">
+                    <div className="relative w-full h-full flex items-center justify-center" style={{ padding: '16px' }}>
                         <img
                             src={currentImage}
                             alt={`Imagem ${activeImage + 1} de ${images.length} - ${property.title}`}
-                            className="max-w-full max-h-full object-contain"
+                            className="object-contain"
                             onClick={(e) => e.stopPropagation()}
-                            style={{ maxWidth: '100%', maxHeight: '100%' }}
+                            style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
                         />
 
                         {/* Contador */}
@@ -246,7 +276,8 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
                             </div>
                         </div>
                     )}
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
