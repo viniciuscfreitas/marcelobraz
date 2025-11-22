@@ -138,11 +138,16 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
 
     // Registrar view quando página carrega (Grug gosta: simples, uma vez por visita!)
     useEffect(() => {
-        if (!property?.id || viewTrackedRef.current) return;
+        if (!property?.id) return;
         
-        viewTrackedRef.current = true;
+        // Resetar ref quando muda de imóvel (Grug gosta: cada imóvel conta uma vez!)
+        viewTrackedRef.current = false;
         
         const trackView = async () => {
+            // Proteção: só conta uma vez por imóvel
+            if (viewTrackedRef.current) return;
+            viewTrackedRef.current = true;
+            
             try {
                 const isDev = import.meta.env.DEV;
                 const apiUrl = import.meta.env.VITE_API_URL || (isDev ? 'http://localhost:3001' : '');
@@ -152,6 +157,8 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             } catch (err) {
                 // Silencioso - não quebrar UX se falhar
                 console.error('Erro ao registrar view:', err);
+                // Resetar ref se falhar para permitir retry
+                viewTrackedRef.current = false;
             }
         };
         

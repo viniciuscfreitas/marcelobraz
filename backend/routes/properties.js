@@ -72,6 +72,12 @@ router.get('/', (req, res) => {
 // POST /api/properties/:id/view - Registrar visualização (Grug gosta: endpoint separado!)
 router.post('/:id/view', (req, res) => {
     try {
+        // Verificar se imóvel existe antes de incrementar (Grug gosta: validação simples!)
+        const property = db.prepare('SELECT id FROM properties WHERE id = ?').get(req.params.id);
+        if (!property) {
+            return res.status(404).json({ error: 'Imóvel não encontrado' });
+        }
+        
         db.prepare('UPDATE properties SET views = views + 1 WHERE id = ?').run(req.params.id);
         res.json({ success: true });
     } catch (error) {
