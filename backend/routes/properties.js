@@ -4,18 +4,64 @@ const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { parseProperty, parseProperties, preparePropertyData } = require('../utils/propertyHelpers');
 const { validateProperty, handleValidationErrors } = require('../validators/propertyValidator');
+const { buildPropertyQuery } = require('../utils/queryBuilder');
 
 // GET /api/properties - Listar todas as propriedades (público)
 // Grug gosta: SELECT específico para performance (não SELECT *)
+// Suporta: paginação (?page=1&limit=12), busca (?search=termo), filtros
 router.get('/', (req, res) => {
     try {
-        const properties = db.prepare(`
+        const page = parseInt(req.query.page) || null;
+        const limit = parseInt(req.query.limit) || null;
+        
+        // Extrair filtros da query
+        const filters = {
+            search: req.query.search?.trim() || null,
+            areaMin: req.query.area_min ? parseFloat(req.query.area_min) : null,
+            areaMax: req.query.area_max ? parseFloat(req.query.area_max) : null,
+            quartosMin: req.query.quartos_min ? parseInt(req.query.quartos_min) : null,
+            quartosMax: req.query.quartos_max ? parseInt(req.query.quartos_max) : null,
+            banheirosMin: req.query.banheiros_min ? parseInt(req.query.banheiros_min) : null,
+            banheirosMax: req.query.banheiros_max ? parseInt(req.query.banheiros_max) : null,
+            vagasMin: req.query.vagas_min ? parseInt(req.query.vagas_min) : null,
+            vagasMax: req.query.vagas_max ? parseInt(req.query.vagas_max) : null
+        };
+
+        const { whereClause, params } = buildPropertyQuery(filters);
+        
+        const baseQuery = `
             SELECT id, title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-                   quartos, vagas, banheiros, area_util, cidade, created_at
+                   quartos, vagas, banheiros, area_util, cidade, created_at, description
             FROM properties 
+            ${whereClause}
             ORDER BY featured DESC, created_at DESC
-        `).all();
-        res.json(parseProperties(properties));
+        `;
+
+        // Se não tem paginação, retorna tudo (compatibilidade)
+        if (!page && !limit) {
+            const properties = db.prepare(baseQuery).all(...params);
+            return res.json(parseProperties(properties));
+        }
+
+        // Com paginação
+        const validPage = Math.max(1, page || 1);
+        const validLimit = Math.max(1, Math.min(100, limit || 12));
+        const offset = (validPage - 1) * validLimit;
+
+        const countQuery = `SELECT COUNT(*) as count FROM properties ${whereClause}`;
+        const totalResult = db.prepare(countQuery).get(...params);
+        const total = totalResult.count;
+
+        const paginatedQuery = `${baseQuery} LIMIT ? OFFSET ?`;
+        const properties = db.prepare(paginatedQuery).all(...params, validLimit, offset);
+
+        const totalPages = Math.ceil(total / validLimit);
+        const hasMore = validPage < totalPages;
+
+        res.json({
+            data: parseProperties(properties),
+            pagination: { page: validPage, limit: validLimit, total, totalPages, hasMore }
+        });
     } catch (error) {
         console.error('Error fetching properties:', error);
         res.status(500).json({ error: 'Erro ao buscar imóveis' });

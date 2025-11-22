@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Edit, Trash2, Search, MapPin, Home, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
@@ -9,27 +9,85 @@ import Toast from './Toast';
 export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = '' }) {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(1);
     const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, property: null });
     const { token } = useAuth();
     const { toast, showToast, hideToast } = useToast();
+    const sentinelRef = useRef(null);
+    const loadingRef = useRef(false);
 
-    useEffect(() => {
-        fetchProperties();
-    }, [refreshTrigger]);
-
-    const fetchProperties = async () => {
+    const fetchProperties = async (pageNum = 1, append = false) => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
         setLoading(true);
+        
         try {
-            const res = await fetch(`${API_URL}/api/properties`);
+            const url = `${API_URL}/api/properties?page=${pageNum}&limit=20${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`;
+            const res = await fetch(url);
             if (!res.ok) throw new Error('Falha na conexão');
             const data = await res.json();
-            setProperties(data);
+            
+            // Se API retorna array (compatibilidade), tratar como página única
+            if (Array.isArray(data)) {
+                if (append) {
+                    setProperties(prev => [...prev, ...data]);
+                } else {
+                    setProperties(data);
+                }
+                setHasMore(false);
+            } else {
+                // API retorna { data, pagination }
+                if (append) {
+                    setProperties(prev => [...prev, ...data.data]);
+                } else {
+                    setProperties(data.data);
+                }
+                setHasMore(data.pagination.hasMore);
+            }
         } catch (error) {
             console.error('Erro ao buscar imóveis:', error);
+            if (!append) setProperties([]);
         } finally {
             setLoading(false);
+            loadingRef.current = false;
         }
     };
+
+    useEffect(() => {
+        // Reset quando refreshTrigger muda
+        setProperties([]);
+        setPage(1);
+        setHasMore(true);
+        fetchProperties(1, false);
+    }, [refreshTrigger]);
+
+    // Scroll infinito com Intersection Observer
+    useEffect(() => {
+        if (!hasMore || loading || !sentinelRef.current) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    const nextPage = page + 1;
+                    setPage(nextPage);
+                    fetchProperties(nextPage, true);
+                }
+            },
+            { threshold: 0.1, rootMargin: '200px' }
+        );
+
+        observer.observe(sentinelRef.current);
+        return () => observer.disconnect();
+    }, [hasMore, loading, page, searchTerm]);
+
+    // Recarregar quando searchTerm muda
+    useEffect(() => {
+        setProperties([]);
+        setPage(1);
+        setHasMore(true);
+        fetchProperties(1, false);
+    }, [searchTerm]);
 
     const handleDeleteClick = (property) => {
         setDeleteConfirm({ isOpen: true, property });
@@ -83,13 +141,8 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         }
     };
 
-    const filteredProperties = properties.filter(p =>
-        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.subtitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.bairro?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.tipo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.price?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Busca já é feita na API, não precisa filtrar localmente
+    const filteredProperties = properties;
 
     if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
 
@@ -203,6 +256,11 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                         </tbody>
                     </table>
                 </div>
+                {/* Sentinel para scroll infinito */}
+                {hasMore && <div ref={sentinelRef} className="h-20" />}
+                {loading && properties.length > 0 && (
+                    <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
+                )}
             </div>
 
             {/* Mobile: Cards diretos na tela */}
@@ -264,6 +322,12 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                         </div>
                     </div>
                 ))}
+
+                {/* Sentinel para scroll infinito (mobile) */}
+                {hasMore && <div ref={sentinelRef} className="h-20" />}
+                {loading && properties.length > 0 && (
+                    <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
+                )}
 
                 {filteredProperties.length === 0 && !loading && (
                     <div className="p-8 text-center">

@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../components/Button.jsx';
 import { PortfolioEmptyState } from '../components/PortfolioEmptyState.jsx';
 import { PortfolioFilters } from '../components/PortfolioFilters.jsx';
-import { PortfolioGrid } from '../components/PortfolioGrid.jsx';
+import { VirtualizedGrid } from '../components/VirtualizedGrid.jsx';
+import { useInfiniteProperties } from '../hooks/useInfiniteProperties.js';
 import { BROKER_INFO } from '../data/constants.js';
 
 /**
@@ -10,24 +11,56 @@ import { BROKER_INFO } from '../data/constants.js';
  * Grug gosta: view simples que orquestra componentes menores
  *
  * @param {Object} props
- * @param {Array} props.properties - Lista de imóveis (vinda da API ou estática)
  * @param {Function} props.navigateTo - Função para navegar entre views
  * @param {Function} props.onPropertyClick - Callback quando imóvel é clicado
  */
-export const PortfolioView = ({ properties = [], navigateTo, onPropertyClick }) => {
+export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
     const [filters, setFilters] = useState({ bairro: 'Todos', tipo: 'Todos' });
+    const [searchInput, setSearchInput] = useState('');
+    const [search, setSearch] = useState(''); // Debounced search
+    
+    // Debounce search (300ms)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearch(searchInput);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
+    
+    // Preparar filtros para API (remover 'Todos' e converter para formato da API)
+    const apiFilters = {};
+    if (filters.area_min) apiFilters.area_min = filters.area_min;
+    if (filters.area_max) apiFilters.area_max = filters.area_max;
+    if (filters.quartos_min) apiFilters.quartos_min = filters.quartos_min;
+    if (filters.quartos_max) apiFilters.quartos_max = filters.quartos_max;
+    if (filters.banheiros_min) apiFilters.banheiros_min = filters.banheiros_min;
+    if (filters.banheiros_max) apiFilters.banheiros_max = filters.banheiros_max;
+    if (filters.vagas_min) apiFilters.vagas_min = filters.vagas_min;
+    if (filters.vagas_max) apiFilters.vagas_max = filters.vagas_max;
+    
+    // Usar hook de scroll infinito
+    const { items, loading, hasMore, loadMore } = useInfiniteProperties({
+        search,
+        filters: apiFilters
+    });
 
-    // Calcular filtros disponíveis baseado nos imóveis atuais
-    const availableNeighborhoods = useMemo(() => ['Todos', ...new Set(properties.map(p => p.bairro))], [properties]);
-    const availableTypes = useMemo(() => ['Todos', ...new Set(properties.map(p => p.tipo))], [properties]);
-
-    const filteredProperties = useMemo(() => properties.filter(prop => {
+    // Filtros básicos (bairro e tipo) - ainda aplicados localmente por enquanto
+    // TODO: Mover para API quando filtros avançados estiverem prontos
+    const filteredItems = items.filter(prop => {
         const bairroMatch = filters.bairro === 'Todos' || prop.bairro === filters.bairro;
         const tipoMatch = filters.tipo === 'Todos' || prop.tipo === filters.tipo;
         return bairroMatch && tipoMatch;
-    }), [properties, filters]);
+    });
 
-    const handleClearFilters = () => setFilters({ bairro: 'Todos', tipo: 'Todos' });
+    // Calcular filtros disponíveis baseado nos itens carregados
+    const availableNeighborhoods = ['Todos', ...new Set(items.map(p => p.bairro).filter(Boolean))];
+    const availableTypes = ['Todos', ...new Set(items.map(p => p.tipo).filter(Boolean))];
+
+    const handleClearFilters = () => {
+        setFilters({ bairro: 'Todos', tipo: 'Todos' });
+        setSearchInput('');
+        setSearch('');
+    };
 
     return (
         <div className="min-h-screen bg-[#f8fafc]">
@@ -58,14 +91,22 @@ export const PortfolioView = ({ properties = [], navigateTo, onPropertyClick }) 
                         onClearFilters={handleClearFilters}
                         neighborhoods={availableNeighborhoods}
                         types={availableTypes}
+                        search={searchInput}
+                        onSearchChange={setSearchInput}
                     />
                 </div>
             </div>
 
             {/* Properties Grid or Empty State */}
             <div className="container mx-auto px-6 pb-24">
-                {filteredProperties.length > 0 ? (
-                    <PortfolioGrid properties={filteredProperties} onPropertyClick={onPropertyClick} />
+                {filteredItems.length > 0 || loading ? (
+                    <VirtualizedGrid
+                        items={filteredItems}
+                        onPropertyClick={onPropertyClick}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        loading={loading}
+                    />
                 ) : (
                     <PortfolioEmptyState onClearFilters={handleClearFilters} />
                 )}

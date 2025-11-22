@@ -15,6 +15,8 @@ const PORT = process.env.PORT || 3001;
 const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cron = require('node-cron');
+const backupDatabase = require('./scripts/backup-db');
 
 // Rate limiting (Grug gosta: proteção simples contra DDoS)
 const limiter = rateLimit({
@@ -77,7 +79,23 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Backup automático diário às 02:00 AM (Grug gosta: backup simples e automático)
+cron.schedule('0 2 * * *', () => {
+    console.log('🔄 Iniciando backup automático...');
+    backupDatabase();
+}, {
+    scheduled: true,
+    timezone: "America/Sao_Paulo"
+});
+
+// Backup na inicialização (opcional, mas útil)
+if (process.env.NODE_ENV === 'production') {
+    console.log('🔄 Criando backup inicial...');
+    backupDatabase();
+}
+
 app.listen(PORT, () => {
     console.log(`🦖 Grug backend rodando na porta ${PORT}`);
     console.log(`📍 http://localhost:${PORT}/api/health`);
+    console.log(`💾 Backup automático agendado: diariamente às 02:00 AM`);
 });
