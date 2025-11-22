@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LeadModal } from '../components/LeadModal';
 import { PropertyGallery } from '../components/property/PropertyGallery';
 import { PropertyHeader } from '../components/property/PropertyHeader';
@@ -19,6 +19,7 @@ import { generateShareUrl } from '../utils/urlHelpers';
 export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onShareSuccess }) => {
     const [leadCaptured, setLeadCaptured] = useState(false);
     const [showLeadModal, setShowLeadModal] = useState(false);
+    const viewTrackedRef = useRef(false);
 
     // Função de compartilhar (Grug gosta: simples e direto, sempre funciona)
     const handleShare = async () => {
@@ -134,6 +135,28 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [property]);
+
+    // Registrar view quando página carrega (Grug gosta: simples, uma vez por visita!)
+    useEffect(() => {
+        if (!property?.id || viewTrackedRef.current) return;
+        
+        viewTrackedRef.current = true;
+        
+        const trackView = async () => {
+            try {
+                const isDev = import.meta.env.DEV;
+                const apiUrl = import.meta.env.VITE_API_URL || (isDev ? 'http://localhost:3001' : '');
+                const endpoint = apiUrl ? `${apiUrl}/api/properties/${property.id}/view` : `/api/properties/${property.id}/view`;
+                
+                await fetch(endpoint, { method: 'POST' });
+            } catch (err) {
+                // Silencioso - não quebrar UX se falhar
+                console.error('Erro ao registrar view:', err);
+            }
+        };
+        
+        trackView();
+    }, [property?.id]);
 
     // SEO dinâmico com Schema.org
     const getTransactionLabel = (type) => {

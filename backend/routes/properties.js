@@ -69,12 +69,20 @@ router.get('/', (req, res) => {
     }
 });
 
+// POST /api/properties/:id/view - Registrar visualização (Grug gosta: endpoint separado!)
+router.post('/:id/view', (req, res) => {
+    try {
+        db.prepare('UPDATE properties SET views = views + 1 WHERE id = ?').run(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error incrementing view:', error);
+        res.status(500).json({ error: 'Erro ao registrar visualização' });
+    }
+});
+
 // GET /api/properties/:id - Buscar uma propriedade
 router.get('/:id', (req, res) => {
     try {
-        // Incrementar views (Grug gosta: simples, direto!)
-        db.prepare('UPDATE properties SET views = views + 1 WHERE id = ?').run(req.params.id);
-        
         const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
 
         if (!property) {
