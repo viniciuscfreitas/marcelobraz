@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar, Lock } from 'lucide-react';
 import { Button } from '../components/Button';
 import { LeadModal } from '../components/LeadModal';
 import { BROKER_INFO, COLORS } from '../data/constants';
@@ -11,6 +11,43 @@ import { BROKER_INFO, COLORS } from '../data/constants';
 export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) => {
     const [activeImage, setActiveImage] = useState(0);
     const [viewCount, setViewCount] = useState(0);
+    const [leadCaptured, setLeadCaptured] = useState(false);
+    const [showLeadModal, setShowLeadModal] = useState(false);
+
+    // Helper simples: verifica se lead foi capturado (Grug gosta: função pequena, sem over-engineering)
+    const checkLeadCaptured = (propId) => {
+        const capturedLeads = JSON.parse(localStorage.getItem('leads_captured') || '[]');
+        const globalCaptured = localStorage.getItem('lead_captured') === 'true';
+        return propId ? (capturedLeads.includes(propId) || globalCaptured) : globalCaptured;
+    };
+
+    // Verificar se lead foi capturado
+    useEffect(() => {
+        const propertyId = property?.id;
+        const isCaptured = checkLeadCaptured(propertyId);
+        setLeadCaptured(isCaptured);
+        
+        // Se não foi capturado, abrir modal automaticamente após um breve delay
+        let timer = null;
+        if (!isCaptured && property) {
+            timer = setTimeout(() => setShowLeadModal(true), 500);
+        }
+        
+        // Handler único para atualizar estado quando lead é capturado
+        const updateLeadState = () => {
+            const newIsCaptured = checkLeadCaptured(propertyId);
+            setLeadCaptured(newIsCaptured);
+        };
+        
+        window.addEventListener('storage', updateLeadState);
+        window.addEventListener('leadCaptured', updateLeadState);
+        
+        return () => {
+            if (timer) clearTimeout(timer);
+            window.removeEventListener('storage', updateLeadState);
+            window.removeEventListener('leadCaptured', updateLeadState);
+        };
+    }, [property]);
 
     useEffect(() => {
         // View count (pode ser conectado à API no futuro)
@@ -143,27 +180,42 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                     </div>
                                 </div>
 
-                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 min-w-[250px]">
+                                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 min-w-[250px] relative">
+                                    {!leadCaptured && (
+                                        <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-10 p-4 border-2 border-primary/20">
+                                            <Lock size={32} className="text-primary mb-3" />
+                                            <p className="text-sm font-bold text-gray-900 mb-2 text-center">Valores Protegidos</p>
+                                            <p className="text-xs text-gray-600 mb-4 text-center">Cadastre-se para ver o valor e detalhes completos</p>
+                                            <Button
+                                                variant="primary"
+                                                className="w-full justify-center py-2 text-sm"
+                                                onClick={() => setShowLeadModal(true)}
+                                                ariaLabel="Desbloquear valores do imóvel"
+                                            >
+                                                Ver Preço Agora
+                                            </Button>
+                                        </div>
+                                    )}
                                     <p className="text-sm text-gray-500 mb-1">Valor de {property.tipo === 'Aluguel' ? 'Locação' : 'Venda'}</p>
                                     <p className="text-3xl font-bold text-primary mb-2">
-                                        {formatPrice(property.price)}
+                                        {leadCaptured ? formatPrice(property.price) : 'R$ ***,***'}
                                     </p>
                                     <div className="space-y-1 text-sm text-gray-600 pt-2 border-t border-gray-200">
                                         {property.condominio && (
                                             <div className="flex justify-between">
                                                 <span>Condomínio:</span>
-                                                <span className="font-semibold">{formatPrice(property.condominio)}</span>
+                                                <span className="font-semibold">{leadCaptured ? formatPrice(property.condominio) : 'R$ ***'}</span>
                                             </div>
                                         )}
                                         {property.iptu && (
                                             <div className="flex justify-between">
                                                 <span>IPTU:</span>
-                                                <span className="font-semibold">{formatPrice(property.iptu)}</span>
+                                                <span className="font-semibold">{leadCaptured ? formatPrice(property.iptu) : 'R$ ***'}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between pt-2 border-t border-gray-200 font-bold text-gray-900 mt-2">
                                             <span>Total Estimado:</span>
-                                            <span>{formatPrice(totalVal)}</span>
+                                            <span>{leadCaptured ? formatPrice(totalVal) : 'R$ ***,***'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -252,7 +304,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                         )}
 
                         {/* Map Section */}
-                        {property.mostrar_endereco === 1 && (
+                        {property.mostrar_endereco === 1 && leadCaptured && (
                             <section className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden" aria-labelledby="location-heading">
                                 <h2 id="location-heading" className="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2">
                                     <MapIcon size={24} className="text-primary" aria-hidden="true" /> Localização
@@ -381,6 +433,20 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
 
                 </div>
             </div>
+
+            {/* Lead Modal */}
+            <LeadModal
+                isOpen={showLeadModal}
+                onClose={() => setShowLeadModal(false)}
+                property={property}
+                type="gate"
+                onSuccess={(msg) => {
+                    setLeadCaptured(true);
+                    // Disparar evento para atualizar outros componentes
+                    window.dispatchEvent(new Event('leadCaptured'));
+                    setShowLeadModal(false);
+                }}
+            />
         </div>
     );
 };

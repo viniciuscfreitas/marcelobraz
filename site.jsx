@@ -32,6 +32,8 @@ export default function RealEstateSite() {
 
   const handleModalSuccess = (msg) => {
     setToastMessage(msg);
+    // Disparar evento para atualizar componentes que verificam lead capturado
+    window.dispatchEvent(new Event('leadCaptured'));
   };
 
   const renderContent = () => {

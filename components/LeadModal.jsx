@@ -72,6 +72,19 @@ export const LeadModal = ({ isOpen, onClose, property, type = "gate", onSuccess 
         throw new Error(errorData.error || 'Erro ao salvar lead');
       }
 
+      // Sucesso - salvar lead capturado no localStorage
+      const capturedLeads = JSON.parse(localStorage.getItem('leads_captured') || '[]');
+      const propertyId = property?.id || 'global';
+      if (!capturedLeads.includes(propertyId)) {
+        capturedLeads.push(propertyId);
+        localStorage.setItem('leads_captured', JSON.stringify(capturedLeads));
+      }
+      // Flag global também
+      localStorage.setItem('lead_captured', 'true');
+      
+      // Disparar evento para atualizar componentes
+      window.dispatchEvent(new Event('leadCaptured'));
+      
       // Sucesso - manter feedback visual via onSuccess
       onSuccess("Acesso liberado! Enviando detalhes...");
       onClose();
