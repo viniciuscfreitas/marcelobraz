@@ -31,3 +31,6 @@ lerna-debug.log*
 
 # Docker (manter .dockerignore no repo)
 
+# Uploads
+backend/uploads/
+
