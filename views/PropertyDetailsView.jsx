@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar, Lock } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Eye, Map as MapIcon, MessageCircle, Mail, Calendar, Lock } from 'lucide-react';
 import { Button } from '../components/Button';
 import { LeadModal } from '../components/LeadModal';
 import { BROKER_INFO, COLORS } from '../data/constants';
@@ -119,18 +119,12 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                     alt={`Imagem ${activeImage + 1} de ${images.length} - ${property.title}`}
                                     className="w-full h-full object-cover transition-transform duration-500"
                                 />
-                                <div className="absolute top-4 right-4 flex gap-2">
+                                <div className="absolute top-4 right-4">
                                     <button
                                         className="p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
                                         aria-label="Compartilhar este imóvel"
                                     >
                                         <Share2 size={20} />
-                                    </button>
-                                    <button
-                                        className="p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 flex items-center justify-center"
-                                        aria-label="Adicionar aos favoritos"
-                                    >
-                                        <Heart size={20} />
                                     </button>
                                 </div>
                                 <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
