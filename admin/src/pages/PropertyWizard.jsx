@@ -42,8 +42,8 @@ export default function PropertyWizard() {
     };
 
     const handleFabSubmit = () => {
-        if (formRef.current) {
-            formRef.current.requestSubmit();
+        if (formRef.current && currentStep === STEPS.length && !loading) {
+            methods.handleSubmit(handleSubmit)();
         }
     };
 
@@ -114,12 +114,9 @@ export default function PropertyWizard() {
                         <FormProvider {...methods}>
                             <form 
                                 ref={formRef} 
-                                onSubmit={methods.handleSubmit(handleSubmit)} 
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                    }
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                 }}
                                 className="p-4 md:p-6"
                             >
@@ -138,7 +135,14 @@ export default function PropertyWizard() {
                                         </button>
                                     ) : (
                                         <button
-                                            type="submit"
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (!loading) {
+                                                    methods.handleSubmit(handleSubmit)(e);
+                                                }
+                                            }}
                                             disabled={loading}
                                             className="btn-primary flex items-center gap-2 px-8 py-2 bg-green-600 hover:bg-green-700 border-green-600"
                                         >

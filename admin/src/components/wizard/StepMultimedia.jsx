@@ -104,12 +104,6 @@ export default function StepMultimedia() {
                             {...register('multimedia.video_url')}
                             className="input-field"
                             placeholder="https://youtube.com/watch?v=..."
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }
-                            }}
                         />
                     </div>
 
@@ -122,12 +116,6 @@ export default function StepMultimedia() {
                             {...register('multimedia.tour_url')}
                             className="input-field"
                             placeholder="https://matterport.com/..."
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                }
-                            }}
                         />
                     </div>
                 </div>
