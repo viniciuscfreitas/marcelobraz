@@ -1,10 +1,27 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { parseProperty, parseProperties, preparePropertyData } = require('../utils/propertyHelpers');
 const { validateProperty, handleValidationErrors } = require('../validators/propertyValidator');
 const { buildPropertyQuery } = require('../utils/queryBuilder');
+
+// Rate limit para views: 1 view por IP por imóvel a cada 5 minutos (proteção contra spam)
+// Grug gosta: simples! Usar IP padrão do express (já trata IPv6)
+const viewRateLimit = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutos
+    max: 1, // 1 request por IP
+    message: 'Muitas requisições. Aguarde alguns minutos.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    // keyGenerator padrão usa req.ip (já trata IPv6)
+    // Mas precisamos combinar IP + property ID
+    keyGenerator: (req) => {
+        // req.ip já é tratado pelo express (IPv4 e IPv6)
+        return `${req.ip || 'unknown'}-view-${req.params.id}`;
+    }
+});
 
 // GET /api/properties - Listar todas as propriedades (público)
 // Grug gosta: SELECT específico para performance (não SELECT *)
@@ -70,7 +87,7 @@ router.get('/', (req, res) => {
 });
 
 // POST /api/properties/:id/view - Registrar visualização (Grug gosta: endpoint separado!)
-router.post('/:id/view', (req, res) => {
+router.post('/:id/view', viewRateLimit, (req, res) => {
     try {
         // Verificar se imóvel existe antes de incrementar (Grug gosta: validação simples!)
         const property = db.prepare('SELECT id FROM properties WHERE id = ?').get(req.params.id);
@@ -112,9 +129,9 @@ router.post('/', requireAuth, validateProperty, handleValidationErrors, (req, re
                 condominio, iptu, area_util, area_total,
                 cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
                 aceita_permuta, aceita_fgts, posicao_apto, andares,
-                features, multimedia, transaction_type
+                features, multimedia, transaction_type, status
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         const values = preparePropertyData(req.body);
@@ -143,7 +160,7 @@ router.put('/:id', requireAuth, validateProperty, handleValidationErrors, (req, 
                 condominio = ?, iptu = ?, area_util = ?, area_total = ?,
                 cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
                 aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
-                features = ?, multimedia = ?, transaction_type = ?,
+                features = ?, multimedia = ?, transaction_type = ?, status = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `);
@@ -204,7 +221,7 @@ router.delete('/:id', requireAuth, (req, res) => {
 
         db.prepare('DELETE FROM properties WHERE id = ?').run(req.params.id);
 
-        res.json({ message: 'Imóvel deletado com sucesso! 🦖' });
+        res.json({ message: 'Imóvel deletado com sucesso!' });
     } catch (error) {
         console.error('Error deleting property:', error);
         res.status(500).json({ error: 'Erro ao deletar imóvel' });

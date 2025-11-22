@@ -9,7 +9,7 @@ const { requireAuth } = require('../middleware/auth');
  */
 router.get('/stats', requireAuth, (req, res) => {
     try {
-        // Total de views (últimos 7 dias - usando views total por enquanto, Grug gosta simples!)
+        // Total de views (todas as views acumuladas)
         const totalViewsResult = db.prepare('SELECT SUM(views) as total FROM properties').get();
         const totalViews = totalViewsResult.total || 0;
 
@@ -21,7 +21,8 @@ router.get('/stats', requireAuth, (req, res) => {
         `).get();
         const leadsCount = leadsResult.count || 0;
 
-        // Taxa de conversão (leads / views * 100)
+        // Taxa de conversão: leads dos últimos 7 dias / views totais
+        // Grug gosta: simples! Se quiser views dos últimos 7 dias, precisa de tabela de views com timestamp
         const conversionRate = totalViews > 0 ? ((leadsCount / totalViews) * 100).toFixed(1) : '0.0';
 
         // Top 3 imóveis mais vistos

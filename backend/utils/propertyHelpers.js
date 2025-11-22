@@ -83,7 +83,8 @@ function preparePropertyData(data) {
         data.andares || null,
         data.features ? JSON.stringify(data.features) : '{}',
         data.multimedia ? JSON.stringify(data.multimedia) : '{}',
-        data.transaction_type || 'Venda'
+        data.transaction_type || 'Venda',
+        data.status || 'disponivel'
     ];
 }
 

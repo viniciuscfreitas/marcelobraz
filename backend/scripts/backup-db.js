@@ -30,24 +30,23 @@ function backupDatabase() {
         fs.copyFileSync(dbPath, backupPath);
         console.log(`✅ Backup criado: ${backupFileName}`);
 
-        // Manter apenas últimos 7 backups (deletar mais antigos)
+        // Manter apenas últimos 30 dias de backups (Grug gosta: limpeza automática!)
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
         const backups = fs.readdirSync(backupsDir)
             .filter(f => f.startsWith('database-') && f.endsWith('.sqlite'))
             .map(f => ({
                 name: f,
                 path: path.join(backupsDir, f),
                 time: fs.statSync(path.join(backupsDir, f)).mtime
-            }))
-            .sort((a, b) => b.time - a.time); // Mais recente primeiro
+            }));
 
-        // Deletar backups além dos 7 mais recentes
-        if (backups.length > 7) {
-            const toDelete = backups.slice(7);
-            toDelete.forEach(backup => {
+        // Deletar backups mais antigos que 30 dias
+        backups.forEach(backup => {
+            if (backup.time.getTime() < thirtyDaysAgo) {
                 fs.unlinkSync(backup.path);
                 console.log(`🗑️ Backup antigo removido: ${backup.name}`);
-            });
-        }
+            }
+        });
     } catch (error) {
         console.error('❌ Erro ao criar backup:', error);
     }

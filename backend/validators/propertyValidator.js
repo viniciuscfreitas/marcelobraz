@@ -52,6 +52,11 @@ const validateProperty = [
         .optional({ checkFalsy: true })
         .trim()
         .isIn(['Venda', 'Aluguel', 'Temporada', 'Leilão']).withMessage('Tipo de transação inválido'),
+    
+    body('status')
+        .optional({ checkFalsy: true })
+        .trim()
+        .isIn(['disponivel', 'exclusivo', 'em_breve', 'venda_silenciosa', 'vendido', 'alugado']).withMessage('Status inválido'),
 ];
 
 /**
