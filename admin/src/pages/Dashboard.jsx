@@ -14,39 +14,32 @@ export default function Dashboard() {
     const [totalProperties, setTotalProperties] = useState(0);
     const [totalLeads, setTotalLeads] = useState(0);
 
-    // Buscar stats ao montar e ao focar na janela
+    // Buscar apenas leads (imóveis vem do PropertiesList via onTotalChange)
+    // Grug gosta: uma requisição a menos!
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchLeads = async () => {
+            if (!token) return;
+            
             try {
-                // Buscar contagem de imóveis
-                const propertiesRes = await fetch(`${API_URL}/api/properties`);
-                if (propertiesRes.ok) {
-                    const properties = await propertiesRes.json();
-                    setTotalProperties(properties.length);
-                }
-
-                // Buscar contagem de leads (precisa token)
-                if (token) {
-                    const leadsRes = await fetch(`${API_URL}/api/leads`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (leadsRes.ok) {
-                        const leads = await leadsRes.json();
-                        setTotalLeads(leads.length);
+                const leadsRes = await fetch(`${API_URL}/api/leads`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
                     }
+                });
+                if (leadsRes.ok) {
+                    const leads = await leadsRes.json();
+                    setTotalLeads(leads.length);
                 }
             } catch (err) {
-                console.error('Erro ao buscar stats:', err);
+                console.error('Erro ao buscar leads:', err);
             }
         };
 
-        fetchStats();
+        fetchLeads();
 
         // Refresh ao focar na janela
         const handleFocus = () => {
-            fetchStats();
+            fetchLeads();
         };
 
         window.addEventListener('focus', handleFocus);
@@ -109,6 +102,7 @@ export default function Dashboard() {
                             onEdit={handleEdit}
                             refreshTrigger={refreshTrigger}
                             searchTerm={searchTerm}
+                            onTotalChange={setTotalProperties}
                         />
                     </div>
                 </section>
@@ -119,6 +113,7 @@ export default function Dashboard() {
                         onEdit={handleEdit}
                         refreshTrigger={refreshTrigger}
                         searchTerm={searchTerm}
+                        onTotalChange={setTotalProperties}
                     />
                 </div>
             </div>

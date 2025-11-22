@@ -6,7 +6,7 @@ import ConfirmDialog from './ConfirmDialog';
 import { useToast } from '../hooks/useToast';
 import Toast from './Toast';
 
-export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = '' }) {
+export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = '', onTotalChange }) {
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
@@ -64,6 +64,11 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                     setProperties(data.data);
                 }
                 setHasMore(data.pagination.hasMore);
+                
+                // Grug gosta: expor total para Dashboard (evita requisição duplicada)
+                if (onTotalChange && !append) {
+                    onTotalChange(data.pagination.total);
+                }
             }
         } catch (error) {
             console.error('Erro ao buscar imóveis:', error);
