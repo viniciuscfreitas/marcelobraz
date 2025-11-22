@@ -22,7 +22,7 @@ export default function StepMultimedia() {
         if (!file) return;
         try {
             const url = await uploadImage(file);
-            setValue('image', url);
+            setValue('image', url, { shouldValidate: false });
         } catch (error) {
             showToast('Erro ao enviar imagem', 'error');
         }
@@ -45,7 +45,7 @@ export default function StepMultimedia() {
                             <img src={imageUrl} alt="Capa" className="w-full h-full object-cover" />
                             <button
                                 type="button"
-                                onClick={() => setValue('image', '')}
+                                onClick={() => setValue('image', '', { shouldValidate: false })}
                                 className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                             >
                                 <X size={16} />
@@ -104,6 +104,12 @@ export default function StepMultimedia() {
                             {...register('multimedia.video_url')}
                             className="input-field"
                             placeholder="https://youtube.com/watch?v=..."
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }
+                            }}
                         />
                     </div>
 
@@ -116,6 +122,12 @@ export default function StepMultimedia() {
                             {...register('multimedia.tour_url')}
                             className="input-field"
                             placeholder="https://matterport.com/..."
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }
+                            }}
                         />
                     </div>
                 </div>

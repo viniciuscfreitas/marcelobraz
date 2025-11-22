@@ -112,7 +112,17 @@ export default function PropertyWizard() {
                         </div>
 
                         <FormProvider {...methods}>
-                            <form ref={formRef} onSubmit={methods.handleSubmit(handleSubmit)} className="p-4 md:p-6">
+                            <form 
+                                ref={formRef} 
+                                onSubmit={methods.handleSubmit(handleSubmit)} 
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                className="p-4 md:p-6"
+                            >
                                 <CurrentComponent />
 
                                 {/* Botões apenas no desktop - mobile usa bottom nav */}
