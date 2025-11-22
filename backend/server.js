@@ -36,11 +36,15 @@ app.use(morgan('dev')); // Logging (Grug likes logs)
 app.use('/api/', limiter); // Rate limit em todas as rotas API
 // CORS: Grug gosta de segurança! Sem '*' em produção
 // Permite admin e site em produção
-const corsOrigins = process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-    : (process.env.NODE_ENV === 'development' 
-        ? ['*'] 
-        : ['https://marcelobraz.vinicius.xyz', 'https://admin.marcelobraz.vinicius.xyz']);
+let corsOrigins;
+if (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.trim()) {
+    corsOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(o => o);
+} else if (process.env.NODE_ENV === 'development') {
+    corsOrigins = ['*'];
+} else {
+    // Produção: domínios padrão se CORS_ORIGIN não estiver definido
+    corsOrigins = ['https://marcelobraz.vinicius.xyz', 'https://admin.marcelobraz.vinicius.xyz'];
+}
 
 const corsOptions = {
     origin: corsOrigins.includes('*') ? '*' : corsOrigins,
@@ -48,6 +52,8 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 };
+
+console.log(`🌐 CORS configurado para: ${corsOrigins.includes('*') ? '*' : corsOrigins.join(', ')}`);
 app.use(cors(corsOptions));
 app.use(express.json());
 
