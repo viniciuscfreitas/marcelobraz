@@ -15,6 +15,7 @@ import { TestimonialsSection } from './sections/TestimonialsSection.jsx';
 import { ValuationSection } from './sections/ValuationSection.jsx';
 import { WhatsappCaptureSection } from './sections/WhatsappCaptureSection.jsx';
 import { PortfolioView } from './views/PortfolioView.jsx';
+import { PropertyDetailsView } from './views/PropertyDetailsView.jsx';
 
 export default function RealEstateSite() {
   const nav = useNavigation();
@@ -24,12 +25,54 @@ export default function RealEstateSite() {
   const [toastMessage, setToastMessage] = useState(null);
 
   const handlePropertyClick = (prop) => {
-      setSelectedProperty(prop);
-    openModal('gate');
+    setSelectedProperty(prop);
+    nav.navigateTo('property');
+    // openModal('gate'); // Removido: agora vai para a página de detalhes
   };
 
   const handleModalSuccess = (msg) => {
     setToastMessage(msg);
+  };
+
+  const renderContent = () => {
+    switch (nav.currentView) {
+      case 'home':
+        return (
+          <main>
+            <HeroSection navigateTo={nav.navigateTo} />
+            <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} properties={properties} />
+            <AboutSection />
+            <ValuationSection />
+            <TestimonialsSection />
+            <WhatsappCaptureSection />
+          </main>
+        );
+      case 'portfolio':
+        return (
+          <PortfolioView
+            properties={properties}
+            navigateTo={nav.navigateTo}
+            onPropertyClick={handlePropertyClick}
+          />
+        );
+      case 'property':
+        return (
+          <PropertyDetailsView
+            property={selectedProperty}
+            navigateTo={nav.navigateTo}
+            onOpenLeadModal={(type) => {
+              // Se for whatsapp, abre direto. Se for email, abre modal.
+              if (type === 'whatsapp') {
+                window.open(BROKER_INFO.whatsapp_link, '_blank');
+              } else {
+                openModal('contact'); // Reutilizando modal de contato/gate
+              }
+            }}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -46,32 +89,18 @@ export default function RealEstateSite() {
         currentView={nav.currentView}
       />
 
-      {nav.currentView === 'home' ? (
-        <>
-          <main>
-            <HeroSection navigateTo={nav.navigateTo} />
-            <CollectionSection navigateTo={nav.navigateTo} onPropertyClick={handlePropertyClick} properties={properties} />
-            <AboutSection />
-            <ValuationSection />
-            <TestimonialsSection />
-            <WhatsappCaptureSection />
-          </main>
-          <Footer navigateTo={nav.navigateTo} />
-            </>
-        ) : (
-        <PortfolioView
-          properties={properties}
-          navigateTo={nav.navigateTo}
-          onPropertyClick={handlePropertyClick}
-        />
-      )} <a href={BROKER_INFO.whatsapp_link} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 group flex items-center justify-end focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400 rounded-full" aria-label="Falar no WhatsApp">
+      {renderContent()}
+
+      {nav.currentView !== 'property' && <Footer navigateTo={nav.navigateTo} />}
+
+      <a href={BROKER_INFO.whatsapp_link} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 group flex items-center justify-end focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400 rounded-full" aria-label="Falar no WhatsApp">
         <div className="absolute right-16 bg-white py-2 px-4 rounded-lg shadow-xl text-xs font-bold text-[#0f172a] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 mr-2 hidden md:block border border-gray-100" aria-hidden="true">Falar com Marcelo</div>
         <div className="bg-[#25D366] text-white p-4 rounded-full shadow-2xl shadow-green-500/30 hover:scale-110 transition-transform duration-300 flex items-center justify-center w-14 h-14"><MessageCircle size={30} /></div>
       </a>
 
       <LeadModal
         isOpen={modalState.isOpen}
-        onClose={() => { closeModal(); setSelectedProperty(null); }}
+        onClose={() => { closeModal(); }}
         property={selectedProperty}
         type={modalState.type}
         onSuccess={handleModalSuccess}

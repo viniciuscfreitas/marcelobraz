@@ -13,11 +13,11 @@ import { CONSTANTS } from '../data/constants.js';
  * - Performance otimizada com requestAnimationFrame
  * 
  * @returns {{
- *   currentView: 'home'|'portfolio',
+ *   currentView: 'home'|'portfolio'|'property',
  *   isScrolled: boolean,
  *   mobileMenuOpen: boolean,
  *   setMobileMenuOpen: (open: boolean) => void,
- *   navigateTo: (view: 'home'|'portfolio', sectionId?: string) => void
+ *   navigateTo: (view: 'home'|'portfolio'|'property', sectionId?: string) => void
  * }}
  */
 export const useNavigation = () => {
