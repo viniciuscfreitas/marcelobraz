@@ -7,7 +7,8 @@ import { PropertyMap } from '../components/property/PropertyMap';
 import { PropertyMultimedia } from '../components/property/PropertyMultimedia';
 import { PropertyContact } from '../components/property/PropertyContact';
 import { PropertyBrokerProfile } from '../components/property/PropertyBrokerProfile';
-import { useSEO } from '../hooks/useSEO';
+import { FinancingCalculator } from '../components/property/FinancingCalculator';
+import { useSEO } from '../hooks/useSEO.jsx';
 import { BROKER_INFO } from '../data/constants';
 
 /**
@@ -194,6 +195,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                             leadCaptured={leadCaptured}
                             onUnlockPrice={() => setShowLeadModal(true)}
                         />
+                        <FinancingCalculator property={property} />
                         <PropertyFeatures features={features} />
                         {leadCaptured && <PropertyMap property={property} />}
                         <PropertyMultimedia multimedia={multimedia} property={property} />

@@ -85,7 +85,10 @@ function initDatabase() {
     { name: 'andares', type: 'TEXT' },
     { name: 'features', type: 'TEXT' },
     { name: 'multimedia', type: 'TEXT' },
-    { name: 'transaction_type', type: "TEXT DEFAULT 'Venda'" }
+    { name: 'transaction_type', type: "TEXT DEFAULT 'Venda'" },
+    // Grug gosta: novas colunas Fase 1
+    { name: 'status', type: "TEXT DEFAULT 'disponivel'" },
+    { name: 'views', type: 'INTEGER DEFAULT 0' }
   ];
 
   columnsToAdd.forEach(col => {

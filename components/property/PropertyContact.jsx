@@ -1,12 +1,19 @@
 import { MessageCircle, Mail, Calendar } from 'lucide-react';
 import { Button } from '../Button';
 import { COLORS, BROKER_INFO } from '../../data/constants';
+import { generateWhatsAppLink } from '../../utils/whatsappHelpers';
 
 /**
  * Componente de Card de Contato
  * Grug gosta: componente focado, < 150 linhas
  */
 export const PropertyContact = ({ property, onOpenLeadModal }) => {
+    // Grug gosta: WhatsApp com contexto completo!
+    const handleWhatsAppClick = () => {
+        const whatsappUrl = generateWhatsAppLink(property);
+        window.open(whatsappUrl, '_blank');
+    };
+
     return (
         <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0f172a] to-[#d4af37]"></div>
@@ -21,7 +28,7 @@ export const PropertyContact = ({ property, onOpenLeadModal }) => {
                     variant="primary"
                     className="w-full justify-center py-4 text-lg shadow-lg border-none hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: COLORS.WHATSAPP }}
-                    onClick={() => onOpenLeadModal('whatsapp')}
+                    onClick={handleWhatsAppClick}
                     ariaLabel="Abrir conversa no WhatsApp"
                 >
                     <MessageCircle className="mr-2" />
