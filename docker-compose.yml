@@ -21,6 +21,7 @@ services:
   admin:
     build:
       context: ./admin
+      dockerfile: Dockerfile
       args:
         - VITE_API_URL=${VITE_API_URL:-http://localhost:3040}
         - VITE_SITE_URL=${VITE_SITE_URL:-${VITE_API_URL:-https://marcelobraz.vinicius.xyz}}
