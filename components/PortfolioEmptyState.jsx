@@ -7,7 +7,7 @@
  */
 export const PortfolioEmptyState = ({ onClearFilters }) => {
     return (
-        <div className="text-center py-20">
+        <div className="text-center pt-32 pb-20">
             <p className="text-xl text-gray-500 font-serif">
                 Nenhum imóvel encontrado com esses filtros.
             </p>
