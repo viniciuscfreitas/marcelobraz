@@ -72,7 +72,7 @@ export const usePropertyWizard = () => {
             });
 
             if (res.ok) {
-                onSuccess('Imóvel salvo com sucesso! 🦖');
+                onSuccess('Imóvel salvo com sucesso!');
                 setTimeout(() => navigate('/'), 1500);
             } else {
                 const errorData = await res.json().catch(() => ({ error: 'Erro ao salvar' }));
