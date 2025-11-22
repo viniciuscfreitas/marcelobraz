@@ -53,10 +53,10 @@ export default function Dashboard() {
 
     return (
         <Layout searchTerm={searchTerm} setSearchTerm={setSearchTerm}>
-            <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col px-4 md:px-6 py-4 md:py-6 pb-20 md:pb-6 md:min-h-0">
+            <div className="flex-1 overflow-y-auto md:overflow-hidden flex flex-col px-4 md:px-6 py-2 md:py-4 pb-20 md:pb-4 md:min-h-0">
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 flex-shrink-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 flex-shrink-0">
                     <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex justify-between items-start relative overflow-hidden group">
                         <div className="z-10">
                             <div className="flex items-center gap-2 mb-4">
@@ -124,8 +124,8 @@ export default function Dashboard() {
 
                 {/* Top 3 Imóveis Mais Vistos */}
                 {stats?.top_properties && stats.top_properties.length > 0 && (
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 mb-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">🔥 Top 3 Imóveis Mais Vistos</h3>
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
+                        <h3 className="text-base font-bold text-gray-900 mb-3">Top 3 Imóveis Mais Vistos</h3>
                         <div className="space-y-3">
                             {stats.top_properties.map((prop, idx) => (
                                 <div key={prop.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
@@ -149,13 +149,13 @@ export default function Dashboard() {
                 {/* Properties Section - Grug gosta: renderizar só um componente! */}
                 {isDesktop ? (
                     <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" role="region" aria-labelledby="properties-heading">
-                        <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
+                        <div className="p-3 md:p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 flex-shrink-0">
                             <div>
-                                <h3 id="properties-heading" className="text-lg md:text-xl font-bold text-gray-900">Seus Imóveis</h3>
-                                <p className="text-xs md:text-sm text-gray-500 mt-1">Gerencie sua lista de propriedades exclusivas.</p>
+                                <h3 id="properties-heading" className="text-base md:text-lg font-bold text-gray-900">Seus Imóveis</h3>
+                                <p className="text-xs text-gray-500 mt-0.5">Gerencie sua lista de propriedades exclusivas.</p>
                             </div>
                         </div>
-                        <div className="p-0 flex-1 min-h-0 overflow-hidden">
+                        <div className="p-0 flex-1 min-h-0 overflow-auto">
                             <PropertiesList
                                 onEdit={handleEdit}
                                 refreshTrigger={refreshTrigger}

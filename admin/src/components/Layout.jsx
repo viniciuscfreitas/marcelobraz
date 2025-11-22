@@ -78,14 +78,14 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
             {/* Main Content Wrapper */}
             <div className="md:pl-24 h-full flex flex-col overflow-hidden bg-[#FAFAFA]">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-100 border-l-0 md:border-l-0 px-4 md:px-6 py-2 md:py-5 flex-shrink-0">
+                <header className="bg-white border-b border-gray-100 border-l-0 md:border-l-0 px-4 md:px-6 py-2 md:py-3 flex-shrink-0">
                     <div className="flex flex-row md:flex-row items-center gap-2 md:gap-4">
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
-                            <h1 className="text-lg md:text-3xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                                Olá, {user?.name}! <span className="animate-bounce inline">👋</span>
+                            <h1 className="text-lg md:text-2xl font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                                Olá, {user?.name}!
                             </h1>
-                            <p className="text-gray-500 text-xs md:text-sm hidden md:block">Aqui está o resumo do seu portfólio hoje</p>
+                            <p className="text-gray-500 text-xs hidden md:block">Aqui está o resumo do seu portfólio hoje</p>
                         </div>
 
                         {/* Botão/Busca */}
