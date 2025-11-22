@@ -7,6 +7,8 @@ import { PropertyMap } from '../components/property/PropertyMap';
 import { PropertyMultimedia } from '../components/property/PropertyMultimedia';
 import { PropertyContact } from '../components/property/PropertyContact';
 import { PropertyBrokerProfile } from '../components/property/PropertyBrokerProfile';
+import { useSEO } from '../hooks/useSEO';
+import { BROKER_INFO } from '../data/constants';
 
 /**
  * Página de Detalhes do Imóvel
@@ -130,6 +132,23 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [property]);
+
+    // SEO dinâmico
+    const getTransactionLabel = (type) => {
+        if (type === 'Aluguel') return 'Locação';
+        if (type === 'Temporada') return 'Temporada';
+        if (type === 'Leilão') return 'Leilão';
+        return 'Venda';
+    };
+
+    useSEO({
+        title: property ? `${property.title} - ${BROKER_INFO.name}` : 'Marcelo Braz - Private Broker',
+        description: property 
+            ? `${property.title} em ${property.bairro || ''}, ${property.cidade || 'Santos'}. ${getTransactionLabel(property.transaction_type)}. ${property.description ? property.description.substring(0, 120) + '...' : 'Imóvel exclusivo na baixada santista.'}`
+            : 'Marcelo Braz - Consultor Private em Santos. Imóveis exclusivos na baixada santista.',
+        image: property?.image || '',
+        url: property ? `${window.location.origin}?property=${property.id}` : window.location.origin
+    });
 
     if (!property) return null;
 
