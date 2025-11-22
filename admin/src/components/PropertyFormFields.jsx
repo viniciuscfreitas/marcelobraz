@@ -48,8 +48,12 @@ export default function PropertyFormFields({
                             type="button"
                             onClick={(e) => {
                                 e.preventDefault();
+                                e.stopPropagation();
                                 if (!uploading) {
-                                    document.getElementById('image-upload').click();
+                                    const input = document.getElementById('image-upload');
+                                    if (input) {
+                                        input.click();
+                                    }
                                 }
                             }}
                             disabled={uploading}

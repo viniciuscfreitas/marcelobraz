@@ -17,7 +17,7 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
     const imageUrl = watch('image');
 
     const handleUploadSuccess = (url) => {
-        setValue('image', url);
+        setValue('image', url, { shouldValidate: false });
     };
 
     const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
@@ -58,6 +58,7 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
     };
 
     const handleImageUpload = async (e) => {
+        e.stopPropagation();
         const file = e.target.files[0];
         if (!file) return;
 

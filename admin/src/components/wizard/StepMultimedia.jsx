@@ -17,6 +17,7 @@ export default function StepMultimedia() {
     const multimedia = watch('multimedia') || {};
 
     const handleMainImageUpload = async (e) => {
+        e.stopPropagation();
         const file = e.target.files[0];
         if (!file) return;
         try {
@@ -70,8 +71,12 @@ export default function StepMultimedia() {
                             type="button"
                             onClick={(e) => {
                                 e.preventDefault();
+                                e.stopPropagation();
                                 if (!uploading) {
-                                    document.getElementById('main-image-upload').click();
+                                    const input = document.getElementById('main-image-upload');
+                                    if (input) {
+                                        input.click();
+                                    }
                                 }
                             }}
                             disabled={uploading}

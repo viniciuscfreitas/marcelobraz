@@ -20,7 +20,7 @@ export default function PropertyForm() {
     const imageUrl = watch('image');
 
     const handleUploadSuccess = (url) => {
-        setValue('image', url);
+        setValue('image', url, { shouldValidate: false });
     };
 
     const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
@@ -47,6 +47,7 @@ export default function PropertyForm() {
     };
 
     const handleImageUpload = async (e) => {
+        e.stopPropagation();
         const file = e.target.files[0];
         if (!file) return;
 
@@ -161,8 +162,12 @@ export default function PropertyForm() {
                                             type="button"
                                             onClick={(e) => {
                                                 e.preventDefault();
+                                                e.stopPropagation();
                                                 if (!uploading) {
-                                                    document.getElementById('image-upload').click();
+                                                    const input = document.getElementById('image-upload');
+                                                    if (input) {
+                                                        input.click();
+                                                    }
                                                 }
                                             }}
                                             disabled={uploading}
