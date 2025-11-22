@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { SITE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 
-export default function Layout({ children, searchTerm, setSearchTerm, showSearch = true }) {
+export default function Layout({ children, searchTerm, setSearchTerm, showSearch = true, fabButton }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -173,18 +173,24 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
                     <span className="text-[10px] font-medium">Leads</span>
                 </button>
 
-                {/* FAB Button */}
+                {/* FAB Button - Customizado no wizard, padrão nas outras páginas */}
                 <div className="relative -top-6">
-                    <button
-                        onClick={handleOpenWizard}
-                        className="w-14 h-14 bg-gold-dark rounded-full flex items-center justify-center text-white shadow-xl shadow-gold/20 active:scale-95 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-gold"
-                        aria-label="Adicionar novo imóvel"
-                    >
-                        <Plus className="w-7 h-7" aria-hidden="true" />
-                    </button>
-                    <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-gold-dark whitespace-nowrap">
-                        Novo
-                    </span>
+                    {fabButton ? (
+                        fabButton
+                    ) : (
+                        <>
+                            <button
+                                onClick={handleOpenWizard}
+                                className="w-14 h-14 bg-gold-dark rounded-full flex items-center justify-center text-white shadow-xl shadow-gold/20 active:scale-95 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-gold"
+                                aria-label="Adicionar novo imóvel"
+                            >
+                                <Plus className="w-7 h-7" aria-hidden="true" />
+                            </button>
+                            <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-gold-dark whitespace-nowrap">
+                                Novo
+                            </span>
+                        </>
+                    )}
                 </div>
 
                 <a

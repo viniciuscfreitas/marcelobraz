@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { Save, ArrowRight } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
@@ -20,6 +20,7 @@ const STEPS = [
 export default function PropertyWizard() {
     const { toast, showToast, hideToast } = useToast();
     const { isEditing, currentStep, loading, methods, onSubmit, nextStep, prevStep, fetchProperty } = usePropertyWizard();
+    const formRef = useRef(null);
 
     useEffect(() => {
         if (isEditing) {
@@ -40,10 +41,46 @@ export default function PropertyWizard() {
         await nextStep((msg) => showToast(msg, 'error'));
     };
 
+    const handleFabSubmit = () => {
+        if (formRef.current) {
+            formRef.current.requestSubmit();
+        }
+    };
+
     const CurrentComponent = STEPS[currentStep - 1].component;
 
+    // FAB customizado para mobile: botão "Próximo" ou "Finalizar"
+    // Grug gosta: botão contextual, simples e direto
+    const fabButton = (
+        <>
+            {currentStep < STEPS.length ? (
+                <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="w-14 h-14 bg-gold-dark rounded-full flex items-center justify-center text-white shadow-xl shadow-gold/20 active:scale-95 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-gold"
+                    aria-label="Próximo passo"
+                >
+                    <ArrowRight className="w-7 h-7" aria-hidden="true" />
+                </button>
+            ) : (
+                <button
+                    type="button"
+                    onClick={handleFabSubmit}
+                    disabled={loading}
+                    className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-green-600/20 active:scale-95 transition-transform focus:ring-2 focus:ring-offset-2 focus:ring-green-600 disabled:opacity-50"
+                    aria-label="Finalizar anúncio"
+                >
+                    <Save className="w-7 h-7" aria-hidden="true" />
+                </button>
+            )}
+            <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-[10px] font-bold text-gold-dark whitespace-nowrap">
+                {currentStep < STEPS.length ? 'Próximo' : 'Finalizar'}
+            </span>
+        </>
+    );
+
     return (
-        <Layout showSearch={false}>
+        <Layout showSearch={false} fabButton={fabButton}>
             <div className="flex-1 overflow-y-auto bg-background pb-12 px-4 md:px-6 py-8">
                 <WizardHeader isEditing={isEditing} currentStep={currentStep} />
 
@@ -57,7 +94,7 @@ export default function PropertyWizard() {
                         </div>
 
                         <FormProvider {...methods}>
-                            <form onSubmit={methods.handleSubmit(handleSubmit)} className="p-6">
+                            <form ref={formRef} onSubmit={methods.handleSubmit(handleSubmit)} className="p-6">
                                 <CurrentComponent />
 
                                 <div className="flex justify-between pt-8 mt-8 border-t border-gray-100">
