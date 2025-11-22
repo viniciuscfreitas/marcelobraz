@@ -58,25 +58,16 @@ export default function Dashboard() {
     }, [token]);
 
     const handleOpenDrawer = (id = null) => {
-        // Mobile: navegar para página de formulário - Grug gosta: simples e direto
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) {
-            if (id) {
-                navigate(`/properties/${id}`);
-            } else {
-                navigate('/properties/new');
-            }
-            return;
+        // Grug says: Wizard is big. Wizard needs page. No drawer.
+        if (id) {
+            navigate(`/properties/${id}`);
+        } else {
+            navigate('/properties/new');
         }
-        
-        // Desktop: abrir drawer
-        setSelectedPropertyId(id);
-        setIsDrawerOpen(true);
     };
 
     const handleCloseDrawer = () => {
-        setIsDrawerOpen(false);
-        setSelectedPropertyId(null);
+        // Drawer is gone.
     };
 
     const handleSuccess = () => {
@@ -108,11 +99,10 @@ export default function Dashboard() {
                     </button>
                     <button
                         onClick={() => navigate('/leads')}
-                        className={`w-full aspect-square flex items-center justify-center rounded-xl transition-colors ${
-                            location.pathname === '/leads'
-                                ? 'bg-gold/10 text-gold'
-                                : 'text-gray-400 hover:bg-gray-50 hover:text-gold'
-                        }`}
+                        className={`w-full aspect-square flex items-center justify-center rounded-xl transition-colors ${location.pathname === '/leads'
+                            ? 'bg-gold/10 text-gold'
+                            : 'text-gray-400 hover:bg-gray-50 hover:text-gold'
+                            }`}
                         aria-label="Leads"
                         aria-current={location.pathname === '/leads' ? 'page' : undefined}
                     >
@@ -155,11 +145,10 @@ export default function Dashboard() {
                         </div>
 
                         {/* Botão/Busca - Mesmo elemento que expande */}
-                        <div className={`transition-all duration-300 ease-in-out ${
-                            isSearchOpen
-                                ? 'flex-1 md:flex-[2] min-w-0 md:min-w-[calc(50%+390px)]'
-                                : 'w-auto'
-                        }`}>
+                        <div className={`transition-all duration-300 ease-in-out ${isSearchOpen
+                            ? 'flex-1 md:flex-[2] min-w-0 md:min-w-[calc(50%+390px)]'
+                            : 'w-auto'
+                            }`}>
                             {isSearchOpen ? (
                                 // Barra de busca expandida
                                 <div className="bg-gray-50 flex items-center px-4 md:px-5 py-3 md:py-4 rounded-2xl border border-gray-100 transition-all duration-300 ease-in-out">
@@ -282,15 +271,7 @@ export default function Dashboard() {
                 </div>
             </main>
 
-            {/* Property Drawer - Apenas Desktop */}
-            <div className="hidden md:block">
-                <PropertyDrawer
-                    isOpen={isDrawerOpen}
-                    onClose={handleCloseDrawer}
-                    propertyId={selectedPropertyId}
-                    onSuccess={handleSuccess}
-                />
-            </div>
+            {/* Property Drawer - Removed in favor of Wizard Page */}
 
             {/* Mobile Bottom Nav */}
             <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 px-6 py-3 pb-6 flex justify-between items-end z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
