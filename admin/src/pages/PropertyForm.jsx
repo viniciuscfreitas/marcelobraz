@@ -157,19 +157,20 @@ export default function PropertyForm() {
                                             disabled={uploading}
                                             aria-describedby={errors.image ? "image-error" : "image-help"}
                                         />
-                                        <label
-                                            htmlFor="image-upload"
-                                            className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-gold ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            tabIndex="0"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' || e.key === ' ') {
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (!uploading) {
                                                     document.getElementById('image-upload').click();
                                                 }
                                             }}
+                                            disabled={uploading}
+                                            className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors focus:ring-2 focus:ring-gold ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             <Upload size={18} aria-hidden="true" />
                                             {uploading ? 'Enviando...' : 'Escolher Arquivo'}
-                                        </label>
+                                        </button>
                                         <p id="image-help" className="text-xs text-gray-500 mt-2">
                                             Formatos aceitos: JPG, PNG, WEBP. Máx: 5MB.
                                         </p>

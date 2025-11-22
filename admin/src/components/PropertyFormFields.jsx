@@ -44,19 +44,20 @@ export default function PropertyFormFields({
                             id="image-upload"
                             disabled={uploading}
                         />
-                        <label
-                            htmlFor="image-upload"
-                            className={`w-full flex justify-center items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-gold ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            tabIndex="0"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (!uploading) {
                                     document.getElementById('image-upload').click();
                                 }
                             }}
+                            disabled={uploading}
+                            className={`w-full flex justify-center items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors focus:ring-2 focus:ring-gold ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Upload size={18} />
                             {uploading ? 'Enviando...' : 'Escolher Arquivo'}
-                        </label>
+                        </button>
                         {errors.image && <p className="text-red-600 text-xs mt-1">{errors.image.message}</p>}
                     </div>
                 </div>

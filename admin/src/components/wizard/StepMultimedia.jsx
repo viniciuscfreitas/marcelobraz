@@ -66,13 +66,20 @@ export default function StepMultimedia() {
                             id="main-image-upload"
                             disabled={uploading}
                         />
-                        <label
-                            htmlFor="main-image-upload"
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (!uploading) {
+                                    document.getElementById('main-image-upload').click();
+                                }
+                            }}
+                            disabled={uploading}
                             className={`btn-secondary inline-flex items-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Upload size={18} />
                             {uploading ? 'Enviando...' : 'Escolher Capa'}
-                        </label>
+                        </button>
                         {errors.image && <p className="text-red-600 text-xs mt-2">{errors.image.message}</p>}
                     </div>
                 </div>
