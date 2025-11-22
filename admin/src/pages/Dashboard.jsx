@@ -122,24 +122,18 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Top 3 Imóveis Mais Vistos */}
+                {/* Top 3 Imóveis Mais Vistos - Compacto */}
                 {stats?.top_properties && stats.top_properties.length > 0 && (
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
-                        <h3 className="text-base font-bold text-gray-900 mb-3">Top 3 Imóveis Mais Vistos</h3>
-                        <div className="space-y-3">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2 mb-3 flex-shrink-0">
+                        <h3 className="text-xs font-bold text-gray-700 mb-2 px-2">Top 3 Mais Vistos</h3>
+                        <div className="grid grid-cols-3 gap-2">
                             {stats.top_properties.map((prop, idx) => (
-                                <div key={prop.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl font-bold text-primary w-8">#{idx + 1}</span>
-                                            <div>
-                                                <p className="font-semibold text-gray-900">{prop.title}</p>
-                                                <p className="text-sm text-gray-500">
-                                                    {prop.views} views • {prop.leads} leads ({prop.conversion_rate}%)
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div key={prop.id} className="p-2 bg-gray-50 rounded-lg text-center">
+                                    <p className="text-xs font-bold text-primary mb-1">#{idx + 1}</p>
+                                    <p className="text-xs font-semibold text-gray-900 truncate mb-1" title={prop.title}>{prop.title}</p>
+                                    <p className="text-[10px] text-gray-500">
+                                        {prop.views} views • {prop.conversion_rate}%
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -155,7 +149,7 @@ export default function Dashboard() {
                                 <p className="text-xs text-gray-500 mt-0.5">Gerencie sua lista de propriedades exclusivas.</p>
                             </div>
                         </div>
-                        <div className="p-0 flex-1 min-h-0 overflow-auto">
+                        <div className="p-0 flex-1 min-h-0 overflow-hidden">
                             <PropertiesList
                                 onEdit={handleEdit}
                                 refreshTrigger={refreshTrigger}
