@@ -28,18 +28,18 @@ export const FinancingCalculator = ({ property }) => {
     const jurosTotal = totalPago - propertyPrice;
 
     return (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-            <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="text-blue-600" size={24} />
-                <h3 className="text-xl font-bold text-gray-900">Simule seu Financiamento</h3>
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100">
+            <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="text-primary" size={24} />
+                <h3 className="text-xl font-bold text-gray-900 font-serif">Simule seu Financiamento</h3>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {/* Entrada */}
                 <div>
                     <div className="flex justify-between items-center mb-2">
                         <label className="text-sm font-medium text-gray-700">Entrada (mínimo 20%)</label>
-                        <span className="text-lg font-bold text-blue-600">
+                        <span className="text-lg font-bold text-primary">
                             {(entrada / propertyPrice * 100).toFixed(0)}%
                         </span>
                     </div>
@@ -50,9 +50,9 @@ export const FinancingCalculator = ({ property }) => {
                         step={1000}
                         value={entrada}
                         onChange={(e) => setEntrada(Number(e.target.value))}
-                        className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 mt-1 font-medium">
                         R$ {entrada.toLocaleString('pt-BR')}
                     </p>
                 </div>
@@ -65,7 +65,7 @@ export const FinancingCalculator = ({ property }) => {
                     <select
                         value={prazo}
                         onChange={(e) => setPrazo(Number(e.target.value))}
-                        className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                        className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                     >
                         <option value={15}>15 anos</option>
                         <option value={20}>20 anos</option>
@@ -76,29 +76,29 @@ export const FinancingCalculator = ({ property }) => {
                 </div>
 
                 {/* Resultado */}
-                <div className="bg-white rounded-xl p-4 border-2 border-blue-200 mt-6">
-                    <div className="text-center">
-                        <p className="text-sm text-gray-600 mb-1">Parcela estimada</p>
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mt-6">
+                    <div className="text-center mb-4">
+                        <p className="text-sm text-gray-600 mb-2">Parcela estimada</p>
                         <div className="flex items-center justify-center gap-2">
-                            <DollarSign className="text-green-600" size={28} />
+                            <DollarSign className="text-primary" size={28} />
                             <p className="text-3xl font-bold text-gray-900">
-                                {parcela.toLocaleString('pt-BR', {
+                                R$ {parcela.toLocaleString('pt-BR', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
                                 })}
                             </p>
-                            <span className="text-gray-500">/mês</span>
+                            <span className="text-gray-500 text-lg">/mês</span>
                         </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4 text-xs text-gray-600">
+                    <div className="pt-4 border-t border-gray-200 grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <p className="font-medium">Total pago:</p>
+                            <p className="text-gray-600 mb-1">Total pago:</p>
                             <p className="font-bold text-gray-900">R$ {totalPago.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                         </div>
                         <div>
-                            <p className="font-medium">Juros total:</p>
-                            <p className="font-bold text-orange-600">R$ {jurosTotal.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                            <p className="text-gray-600 mb-1">Juros total:</p>
+                            <p className="font-bold text-gray-700">R$ {jurosTotal.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                         </div>
                     </div>
                 </div>
