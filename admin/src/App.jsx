@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
-import PropertyForm from './pages/PropertyForm';
+import PropertyWizard from './pages/PropertyWizard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -16,8 +16,8 @@ function App() {
                     <Route element={<ProtectedRoute />}>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/leads" element={<Leads />} />
-                        <Route path="/properties/new" element={<PropertyForm />} />
-                        <Route path="/properties/:id" element={<PropertyForm />} />
+                        <Route path="/properties/new" element={<PropertyWizard />} />
+                        <Route path="/properties/:id" element={<PropertyWizard />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/" replace />} />

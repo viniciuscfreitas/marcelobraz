@@ -13,6 +13,8 @@ router.get('/', (req, res) => {
         const parsedProperties = properties.map(prop => ({
             ...prop,
             tags: prop.tags ? JSON.parse(prop.tags) : [],
+            features: prop.features ? JSON.parse(prop.features) : {},
+            multimedia: prop.multimedia ? JSON.parse(prop.multimedia) : {},
             featured: prop.featured === 1 // Converter INTEGER para boolean
         }));
 
@@ -33,6 +35,8 @@ router.get('/:id', (req, res) => {
         }
 
         property.tags = property.tags ? JSON.parse(property.tags) : [];
+        property.features = property.features ? JSON.parse(property.features) : {};
+        property.multimedia = property.multimedia ? JSON.parse(property.multimedia) : {};
         property.featured = property.featured === 1;
         res.json(property);
     } catch (error) {
@@ -44,7 +48,14 @@ router.get('/:id', (req, res) => {
 // POST /api/properties - Criar propriedade (protegido)
 router.post('/', requireAuth, (req, res) => {
     try {
-        const { title, subtitle, price, image, bairro, tipo, specs, tags, featured } = req.body;
+        const {
+            title, subtitle, price, image, bairro, tipo, specs, tags, featured,
+            description, subtype, age, quartos, vagas, banheiros, suites,
+            condominio, iptu, area_util, area_total,
+            cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
+            aceita_permuta, aceita_fgts, posicao_apto, andares,
+            features, multimedia
+        } = req.body;
 
         // Validação básica
         if (!title || !price || !bairro || !tipo) {
@@ -53,8 +64,15 @@ router.post('/', requireAuth, (req, res) => {
 
         // Inserir no banco
         const insert = db.prepare(`
-      INSERT INTO properties (title, subtitle, price, image, bairro, tipo, specs, tags, featured)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO properties (
+        title, subtitle, price, image, bairro, tipo, specs, tags, featured,
+        description, subtype, age, quartos, vagas, banheiros, suites,
+        condominio, iptu, area_util, area_total,
+        cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
+        aceita_permuta, aceita_fgts, posicao_apto, andares,
+        features, multimedia
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
         const result = insert.run(
@@ -66,12 +84,38 @@ router.post('/', requireAuth, (req, res) => {
             tipo,
             specs || null,
             tags ? JSON.stringify(tags) : null,
-            featured ? 1 : 0
+            featured ? 1 : 0,
+            description || null,
+            subtype || null,
+            age || null,
+            quartos || 0,
+            vagas || 0,
+            banheiros || 0,
+            suites || 0,
+            condominio || null,
+            iptu || null,
+            area_util || 0,
+            area_total || 0,
+            cep || null,
+            estado || null,
+            cidade || null,
+            endereco || null,
+            complemento || null,
+            mostrar_endereco !== undefined ? (mostrar_endereco ? 1 : 0) : 1,
+            ref_code || null,
+            aceita_permuta ? 1 : 0,
+            aceita_fgts ? 1 : 0,
+            posicao_apto || null,
+            andares || null,
+            features ? JSON.stringify(features) : '{}',
+            multimedia ? JSON.stringify(multimedia) : '{}'
         );
 
         // Buscar o imóvel criado
         const newProperty = db.prepare('SELECT * FROM properties WHERE id = ?').get(result.lastInsertRowid);
         newProperty.tags = newProperty.tags ? JSON.parse(newProperty.tags) : [];
+        newProperty.features = newProperty.features ? JSON.parse(newProperty.features) : {};
+        newProperty.multimedia = newProperty.multimedia ? JSON.parse(newProperty.multimedia) : {};
         newProperty.featured = newProperty.featured === 1;
 
         res.status(201).json(newProperty);
@@ -84,7 +128,14 @@ router.post('/', requireAuth, (req, res) => {
 // PUT /api/properties/:id - Atualizar propriedade (protegido)
 router.put('/:id', requireAuth, (req, res) => {
     try {
-        const { title, subtitle, price, image, bairro, tipo, specs, tags, featured } = req.body;
+        const {
+            title, subtitle, price, image, bairro, tipo, specs, tags, featured,
+            description, subtype, age, quartos, vagas, banheiros, suites,
+            condominio, iptu, area_util, area_total,
+            cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
+            aceita_permuta, aceita_fgts, posicao_apto, andares,
+            features, multimedia
+        } = req.body;
 
         // Verificar se existe
         const existing = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
@@ -95,7 +146,13 @@ router.put('/:id', requireAuth, (req, res) => {
         // Atualizar
         const update = db.prepare(`
       UPDATE properties
-      SET title = ?, subtitle = ?, price = ?, image = ?, bairro = ?, tipo = ?, specs = ?, tags = ?, featured = ?, updated_at = CURRENT_TIMESTAMP
+      SET title = ?, subtitle = ?, price = ?, image = ?, bairro = ?, tipo = ?, specs = ?, tags = ?, featured = ?,
+          description = ?, subtype = ?, age = ?, quartos = ?, vagas = ?, banheiros = ?, suites = ?,
+          condominio = ?, iptu = ?, area_util = ?, area_total = ?,
+          cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
+          aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
+          features = ?, multimedia = ?,
+          updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
 
@@ -109,12 +166,38 @@ router.put('/:id', requireAuth, (req, res) => {
             specs || null,
             tags ? JSON.stringify(tags) : null,
             featured ? 1 : 0,
+            description || null,
+            subtype || null,
+            age || null,
+            quartos || 0,
+            vagas || 0,
+            banheiros || 0,
+            suites || 0,
+            condominio || null,
+            iptu || null,
+            area_util || 0,
+            area_total || 0,
+            cep || null,
+            estado || null,
+            cidade || null,
+            endereco || null,
+            complemento || null,
+            mostrar_endereco !== undefined ? (mostrar_endereco ? 1 : 0) : 1,
+            ref_code || null,
+            aceita_permuta ? 1 : 0,
+            aceita_fgts ? 1 : 0,
+            posicao_apto || null,
+            andares || null,
+            features ? JSON.stringify(features) : '{}',
+            multimedia ? JSON.stringify(multimedia) : '{}',
             req.params.id
         );
 
         // Retornar atualizado
         const updated = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
         updated.tags = updated.tags ? JSON.parse(updated.tags) : [];
+        updated.features = updated.features ? JSON.parse(updated.features) : {};
+        updated.multimedia = updated.multimedia ? JSON.parse(updated.multimedia) : {};
         updated.featured = updated.featured === 1;
 
         res.json(updated);
@@ -153,6 +236,8 @@ router.patch('/:id/featured', requireAuth, (req, res) => {
         // Retornar atualizado
         const updated = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
         updated.tags = updated.tags ? JSON.parse(updated.tags) : [];
+        updated.features = updated.features ? JSON.parse(updated.features) : {};
+        updated.multimedia = updated.multimedia ? JSON.parse(updated.multimedia) : {};
         updated.featured = updated.featured === 1;
 
         res.json(updated);
