@@ -18,14 +18,28 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     const loadingRef = useRef(false);
 
     const fetchProperties = async (pageNum = 1, append = false) => {
-        if (loadingRef.current) return;
+        // Grug gosta: proteção simples contra múltiplas chamadas
+        if (loadingRef.current) {
+            console.log('⏸️ Já carregando, ignorando requisição duplicada');
+            return;
+        }
+        
         loadingRef.current = true;
         setLoading(true);
         
         try {
             const url = `${API_URL}/api/properties?page=${pageNum}&limit=20${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`;
             const res = await fetch(url);
-            if (!res.ok) throw new Error('Falha na conexão');
+            
+            if (!res.ok) {
+                if (res.status === 429) {
+                    console.warn('⚠️ Rate limit atingido, aguardando...');
+                    // Não fazer nada, aguardar rate limit resetar
+                    return;
+                }
+                throw new Error('Falha na conexão');
+            }
+            
             const data = await res.json();
             
             // Se API retorna array (compatibilidade), tratar como página única
@@ -48,9 +62,16 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         } catch (error) {
             console.error('Erro ao buscar imóveis:', error);
             if (!append) setProperties([]);
+            // Se erro 429, não atualizar hasMore para não tentar mais
+            if (error.message?.includes('429')) {
+                setHasMore(false);
+            }
         } finally {
             setLoading(false);
-            loadingRef.current = false;
+            // Delay antes de permitir próxima requisição (proteção extra)
+            setTimeout(() => {
+                loadingRef.current = false;
+            }, 300);
         }
     };
 
@@ -63,23 +84,32 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     }, [refreshTrigger]);
 
     // Scroll infinito com Intersection Observer
+    // Grug gosta: proteção simples contra flood
     useEffect(() => {
-        if (!hasMore || loading || !sentinelRef.current) return;
+        if (!hasMore || loading || loadingRef.current || !sentinelRef.current) return;
+
+        let lastCallTime = 0;
+        const throttleDelay = 500; // 500ms entre chamadas
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting) {
-                    const nextPage = page + 1;
-                    setPage(nextPage);
-                    fetchProperties(nextPage, true);
-                }
+                if (!entries[0].isIntersecting) return;
+                if (loadingRef.current) return;
+                
+                const now = Date.now();
+                if (now - lastCallTime < throttleDelay) return;
+                lastCallTime = now;
+
+                const nextPage = page + 1;
+                setPage(nextPage);
+                fetchProperties(nextPage, true);
             },
-            { threshold: 0.1, rootMargin: '200px' }
+            { threshold: 0.1, rootMargin: '100px' } // Reduzido de 200px para 100px
         );
 
         observer.observe(sentinelRef.current);
         return () => observer.disconnect();
-    }, [hasMore, loading, page, searchTerm]);
+    }, [hasMore, loading, searchTerm]); // Removido 'page' das dependências
 
     // Recarregar quando searchTerm muda
     useEffect(() => {

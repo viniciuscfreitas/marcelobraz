@@ -17,16 +17,24 @@ export const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loa
     const [visibleItems, setVisibleItems] = useState(12); // Renderizar apenas primeiros 12 inicialmente
 
     // Intersection Observer para scroll infinito
+    // Grug gosta: proteção simples contra flood
     useEffect(() => {
         if (!hasMore || loading || !sentinelRef.current) return;
 
+        let lastCallTime = 0;
+        const throttleDelay = 500; // 500ms entre chamadas
+
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting) {
-                    loadMore();
-                }
+                if (!entries[0].isIntersecting) return;
+                
+                const now = Date.now();
+                if (now - lastCallTime < throttleDelay) return;
+                lastCallTime = now;
+
+                loadMore();
             },
-            { threshold: 0.1, rootMargin: '200px' }
+            { threshold: 0.1, rootMargin: '100px' } // Reduzido de 200px
         );
 
         observer.observe(sentinelRef.current);

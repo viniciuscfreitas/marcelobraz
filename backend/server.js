@@ -19,12 +19,15 @@ const cron = require('node-cron');
 const backupDatabase = require('./scripts/backup-db');
 
 // Rate limiting (Grug gosta: proteção simples contra DDoS)
+// Aumentado para scroll infinito funcionar melhor
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // máximo 100 requests por IP
+    max: 200, // máximo 200 requests por IP (aumentado de 100)
     message: 'Muitas requisições deste IP, tente novamente em 15 minutos.',
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    skipSuccessfulRequests: false, // Contar todas as requisições
+    skipFailedRequests: false
 });
 
 // Middleware
@@ -32,8 +35,15 @@ app.use(helmet()); // Security headers
 app.use(morgan('dev')); // Logging (Grug likes logs)
 app.use('/api/', limiter); // Rate limit em todas as rotas API
 // CORS: Grug gosta de segurança! Sem '*' em produção
+// Permite admin e site em produção
+const corsOrigins = process.env.CORS_ORIGIN 
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : (process.env.NODE_ENV === 'development' 
+        ? ['*'] 
+        : ['https://marcelobraz.vinicius.xyz', 'https://admin.marcelobraz.vinicius.xyz']);
+
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : (process.env.NODE_ENV === 'development' ? '*' : false),
+    origin: corsOrigins.includes('*') ? '*' : corsOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
