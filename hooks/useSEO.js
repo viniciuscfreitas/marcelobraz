@@ -1,63 +1,124 @@
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { BROKER_INFO } from '../data/constants.js';
 
 /**
- * Hook simples para atualizar SEO dinâmico
- * Grug gosta: manipulação direta do DOM, sem bibliotecas pesadas
+ * Hook SEO Grug Brain Style
+ * Gera meta tags dinâmicas para Google, WhatsApp, Facebook
  * 
- * @param {Object} seoData - Dados para SEO
- * @param {string} seoData.title - Título da página
- * @param {string} seoData.description - Descrição da página
- * @param {string} seoData.image - URL da imagem (Open Graph)
- * @param {string} seoData.url - URL canônica
+ * @param {Object} seo - Configurações SEO
+ * @param {string} seo.title - Título da página
+ * @param {string} seo.description - Descrição
+ * @param {string} seo.image - URL da imagem (Open Graph)
+ * @param {string} seo.url - URL canônica
+ * @param {Object} seo.property - Dados do imóvel (opcional, para Schema.org)
  */
-export const useSEO = ({ title, description, image, url }) => {
-    useEffect(() => {
-        // Atualizar título
-        if (title) {
-            document.title = title;
+export const useSEO = ({ title, description, image, url, property }) => {
+    const defaultTitle = `${BROKER_INFO.name} - Private Broker em Santos`;
+    const defaultDescription = 'Imóveis exclusivos de alto padrão em Santos e região. Atendimento personalizado, discrição e expertise no mercado imobiliário de luxo.';
+    const defaultImage = image || `${window.location.origin}/og-default.jpg`;
+
+    const fullTitle = title ? `${title} | ${BROKER_INFO.name}` : defaultTitle;
+    const metaDescription = description || defaultDescription;
+    const canonicalUrl = url || window.location.href;
+
+    // Schema.org para Google Rich Results
+    const generateSchema = () => {
+        if (!property) {
+            // Schema para página principal (Organization)
+            return {
+                "@context": "https://schema.org",
+                "@type": "RealEstateAgent",
+                "name": BROKER_INFO.name,
+                "description": metaDescription,
+                "url": canonicalUrl,
+                "telephone": BROKER_INFO.whatsapp,
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Santos",
+                    "addressRegion": "SP",
+                    "addressCountry": "BR"
+                }
+            };
         }
 
-        // Helper para atualizar ou criar meta tag
-        const updateMetaTag = (property, content) => {
-            if (!content) return;
-            
-            let meta = document.querySelector(`meta[property="${property}"]`) || 
-                      document.querySelector(`meta[name="${property}"]`);
-            
-            if (!meta) {
-                meta = document.createElement('meta');
-                meta.setAttribute(property.startsWith('og:') || property.startsWith('twitter:') ? 'property' : 'name', property);
-                document.head.appendChild(meta);
-            }
-            meta.setAttribute('content', content);
+        // Schema para imóvel específico
+        return {
+            "@context": "https://schema.org",
+            "@type": property.tipo?.includes('Comercial') ? 'CommercialRealEstate' : 'Apartment',
+            "name": property.title,
+            "description": property.description || metaDescription,
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": property.cidade || "Santos",
+                "addressRegion": property.estado || "SP",
+                "streetAddress": property.mostrar_endereco ? property.endereco : property.bairro,
+                "postalCode": property.cep,
+                "addressCountry": "BR"
+            },
+            "geo": property.mostrar_endereco && property.lat && property.lng ? {
+                "@type": "GeoCoordinates",
+                "latitude": property.lat,
+                "longitude": property.lng
+            } : undefined,
+            "offers": {
+                "@type": "Offer",
+                "price": property.price ? property.price.replace(/[^0-9]/g, '') : undefined,
+                "priceCurrency": "BRL",
+                "availability": property.status === 'disponivel' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+            },
+            "floorSize": property.area_util ? {
+                "@type": "QuantitativeValue",
+                "value": property.area_util,
+                "unitCode": "MTK"
+            } : undefined,
+            "numberOfRooms": property.quartos,
+            "image": property.image || image
         };
+    };
 
-        // Meta description
-        if (description) {
-            updateMetaTag('description', description);
-        }
+    return (
+        <Helmet>
+            {/* Título básico */}
+            <title>{fullTitle}</title>
+            <meta name="description" content={metaDescription} />
 
-        // Open Graph
-        if (url) updateMetaTag('og:url', url);
-        if (title) updateMetaTag('og:title', title);
-        if (description) updateMetaTag('og:description', description);
-        if (image) updateMetaTag('og:image', image);
-        updateMetaTag('og:type', 'website');
+            {/* Canonical URL (evita conteúdo duplicado no Google) */}
+            <link rel="canonical" href={canonicalUrl} />
 
-        // Twitter Card
-        if (title) updateMetaTag('twitter:title', title);
-        if (description) updateMetaTag('twitter:description', description);
-        if (image) updateMetaTag('twitter:image', image);
-        updateMetaTag('twitter:card', 'summary_large_image');
+            {/* Open Graph (Facebook, WhatsApp, LinkedIn) */}
+            <meta property="og:type" content={property ? "website" : "business.business"} />
+            <meta property="og:title" content={fullTitle} />
+            <meta property="og:description" content={metaDescription} />
+            <meta property="og:image" content={defaultImage} />
+            <meta property="og:url" content={canonicalUrl} />
+            <meta property="og:site_name" content={BROKER_INFO.name} />
+            <meta property="og:locale" content="pt_BR" />
 
-        // Limpar ao desmontar (restaurar valores padrão)
-        return () => {
-            document.title = 'Marcelo Braz - Private Broker';
-            updateMetaTag('description', 'Marcelo Braz - Consultor Private em Santos. Imóveis exclusivos na baixada santista.');
-            updateMetaTag('og:title', 'Marcelo Braz - Private Broker');
-            updateMetaTag('og:description', 'Consultor Private em Santos. Imóveis exclusivos na baixada santista.');
-            updateMetaTag('og:url', window.location.origin);
-        };
-    }, [title, description, image, url]);
+            {/* Twitter Card */}
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={fullTitle} />
+            <meta name="twitter:description" content={metaDescription} />
+            <meta name="twitter:image" content={defaultImage} />
+
+            {/* Schema.org (Google Rich Results) */}
+            <script type="application/ld+json">
+                {JSON.stringify(generateSchema())}
+            </script>
+
+            {/* Keywords específicas para Santos e região */}
+            {property && (
+                <meta name="keywords" content={`
+          ${property.tipo}, 
+          ${property.bairro}, 
+          ${property.cidade || 'Santos'}, 
+          imóveis ${property.cidade || 'Santos'},
+          ${property.quartos ? `${property.quartos} quartos` : ''},
+          alto padrão,
+          corretor Santos,
+          ${BROKER_INFO.name}
+        `.replace(/\s+/g, ' ').trim()} />
+            )}
+        </Helmet>
+    );
 };
-

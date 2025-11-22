@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -15,12 +15,7 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
     const [loading, setLoading] = useState(false);
     const { toast, showToast, hideToast } = useToast();
     const imageUrl = watch('image');
-
-    const handleUploadSuccess = useCallback((url) => {
-        setValue('image', url, { shouldValidate: false });
-    }, [setValue]);
-
-    const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
+    const { uploading, uploadImage } = useImageUpload(token);
 
     useEffect(() => {
         if (isOpen) {
@@ -63,7 +58,8 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
         if (!file) return;
 
         try {
-            await uploadImage(file);
+            const url = await uploadImage(file);
+            setValue('image', url, { shouldValidate: false });
         } catch (error) {
             showToast(error.message || 'Erro ao fazer upload da imagem. Tente novamente.', 'error');
             e.target.value = '';

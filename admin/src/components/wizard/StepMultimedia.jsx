@@ -9,9 +9,7 @@ export default function StepMultimedia() {
     const { register, watch, setValue, formState: { errors } } = useFormContext();
     const { token } = useAuth();
     const { toast, showToast, hideToast } = useToast();
-    const { uploading, uploadImage } = useImageUpload(token, (url) => {
-        // Callback genérico, vamos lidar com cada campo individualmente
-    });
+    const { uploading, uploadImage } = useImageUpload(token);
 
     const imageUrl = watch('image');
     const multimedia = watch('multimedia') || {};
