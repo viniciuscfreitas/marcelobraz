@@ -162,8 +162,29 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         multimedia = {};
     }
 
-    // Mock images if none provided (fallback)
-    const images = property.images || [property.image];
+    // Coletar todas as imagens disponíveis (Grug gosta: simples, direto)
+    const allImages = [];
+    // Imagem principal
+    if (property.image) allImages.push(property.image);
+    // Array de imagens (se existir)
+    if (property.images && Array.isArray(property.images)) {
+        property.images.forEach(img => {
+            if (img && !allImages.includes(img)) allImages.push(img);
+        });
+    }
+    // Imagens do multimedia (se existir)
+    if (multimedia.photos && Array.isArray(multimedia.photos)) {
+        multimedia.photos.forEach(img => {
+            if (img && !allImages.includes(img)) allImages.push(img);
+        });
+    }
+    if (multimedia.images && Array.isArray(multimedia.images)) {
+        multimedia.images.forEach(img => {
+            if (img && !allImages.includes(img)) allImages.push(img);
+        });
+    }
+    // Fallback: pelo menos uma imagem
+    const images = allImages.length > 0 ? allImages : [property.image].filter(Boolean);
 
     // Format currency
     const formatPrice = (val) => {
@@ -197,12 +218,22 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
 
                         {/* Gallery */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group relative">
+                            {/* Imagem principal */}
                             <div className="aspect-video relative bg-gray-100">
                                 <img
                                     src={images[activeImage] || property.image}
                                     alt={`Imagem ${activeImage + 1} de ${images.length} - ${property.title}`}
                                     className="w-full h-full object-cover transition-transform duration-500"
                                 />
+                                
+                                {/* Contador de imagens */}
+                                {images.length > 1 && (
+                                    <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                                        <span>{activeImage + 1} / {images.length}</span>
+                                    </div>
+                                )}
+                                
+                                {/* Botão compartilhar */}
                                 <div className="absolute top-4 right-4">
                                     <button
                                         onClick={handleShare}
@@ -212,26 +243,68 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                                         <Share2 size={20} />
                                     </button>
                                 </div>
+                                
+                                {/* Navegação de imagens (setas) */}
+                                {images.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
+                                            aria-label="Imagem anterior"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
+                                            aria-label="Próxima imagem"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </>
+                                )}
+                                
+                                {/* View count */}
                                 <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
                                     <Eye size={16} className="text-green-300" />
                                     <span>{viewCount} pessoas visualizaram hoje</span>
                                 </div>
                             </div>
-                            {/* Thumbnails */}
+                            
+                            {/* Grid de thumbnails (Grug gosta: mostra todas as imagens) */}
                             {images.length > 1 && (
-                                <div className="p-4 flex gap-2 overflow-x-auto scrollbar-hide bg-white border-t border-gray-100">
-                                    {images.map((img, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setActiveImage(idx)}
-                                            aria-label={`Ver imagem ${idx + 1} de ${images.length}`}
-                                            aria-current={activeImage === idx ? "true" : "false"}
-                                            className={`relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-h-[44px]
-                                                ${activeImage === idx ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                                        >
-                                            <img src={img} alt={`Miniatura ${idx + 1} de ${images.length}`} className="w-full h-full object-cover" />
-                                        </button>
-                                    ))}
+                                <div className="p-4 bg-white border-t border-gray-100">
+                                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                                        {images.map((img, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setActiveImage(idx)}
+                                                aria-label={`Ver imagem ${idx + 1} de ${images.length}`}
+                                                aria-current={activeImage === idx ? "true" : "false"}
+                                                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-h-[44px] group
+                                                    ${activeImage === idx ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100 hover:border-gray-300'}`}
+                                            >
+                                                <img 
+                                                    src={img} 
+                                                    alt={`Miniatura ${idx + 1} de ${images.length}`} 
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" 
+                                                />
+                                                {activeImage === idx && (
+                                                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                                        <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
