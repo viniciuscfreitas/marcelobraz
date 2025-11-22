@@ -16,6 +16,7 @@ import { ValuationSection } from './sections/ValuationSection.jsx';
 import { WhatsappCaptureSection } from './sections/WhatsappCaptureSection.jsx';
 import { PortfolioView } from './views/PortfolioView.jsx';
 import { PropertyDetailsView } from './views/PropertyDetailsView.jsx';
+import { generatePropertyUrl, extractPropertyIdFromUrl } from './utils/urlHelpers.js';
 
 export default function RealEstateSite() {
   const nav = useNavigation();
@@ -28,15 +29,27 @@ export default function RealEstateSite() {
   useEffect(() => {
     if (hasInitializedFromUrl || properties.length === 0) return;
     
-    const urlParams = new URLSearchParams(window.location.search);
-    const propertyId = urlParams.get('property');
+    // Tentar ler URL amigável primeiro (Grug gosta: SEO primeiro!)
+    const path = window.location.pathname;
+    let propertyId = null;
+    
+    if (path.startsWith('/imovel/')) {
+      // URL amigável: /imovel/tipo-quartos-bairro-id
+      propertyId = extractPropertyIdFromUrl(path);
+    } else {
+      // Fallback: query param antigo (?property=123)
+      const urlParams = new URLSearchParams(window.location.search);
+      propertyId = urlParams.get('property');
+    }
     
     if (propertyId) {
       const property = properties.find(p => p.id === parseInt(propertyId));
       if (property) {
         setSelectedProperty(property);
         nav.navigateTo('property');
-        window.history.replaceState({}, '', window.location.pathname);
+        // Atualizar URL para amigável se estava usando query param
+        const friendlyUrl = generatePropertyUrl(property);
+        window.history.replaceState({}, '', friendlyUrl);
         setHasInitializedFromUrl(true);
       }
     } else {
@@ -47,6 +60,9 @@ export default function RealEstateSite() {
   const handlePropertyClick = (prop) => {
     setSelectedProperty(prop);
     nav.navigateTo('property');
+    // Atualizar URL para amigável (Grug gosta: SEO!)
+    const friendlyUrl = generatePropertyUrl(prop);
+    window.history.pushState({}, '', friendlyUrl);
   };
 
   // Handler para navegação do header - limpa selectedProperty quando sai da página de detalhes

@@ -1,10 +1,12 @@
 import { ArrowRight, Lock } from 'lucide-react';
+import { PropertyBadge } from './property/PropertyBadge';
 
 export const PropertyCard = ({ property, onClick }) => (
   <article className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 cursor-pointer flex flex-col h-full" onClick={() => onClick(property)}>
     <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
       <img src={property.image} alt={property.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
       <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+        <PropertyBadge status={property.status} />
         {property.transaction_type && property.transaction_type !== 'Venda' && (
           <span className="bg-[#d4af37] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase shadow-md">
             {property.transaction_type === 'Aluguel' ? 'Locação' : property.transaction_type}

@@ -10,6 +10,7 @@ import { PropertyBrokerProfile } from '../components/property/PropertyBrokerProf
 import { FinancingCalculator } from '../components/property/FinancingCalculator';
 import { useSEO } from '../hooks/useSEO.jsx';
 import { BROKER_INFO } from '../data/constants';
+import { generateShareUrl } from '../utils/urlHelpers';
 
 /**
  * Página de Detalhes do Imóvel
@@ -26,7 +27,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             return;
         }
 
-        const shareUrl = `${window.location.origin}?property=${property.id}`;
+        const shareUrl = generateShareUrl(property);
         const shareData = {
             title: property.title || 'Imóvel',
             text: `${property.title || 'Imóvel'} - ${property.bairro || ''}, ${property.cidade || ''}`,

@@ -57,7 +57,7 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
 
                 <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
                     <Eye size={16} className="text-green-300" />
-                    <span>{Math.floor(Math.random() * (150 - 20 + 1)) + 20} pessoas visualizaram hoje</span>
+                    <span>{property.views || 0} {property.views === 1 ? 'pessoa visualizou' : 'pessoas visualizaram'}</span>
                 </div>
             </div>
 

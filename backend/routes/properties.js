@@ -72,6 +72,9 @@ router.get('/', (req, res) => {
 // GET /api/properties/:id - Buscar uma propriedade
 router.get('/:id', (req, res) => {
     try {
+        // Incrementar views (Grug gosta: simples, direto!)
+        db.prepare('UPDATE properties SET views = views + 1 WHERE id = ?').run(req.params.id);
+        
         const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
 
         if (!property) {

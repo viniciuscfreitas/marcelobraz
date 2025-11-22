@@ -1,13 +1,17 @@
+import { useState } from 'react';
 import { MessageCircle, Mail, Calendar } from 'lucide-react';
 import { Button } from '../Button';
 import { COLORS, BROKER_INFO } from '../../data/constants';
 import { generateWhatsAppLink } from '../../utils/whatsappHelpers';
+import { ScheduleVisit } from './ScheduleVisit';
 
 /**
  * Componente de Card de Contato
  * Grug gosta: componente focado, < 150 linhas
  */
 export const PropertyContact = ({ property, onOpenLeadModal }) => {
+    const [showSchedule, setShowSchedule] = useState(false);
+
     // Grug gosta: WhatsApp com contexto completo!
     const handleWhatsAppClick = () => {
         const whatsappUrl = generateWhatsAppLink(property);
@@ -46,13 +50,19 @@ export const PropertyContact = ({ property, onOpenLeadModal }) => {
                 <Button
                     variant="ghost"
                     className="w-full justify-center py-3 text-gray-600 hover:text-primary"
-                    onClick={() => onOpenLeadModal('visit')}
+                    onClick={() => setShowSchedule(!showSchedule)}
                     ariaLabel="Agendar visita ao imóvel"
                 >
                     <Calendar className="mr-2" size={18} />
                     Agendar Visita
                 </Button>
             </div>
+
+            {showSchedule && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                    <ScheduleVisit property={property} />
+                </div>
+            )}
 
             <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                 <p className="text-xs text-gray-400">

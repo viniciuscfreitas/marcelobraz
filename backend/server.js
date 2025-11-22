@@ -9,6 +9,7 @@ const leadsRouter = require('./routes/leads');
 const authRouter = require('./routes/auth');
 const uploadRouter = require('./routes/upload');
 const sitemapRouter = require('./routes/sitemap');
+const adminRouter = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -70,6 +71,7 @@ app.use(express.json());
 app.use('/api/properties', propertiesRouter);
 app.use('/api/leads', leadsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/admin', adminRouter);
 app.use('/sitemap.xml', sitemapRouter);
 
 // Health check

@@ -1,5 +1,6 @@
 import { MapPin, Bed, Bath, Maximize, Car, Lock } from 'lucide-react';
 import { Button } from '../Button';
+import { PropertyBadge } from './PropertyBadge';
 
 /**
  * Componente de Header com Título e Preço
@@ -38,6 +39,7 @@ export const PropertyHeader = ({ property, leadCaptured, onUnlockPrice }) => {
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-8">
                 <div className="flex-1">
                     <div className="flex flex-wrap gap-2 mb-3">
+                        <PropertyBadge status={property.status} />
                         <span className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-wider shadow-sm">
                             {property.tipo}
                         </span>

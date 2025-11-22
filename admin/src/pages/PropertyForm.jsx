@@ -259,6 +259,22 @@ export default function PropertyForm() {
                             </div>
 
                             <div>
+                                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select
+                                    id="status"
+                                    {...register('status')}
+                                    className="input-field"
+                                >
+                                    <option value="disponivel">Disponível</option>
+                                    <option value="exclusivo">⭐ Exclusivo</option>
+                                    <option value="em_breve">🔜 Em Breve</option>
+                                    <option value="venda_silenciosa">🤫 Venda Silenciosa</option>
+                                    <option value="vendido">✅ Vendido</option>
+                                    <option value="alugado">🏠 Alugado</option>
+                                </select>
+                            </div>
+
+                            <div>
                                 <label htmlFor="specs" className="block text-sm font-medium text-gray-700 mb-1">Specs</label>
                                 <input
                                     id="specs"
