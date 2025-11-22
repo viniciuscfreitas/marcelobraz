@@ -52,7 +52,7 @@ export default function StepInfo() {
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Informações Principais</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-2">
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Título do Anúncio *</label>
                         <input
                             id="title"
@@ -64,7 +64,7 @@ export default function StepInfo() {
                         <p className="text-xs text-gray-500 mt-1">Inclua o tipo de propriedade e sua principal característica.</p>
                     </div>
 
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-2">
                         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Descrição</label>
                         <textarea
                             id="description"
@@ -75,7 +75,7 @@ export default function StepInfo() {
                         />
                     </div>
 
-                    <div>
+                    <div className="col-span-1">
                         <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1.5">Tipo de Imóvel *</label>
                         <select
                             id="tipo"
@@ -92,7 +92,7 @@ export default function StepInfo() {
                         {errors.tipo && <span className="text-red-600 text-xs mt-1 block">{errors.tipo.message}</span>}
                     </div>
 
-                    <div>
+                    <div className="col-span-1">
                         <label htmlFor="subtype" className="block text-sm font-medium text-gray-700 mb-1.5">Subtipo</label>
                         <select
                             id="subtype"
@@ -111,7 +111,7 @@ export default function StepInfo() {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="col-span-1">
                         <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1.5">Idade do Imóvel</label>
                         <select
                             id="age"
@@ -130,7 +130,7 @@ export default function StepInfo() {
                         </select>
                     </div>
 
-                    <div>
+                    <div className="col-span-1">
                         <label htmlFor="ref_code" className="block text-sm font-medium text-gray-700 mb-1.5">Código de Referência</label>
                         <input
                             id="ref_code"
