@@ -68,10 +68,13 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         } catch (error) {
             console.error('Erro ao buscar imóveis:', error);
             if (!append) setProperties([]);
-            // Resetar lastPageLoaded em caso de erro
-            lastPageLoadedRef.current = 0;
+            // Em erro 429, não resetar lastPageLoaded (rate limit vai resetar)
+            // Outros erros: manter lastPageLoaded para não retentar mesma página
             if (error.message?.includes('429')) {
                 setHasMore(false);
+            } else {
+                // Em outros erros, resetar para permitir retry
+                lastPageLoadedRef.current = 0;
             }
         } finally {
             setLoading(false);
@@ -82,45 +85,38 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         }
     };
 
-    // Scroll infinito com Intersection Observer
-    // Grug gosta: proteção simples contra flood e duplicatas
+    // Throttle persistente (Grug gosta: simples, direto)
     const lastCallTimeRef = useRef(0);
-    const currentPageRef = useRef(1);
-    
-    useEffect(() => {
-        currentPageRef.current = page;
-    }, [page]);
 
     // Reset quando refreshTrigger ou searchTerm muda
     useEffect(() => {
         setProperties([]);
         setPage(1);
         setHasMore(true);
-        lastPageLoadedRef.current = 0; // Resetar rastreamento
-        currentPageRef.current = 1;
+        lastPageLoadedRef.current = 0;
         fetchProperties(1, false);
     }, [refreshTrigger, searchTerm]);
 
     // Intersection Observer para scroll infinito
+    // Grug gosta: lógica simples, sem abstrações desnecessárias
     useEffect(() => {
         if (!hasMore || loading || !sentinelRef.current) return;
 
-        const throttleDelay = 500; // 500ms entre chamadas
+        const throttleDelay = 500;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 if (!entries[0].isIntersecting) return;
                 if (loadingRef.current) return;
                 
+                // Throttle
                 const now = Date.now();
                 if (now - lastCallTimeRef.current < throttleDelay) return;
                 lastCallTimeRef.current = now;
 
-                // Proteção: não carregar mesma página duas vezes
-                const nextPage = currentPageRef.current + 1;
-                if (nextPage <= lastPageLoadedRef.current) return;
+                // Próxima página = última carregada + 1 (Grug gosta: simples e direto!)
+                const nextPage = lastPageLoadedRef.current + 1;
                 
-                currentPageRef.current = nextPage;
                 setPage(nextPage);
                 fetchProperties(nextPage, true);
             },

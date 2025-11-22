@@ -18,16 +18,18 @@ export const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loa
     const lastCallTimeRef = useRef(0); // Throttle persistente
 
     // Intersection Observer para scroll infinito
-    // Grug gosta: proteção simples contra flood e duplicatas
+    // Grug gosta: proteção simples, direto
     useEffect(() => {
         if (!hasMore || loading || !sentinelRef.current) return;
 
-        const throttleDelay = 500; // 500ms entre chamadas
+        const throttleDelay = 500;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 if (!entries[0].isIntersecting) return;
+                if (loading) return; // Proteção extra
                 
+                // Throttle
                 const now = Date.now();
                 if (now - lastCallTimeRef.current < throttleDelay) return;
                 lastCallTimeRef.current = now;
