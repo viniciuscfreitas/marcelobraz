@@ -22,7 +22,7 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
             </a>
 
             {/* Desktop Sidebar - Compacta Fixa */}
-            <aside className="hidden md:flex w-24 bg-white h-screen fixed left-0 top-0 flex-col items-center py-8 shadow-sm border-r border-gray-100 z-20" role="navigation" aria-label="Menu Principal">
+            <aside className="hidden md:flex w-24 bg-white h-screen fixed left-0 top-0 flex-col items-center py-8 shadow-sm border-r border-gray-100 border-t-0 z-20" role="navigation" aria-label="Menu Principal">
                 {/* Logo */}
                 <div className="mb-10 p-2 bg-gold-dark rounded-xl shadow-lg shadow-gold/20">
                     <Building className="text-white w-6 h-6" aria-hidden="true" />
@@ -78,7 +78,7 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
             {/* Main Content Wrapper */}
             <div className="md:pl-24 h-full flex flex-col overflow-hidden bg-[#FAFAFA]">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-2 md:py-5 flex-shrink-0">
+                <header className="bg-white border-b border-gray-100 border-l-0 md:border-l-0 px-4 md:px-6 py-2 md:py-5 flex-shrink-0">
                     <div className="flex flex-row md:flex-row items-center gap-2 md:gap-4">
                         {/* Saudação - Esconde quando busca expandida */}
                         <div className={`flex-1 transition-all duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 max-w-0 md:max-w-none overflow-hidden md:overflow-visible' : 'opacity-100 scale-100 max-w-full'}`}>
