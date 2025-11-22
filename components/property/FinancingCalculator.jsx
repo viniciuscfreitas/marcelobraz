@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, DollarSign } from 'lucide-react';
+import { TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
 
 /**
  * Calculadora de Financiamento - Grug Brain Style
@@ -103,10 +103,13 @@ export const FinancingCalculator = ({ property }) => {
                     </div>
                 </div>
 
-                <p className="text-xs text-center text-gray-500 mt-4">
-                    ⚠️ Simulação aproximada com taxa de 0.9% a.m. (11.3% a.a.).<br />
-                    Taxa final depende da análise de crédito do banco.
-                </p>
+                <div className="flex items-start gap-2 text-xs text-gray-500 mt-4">
+                    <AlertTriangle className="text-orange-500 mt-0.5 flex-shrink-0" size={14} />
+                    <p className="text-center">
+                        Simulação aproximada com taxa de 0.9% a.m. (11.3% a.a.).<br />
+                        Taxa final depende da análise de crédito do banco.
+                    </p>
+                </div>
             </div>
         </div>
     );
