@@ -1,8 +1,49 @@
 import { useFormContext } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useViaCep } from '../../hooks/useViaCep';
 
 export default function StepInfo() {
-    const { register, formState: { errors }, watch } = useFormContext();
+    const { register, formState: { errors }, watch, setValue } = useFormContext();
     const tipo = watch('tipo');
+    const cepValue = watch('cep');
+    const { buscarCep, loading: cepLoading } = useViaCep();
+    const [cepProcessado, setCepProcessado] = useState('');
+
+    // Formata CEP enquanto digita
+    const formatarCep = (value) => {
+        const cepLimpo = value.replace(/\D/g, '');
+        if (cepLimpo.length <= 5) return cepLimpo;
+        return `${cepLimpo.slice(0, 5)}-${cepLimpo.slice(5, 8)}`;
+    };
+
+    // Busca endereço quando CEP completo (debounce simples)
+    useEffect(() => {
+        const cepLimpo = cepValue?.replace(/\D/g, '') || '';
+        
+        // Reset ao limpar CEP
+        if (!cepValue || cepLimpo.length < 8) {
+            setCepProcessado('');
+            return;
+        }
+
+        // Debounce simples: só busca após 500ms sem digitar
+        const timer = setTimeout(() => {
+            if (cepLimpo.length === 8 && cepLimpo !== cepProcessado) {
+                buscarCep(cepValue).then((endereco) => {
+                    if (endereco) {
+                        setCepProcessado(cepLimpo);
+                        if (endereco.endereco) setValue('endereco', endereco.endereco);
+                        if (endereco.bairro) setValue('bairro', endereco.bairro);
+                        if (endereco.cidade) setValue('cidade', endereco.cidade);
+                        if (endereco.estado) setValue('estado', endereco.estado);
+                        if (endereco.cep) setValue('cep', formatarCep(endereco.cep));
+                    }
+                });
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [cepValue, buscarCep, setValue, cepProcessado]);
 
     return (
         <div className="space-y-6 md:space-y-8 animate-fade-in pb-4 md:pb-0">
@@ -107,27 +148,27 @@ export default function StepInfo() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div>
                         <label htmlFor="quartos" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Quartos</label>
-                        <input type="number" id="quartos" {...register('quartos')} className="input-field w-full" min="0" />
+                        <input type="number" id="quartos" {...register('quartos')} className="input-field" min="0" />
                     </div>
                     <div>
                         <label htmlFor="suites" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Suítes</label>
-                        <input type="number" id="suites" {...register('suites')} className="input-field w-full" min="0" />
+                        <input type="number" id="suites" {...register('suites')} className="input-field" min="0" />
                     </div>
                     <div>
                         <label htmlFor="banheiros" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Banheiros</label>
-                        <input type="number" id="banheiros" {...register('banheiros')} className="input-field w-full" min="0" />
+                        <input type="number" id="banheiros" {...register('banheiros')} className="input-field" min="0" />
                     </div>
                     <div>
                         <label htmlFor="vagas" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Vagas</label>
-                        <input type="number" id="vagas" {...register('vagas')} className="input-field w-full" min="0" />
+                        <input type="number" id="vagas" {...register('vagas')} className="input-field" min="0" />
                     </div>
                     <div>
                         <label htmlFor="area_util" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Área Útil (m²)</label>
-                        <input type="number" id="area_util" {...register('area_util')} className="input-field w-full" min="0" step="0.01" />
+                        <input type="number" id="area_util" {...register('area_util')} className="input-field" min="0" step="0.01" />
                     </div>
                     <div>
                         <label htmlFor="area_total" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Área Total (m²)</label>
-                        <input type="number" id="area_total" {...register('area_total')} className="input-field w-full" min="0" step="0.01" />
+                        <input type="number" id="area_total" {...register('area_total')} className="input-field" min="0" step="0.01" />
                     </div>
                 </div>
             </section>
@@ -172,8 +213,22 @@ export default function StepInfo() {
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Localização</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
-                        <label htmlFor="cep" className="block text-sm font-medium text-gray-700 mb-1.5">CEP</label>
-                        <input id="cep" {...register('cep')} className="input-field w-full" placeholder="00000-000" />
+                        <label htmlFor="cep" className="block text-sm font-medium text-gray-700 mb-1.5">
+                            CEP
+                            {cepLoading && <span className="ml-2 text-xs text-gray-500">(buscando...)</span>}
+                        </label>
+                        <input 
+                            id="cep" 
+                            {...register('cep')} 
+                            className="input-field" 
+                            placeholder="00000-000"
+                            maxLength={9}
+                            onChange={(e) => {
+                                const formatted = formatarCep(e.target.value);
+                                setValue('cep', formatted, { shouldValidate: false, shouldDirty: true });
+                            }}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Digite o CEP para preencher automaticamente</p>
                     </div>
                     <div>
                         <label htmlFor="bairro" className="block text-sm font-medium text-gray-700 mb-1.5">Bairro *</label>
@@ -187,19 +242,19 @@ export default function StepInfo() {
                     </div>
                     <div>
                         <label htmlFor="cidade" className="block text-sm font-medium text-gray-700 mb-1.5">Cidade</label>
-                        <input id="cidade" {...register('cidade')} className="input-field w-full" placeholder="Ex: Santos" />
+                        <input id="cidade" {...register('cidade')} className="input-field" placeholder="Ex: Santos" />
                     </div>
                     <div>
                         <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
-                        <input id="estado" {...register('estado')} className="input-field w-full" placeholder="Ex: SP" />
+                        <input id="estado" {...register('estado')} className="input-field" placeholder="Ex: SP" maxLength={2} />
                     </div>
                     <div className="col-span-2">
                         <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-1.5">Endereço</label>
-                        <input id="endereco" {...register('endereco')} className="input-field w-full" placeholder="Rua, Número" />
+                        <input id="endereco" {...register('endereco')} className="input-field" placeholder="Rua, Número" />
                     </div>
                     <div className="col-span-2">
                         <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-1.5">Complemento</label>
-                        <input id="complemento" {...register('complemento')} className="input-field w-full" placeholder="Apto, Bloco" />
+                        <input id="complemento" {...register('complemento')} className="input-field" placeholder="Apto, Bloco" />
                     </div>
                     <div className="col-span-2">
                         <div className="flex items-center gap-2">
