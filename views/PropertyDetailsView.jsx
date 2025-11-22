@@ -24,7 +24,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             alert('Erro: Imóvel não encontrado');
             return;
         }
-        
+
         const shareUrl = `${window.location.origin}?property=${property.id}`;
         const shareData = {
             title: property.title || 'Imóvel',
@@ -75,11 +75,11 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             textArea.focus();
             textArea.select();
             textArea.setSelectionRange(0, shareUrl.length);
-            
+
             try {
                 const success = document.execCommand('copy');
                 document.body.removeChild(textArea);
-                
+
                 if (success) {
                     if (onShareSuccess) {
                         onShareSuccess('Link copiado!');
@@ -108,20 +108,20 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         const propertyId = property?.id;
         const isCaptured = checkLeadCaptured(propertyId);
         setLeadCaptured(isCaptured);
-        
+
         let timer = null;
         if (!isCaptured && property) {
             timer = setTimeout(() => setShowLeadModal(true), 500);
         }
-        
+
         const updateLeadState = () => {
             const newIsCaptured = checkLeadCaptured(propertyId);
             setLeadCaptured(newIsCaptured);
         };
-        
+
         window.addEventListener('storage', updateLeadState);
         window.addEventListener('leadCaptured', updateLeadState);
-        
+
         return () => {
             if (timer) clearTimeout(timer);
             window.removeEventListener('storage', updateLeadState);
@@ -133,7 +133,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         window.scrollTo(0, 0);
     }, [property]);
 
-    // SEO dinâmico
+    // SEO dinâmico com Schema.org
     const getTransactionLabel = (type) => {
         if (type === 'Aluguel') return 'Locação';
         if (type === 'Temporada') return 'Temporada';
@@ -141,13 +141,15 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         return 'Venda';
     };
 
-    useSEO({
-        title: property ? `${property.title} - ${BROKER_INFO.name}` : 'Marcelo Braz - Private Broker',
-        description: property 
-            ? `${property.title} em ${property.bairro || ''}, ${property.cidade || 'Santos'}. ${getTransactionLabel(property.transaction_type)}. ${property.description ? property.description.substring(0, 120) + '...' : 'Imóvel exclusivo na baixada santista.'}`
-            : 'Marcelo Braz - Consultor Private em Santos. Imóveis exclusivos na baixada santista.',
-        image: property?.image || '',
-        url: property ? `${window.location.origin}?property=${property.id}` : window.location.origin
+    // Renderizar SEO (Grug gosta: componente dentro do render!)
+    const seoMeta = useSEO({
+        title: property.title,
+        description: property.description
+            ? property.description.substring(0, 155)
+            : `${property.title} em ${property.bairro || ''}, ${property.cidade || 'Santos'}. ${getTransactionLabel(property.tipo)}. ${property.quartos ? `${property.quartos} quartos` : ''} ${property.area_util ? `${property.area_util}m²` : ''}`.trim(),
+        image: property.image,
+        url: window.location.href,
+        property: property // Passa property inteira para gerar Schema.org
     });
 
     if (!property) return null;
@@ -172,24 +174,25 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     const addUnique = (img) => {
         if (img && !allImages.includes(img)) allImages.push(img);
     };
-    
+
     if (property.image) addUnique(property.image);
     if (Array.isArray(property.images)) property.images.forEach(addUnique);
     if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
     if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
-    
+
     const images = allImages.length > 0 ? allImages : [property.image].filter(Boolean);
 
     return (
         <div className="min-h-screen bg-gray-50 pt-20 pb-12 font-sans">
+            {seoMeta}
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <main className="lg:col-span-2 space-y-8" role="main">
                         <PropertyGallery property={property} images={images} onShare={handleShare} />
-                        <PropertyHeader 
-                            property={property} 
-                            leadCaptured={leadCaptured} 
-                            onUnlockPrice={() => setShowLeadModal(true)} 
+                        <PropertyHeader
+                            property={property}
+                            leadCaptured={leadCaptured}
+                            onUnlockPrice={() => setShowLeadModal(true)}
                         />
                         <PropertyFeatures features={features} />
                         {leadCaptured && <PropertyMap property={property} />}

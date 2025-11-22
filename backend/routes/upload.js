@@ -28,18 +28,13 @@ const upload = multer({
     }
 });
 
-// Rota de upload (Protegida)
-router.post('/', authenticateToken, (req, res, next) => {
-    upload.single('image')(req, res, (err) => {
-        if (err) {
-            // Erro do multer é tratado no error handler global
-            return next(err);
-        }
-        next();
-    });
-}, (req, res) => {
+// Rota de upload (Protegida) - Grug gosta: simples e direto
+router.post('/', authenticateToken, upload.single('image'), (req, res) => {
+    console.log('📤 Upload recebido:', req.file ? `Arquivo: ${req.file.filename}` : 'Sem arquivo');
+    
     try {
         if (!req.file) {
+            console.log('❌ Upload falhou: Nenhum arquivo enviado');
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
@@ -48,9 +43,11 @@ router.post('/', authenticateToken, (req, res, next) => {
         const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1') || host.includes(':3001');
         const protocol = isLocalhost ? (req.protocol || 'http') : 'https';
         const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+        
+        console.log('✅ Upload concluído:', imageUrl);
         res.json({ url: imageUrl });
     } catch (error) {
-        console.error('Erro no upload:', error);
+        console.error('❌ Erro no upload:', error);
         res.status(500).json({ error: 'Erro ao fazer upload da imagem' });
     }
 });

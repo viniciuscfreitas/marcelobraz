@@ -56,16 +56,20 @@ const corsOptions = {
 
 console.log(`🌐 CORS configurado para: ${corsOrigins.includes('*') ? '*' : corsOrigins.join(', ')}`);
 app.use(cors(corsOptions));
-app.use(express.json());
 
-// Servir uploads estaticamente
+// Servir uploads estaticamente (antes de json para não interferir)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// Rota de upload (antes de express.json para FormData funcionar)
+app.use('/api/upload', uploadRouter);
+
+// Express JSON apenas para rotas JSON (não interfere em FormData)
+app.use(express.json());
+
+// Routes JSON
 app.use('/api/properties', propertiesRouter);
 app.use('/api/leads', leadsRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/upload', uploadRouter);
 app.use('/sitemap.xml', sitemapRouter);
 
 // Health check
