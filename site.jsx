@@ -1,5 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Footer } from './components/Footer.jsx';
 import { Header } from './components/Header.jsx';
 import { LeadModal } from './components/LeadModal.jsx';
@@ -23,6 +23,20 @@ export default function RealEstateSite() {
   const { properties } = useProperties();
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Verificar URL para navegar para imóvel específico (Grug gosta: simples, direto)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const propertyId = urlParams.get('property');
+    
+    if (propertyId && properties.length > 0) {
+      const property = properties.find(p => p.id === parseInt(propertyId));
+      if (property) {
+        setSelectedProperty(property);
+        nav.navigateTo('property');
+      }
+    }
+  }, [properties, nav]);
 
   const handlePropertyClick = (prop) => {
     setSelectedProperty(prop);
@@ -70,6 +84,7 @@ export default function RealEstateSite() {
                 openModal('contact'); // Reutilizando modal de contato/gate
               }
             }}
+            onShareSuccess={(msg) => setToastMessage(msg)}
           />
         );
       default:

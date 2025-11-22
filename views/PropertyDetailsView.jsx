@@ -8,11 +8,67 @@ import { BROKER_INFO, COLORS } from '../data/constants';
  * Página de Detalhes do Imóvel
  * Design premium inspirado no Imovelweb mas com nossa identidade visual.
  */
-export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) => {
+export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onShareSuccess }) => {
     const [activeImage, setActiveImage] = useState(0);
     const [viewCount, setViewCount] = useState(0);
     const [leadCaptured, setLeadCaptured] = useState(false);
     const [showLeadModal, setShowLeadModal] = useState(false);
+
+    // Função de compartilhar (Grug gosta: simples e direto)
+    const handleShare = async () => {
+        if (!property?.id) return;
+        
+        const shareUrl = `${window.location.origin}?property=${property.id}`;
+        const shareData = {
+            title: property.title,
+            text: `${property.title} - ${property.bairro}, ${property.cidade}`,
+            url: shareUrl
+        };
+
+        // Tenta usar Web Share API se disponível (mobile principalmente)
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+                if (onShareSuccess) onShareSuccess('Link compartilhado!');
+                return;
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Erro ao compartilhar:', err);
+                } else {
+                    // Usuário cancelou, não fazer nada
+                    return;
+                }
+            }
+        }
+
+        // Fallback: copiar para clipboard
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            if (onShareSuccess) onShareSuccess('Link copiado para área de transferência!');
+        } catch (err) {
+            console.error('Erro ao copiar:', err);
+            // Fallback final: tentar método antigo
+            const textArea = document.createElement('textarea');
+            textArea.value = shareUrl;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            textArea.style.pointerEvents = 'none';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                const success = document.execCommand('copy');
+                if (success && onShareSuccess) {
+                    onShareSuccess('Link copiado!');
+                } else {
+                    alert('Erro ao copiar. Tente novamente.');
+                }
+            } catch (fallbackErr) {
+                console.error('Erro ao copiar (fallback):', fallbackErr);
+                alert('Erro ao compartilhar. Tente novamente.');
+            }
+            document.body.removeChild(textArea);
+        }
+    };
 
     // Helper simples: verifica se lead foi capturado (Grug gosta: função pequena, sem over-engineering)
     const checkLeadCaptured = (propId) => {
@@ -121,6 +177,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                 />
                                 <div className="absolute top-4 right-4">
                                     <button
+                                        onClick={handleShare}
                                         className="p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
                                         aria-label="Compartilhar este imóvel"
                                     >
