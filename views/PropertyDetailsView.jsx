@@ -190,18 +190,26 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     const features = parseJsonField(property.features, {});
     const multimedia = parseJsonField(property.multimedia, {});
 
-    // Coletar todas as imagens disponíveis
+    // Coletar todas as imagens disponíveis (Grug gosta: simples, direto!)
     const allImages = [];
     const addUnique = (img) => {
-        if (img && !allImages.includes(img)) allImages.push(img);
+        if (img && typeof img === 'string' && img.trim() && !allImages.includes(img)) {
+            allImages.push(img);
+        }
     };
 
-    if (property.image) addUnique(property.image);
-    if (Array.isArray(property.images)) property.images.forEach(addUnique);
-    if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
-    if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
+    // Prioridade: images array > image > multimedia.photos > multimedia.images
+    if (Array.isArray(property.images) && property.images.length > 0) {
+        property.images.forEach(addUnique);
+    } else {
+        // Fallback: usar image principal se não tem array
+        if (property.image) addUnique(property.image);
+        if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
+        if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
+    }
 
-    const images = allImages.length > 0 ? allImages : [property.image].filter(Boolean);
+    // Garantir pelo menos uma imagem
+    const images = allImages.length > 0 ? allImages : (property.image ? [property.image] : []);
 
     return (
         <div className="min-h-screen bg-[#f8fafc] pt-20 pb-12 font-sans">

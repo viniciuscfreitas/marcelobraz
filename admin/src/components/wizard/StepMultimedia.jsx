@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Upload, X, Image as ImageIcon, Video, Map } from 'lucide-react';
 import { useImageUpload } from '../../hooks/useImageUpload';
@@ -12,57 +13,93 @@ export default function StepMultimedia() {
     const { uploading, uploadImage } = useImageUpload(token);
 
     const imageUrl = watch('image');
+    const imagesArray = watch('images') || [];
     const multimedia = watch('multimedia') || {};
+    const [localImages, setLocalImages] = useState(imagesArray);
 
-    const handleMainImageUpload = async (e) => {
+    useEffect(() => {
+        setLocalImages(imagesArray);
+    }, [imagesArray]);
+
+    const handleMultipleUpload = async (e) => {
         e.stopPropagation();
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-            const url = await uploadImage(file);
-            setValue('image', url, { shouldValidate: false });
-        } catch (error) {
-            showToast('Erro ao enviar imagem', 'error');
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        // Upload múltiplo (Grug gosta: simples, uma por vez!)
+        for (const file of files) {
+            try {
+                const url = await uploadImage(file);
+                if (url) {
+                    const newImages = [...localImages, url];
+                    setLocalImages(newImages);
+                    setValue('images', newImages, { shouldValidate: false });
+                    // image principal = primeira foto
+                    if (newImages.length === 1) {
+                        setValue('image', url, { shouldValidate: false });
+                    }
+                }
+            } catch (error) {
+                showToast('Erro ao enviar imagem', 'error');
+            }
         }
+        e.target.value = '';
     };
 
-    // Grug note: Por enquanto, apenas URLs para vídeos e tour, e upload simples para planta
-    // No futuro, podemos implementar upload múltiplo de fotos (galeria)
+    const handleRemoveImageAt = (index) => {
+        const newImages = localImages.filter((_, i) => i !== index);
+        setLocalImages(newImages);
+        setValue('images', newImages, { shouldValidate: false });
+        // image principal = primeira foto
+        if (newImages.length > 0) {
+            setValue('image', newImages[0], { shouldValidate: false });
+        } else {
+            setValue('image', '', { shouldValidate: false });
+        }
+    };
 
     return (
         <div className="space-y-6 md:space-y-8 animate-fade-in pb-4 md:pb-0">
             {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
 
-            {/* Imagem Principal */}
+            {/* Fotos do Imóvel */}
             <section className="space-y-4">
-                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Imagem Principal (Capa)</h3>
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Fotos do Imóvel *</h3>
 
-                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
-                    {imageUrl ? (
-                        <div className="relative w-full md:w-64 h-40 rounded-lg overflow-hidden border border-gray-200 group">
-                            <img src={imageUrl} alt="Capa" className="w-full h-full object-cover" />
-                            <button
-                                type="button"
-                                onClick={() => setValue('image', '', { shouldValidate: false })}
-                                className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                            >
-                                <X size={16} />
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="w-full md:w-64 h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 bg-gray-50">
-                            <ImageIcon size={32} className="mb-2" />
-                            <span className="text-sm">Nenhuma imagem</span>
+                <div className="space-y-4">
+                    {/* Grid de fotos */}
+                    {localImages.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {localImages.map((img, idx) => (
+                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                    <img src={img} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                                    {idx === 0 && (
+                                        <div className="absolute top-1 left-1 bg-primary text-white text-xs px-2 py-1 rounded font-bold">
+                                            Capa
+                                        </div>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveImageAt(idx)}
+                                        className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
+                                        aria-label={`Remover foto ${idx + 1}`}
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     )}
 
-                    <div className="flex-1">
+                    {/* Upload */}
+                    <div>
                         <input
                             type="file"
                             accept="image/*"
-                            onChange={handleMainImageUpload}
+                            multiple
+                            onChange={handleMultipleUpload}
                             className="hidden"
-                            id="main-image-upload"
+                            id="images-upload"
                             disabled={uploading}
                         />
                         <button
@@ -71,21 +108,23 @@ export default function StepMultimedia() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!uploading) {
-                                    const input = document.getElementById('main-image-upload');
-                                    if (input) {
-                                        input.click();
-                                    }
+                                    document.getElementById('images-upload')?.click();
                                 }
                             }}
                             disabled={uploading}
                             className={`btn-secondary inline-flex items-center gap-2 ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Upload size={18} />
-                            {uploading ? 'Enviando...' : 'Escolher Capa'}
+                            {uploading ? 'Enviando...' : localImages.length > 0 ? 'Adicionar Mais Fotos' : 'Adicionar Fotos'}
                         </button>
-                        {errors.image && <p className="text-red-600 text-xs mt-2">{errors.image.message}</p>}
+                        <p className="text-xs text-gray-500 mt-2">Primeira foto será a capa. Você pode adicionar várias fotos.</p>
+                        {errors.images && <p className="text-red-600 text-xs mt-1">{errors.images.message}</p>}
                     </div>
                 </div>
+                <input type="hidden" {...register('images', { 
+                    validate: (v) => (!v || v.length === 0) && (!imageUrl) ? 'Pelo menos uma foto é obrigatória' : true 
+                })} />
+                <input type="hidden" {...register('image')} />
             </section>
 
             {/* Links de Mídia */}

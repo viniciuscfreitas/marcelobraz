@@ -49,7 +49,7 @@ router.get('/', (req, res) => {
         
         const baseQuery = `
             SELECT id, title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-                   quartos, vagas, banheiros, area_util, cidade, created_at, description, transaction_type, views
+                   quartos, vagas, banheiros, area_util, cidade, created_at, description, transaction_type, views, images
             FROM properties 
             ${whereClause}
             ORDER BY featured DESC, views DESC, created_at DESC
@@ -129,9 +129,9 @@ router.post('/', requireAuth, validateProperty, handleValidationErrors, (req, re
                 condominio, iptu, area_util, area_total,
                 cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
                 aceita_permuta, aceita_fgts, posicao_apto, andares,
-                features, multimedia, transaction_type, status
+                features, multimedia, transaction_type, status, images
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         const values = preparePropertyData(req.body);
@@ -160,7 +160,7 @@ router.put('/:id', requireAuth, validateProperty, handleValidationErrors, (req, 
                 condominio = ?, iptu = ?, area_util = ?, area_total = ?,
                 cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
                 aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
-                features = ?, multimedia = ?, transaction_type = ?, status = ?,
+                features = ?, multimedia = ?, transaction_type = ?, status = ?, images = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `);

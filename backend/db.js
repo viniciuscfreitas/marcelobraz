@@ -88,7 +88,8 @@ function initDatabase() {
     { name: 'transaction_type', type: "TEXT DEFAULT 'Venda'" },
     // Grug gosta: novas colunas Fase 1
     { name: 'status', type: "TEXT DEFAULT 'disponivel'" },
-    { name: 'views', type: 'INTEGER DEFAULT 0' }
+    { name: 'views', type: 'INTEGER DEFAULT 0' },
+    { name: 'images', type: 'TEXT' }
   ];
 
   columnsToAdd.forEach(col => {

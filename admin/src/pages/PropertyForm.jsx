@@ -34,6 +34,13 @@ export default function PropertyForm() {
             if (data.tags && Array.isArray(data.tags)) {
                 data.tags = data.tags.join(', ');
             }
+            
+            // Garantir images array existe
+            if (!data.images && data.image) {
+                data.images = [data.image];
+            } else if (!data.images) {
+                data.images = [];
+            }
 
             reset(data);
         } catch (error) {

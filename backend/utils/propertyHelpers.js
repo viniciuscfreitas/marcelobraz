@@ -12,22 +12,40 @@ function parseProperty(property) {
     if (!property) return null;
 
     try {
+        // Parse images array
+        let images = [];
+        if (property.images) {
+            try {
+                images = JSON.parse(property.images);
+                if (!Array.isArray(images)) images = [];
+            } catch {
+                images = [];
+            }
+        }
+        // Se não tem images mas tem image, usar image como primeira foto
+        if (images.length === 0 && property.image) {
+            images = [property.image];
+        }
+
         return {
             ...property,
             tags: property.tags ? JSON.parse(property.tags) : [],
             features: property.features ? JSON.parse(property.features) : {},
             multimedia: property.multimedia ? JSON.parse(property.multimedia) : {},
+            images: images,
             featured: property.featured === 1,
             transaction_type: property.transaction_type || 'Venda'
         };
     } catch (error) {
         console.error('Error parsing property JSON fields:', error);
         // Retornar com defaults seguros
+        const images = property?.image ? [property.image] : [];
         return {
             ...property,
             tags: [],
             features: {},
             multimedia: {},
+            images: images,
             featured: property.featured === 1,
             transaction_type: property.transaction_type || 'Venda'
         };
@@ -49,11 +67,23 @@ function parseProperties(properties) {
  * @returns {Array} - Array de valores prontos para prepared statement
  */
 function preparePropertyData(data) {
+    // Processar images array
+    let images = [];
+    if (data.images && Array.isArray(data.images)) {
+        images = data.images.filter(img => img && img.trim());
+    } else if (data.image) {
+        // Se só tem image, criar array com uma foto
+        images = [data.image];
+    }
+
+    // image principal = primeira foto do array (compatibilidade)
+    const mainImage = images.length > 0 ? images[0] : (data.image || null);
+
     return [
         data.title,
         data.subtitle || null,
         data.price,
-        data.image || null,
+        mainImage,
         data.bairro,
         data.tipo,
         data.specs || null,
@@ -84,7 +114,8 @@ function preparePropertyData(data) {
         data.features ? JSON.stringify(data.features) : '{}',
         data.multimedia ? JSON.stringify(data.multimedia) : '{}',
         data.transaction_type || 'Venda',
-        data.status || 'disponivel'
+        data.status || 'disponivel',
+        images.length > 0 ? JSON.stringify(images) : null
     ];
 }
 
