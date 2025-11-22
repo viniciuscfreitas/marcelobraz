@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { API_URL } from '../config';
 
 // Hook simples para upload de imagem - Grug gosta: direto e funcional
 export function useImageUpload(token, onSuccess) {
     const [uploading, setUploading] = useState(false);
+    const onSuccessRef = useRef(onSuccess);
+    
+    // Atualiza ref quando callback muda (evita loop infinito)
+    useEffect(() => {
+        onSuccessRef.current = onSuccess;
+    }, [onSuccess]);
 
     const validateFile = (file) => {
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -44,7 +50,9 @@ export function useImageUpload(token, onSuccess) {
             }
 
             const data = await res.json();
-            if (onSuccess) onSuccess(data.url);
+            if (onSuccessRef.current) {
+                onSuccessRef.current(data.url);
+            }
             return data.url;
         } finally {
             setUploading(false);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -19,9 +19,9 @@ export default function PropertyForm() {
     const { toast, showToast, hideToast } = useToast();
     const imageUrl = watch('image');
 
-    const handleUploadSuccess = (url) => {
+    const handleUploadSuccess = useCallback((url) => {
         setValue('image', url, { shouldValidate: false });
-    };
+    }, [setValue]);
 
     const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
 

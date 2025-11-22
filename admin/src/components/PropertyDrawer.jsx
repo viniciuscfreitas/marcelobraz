@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -16,9 +16,9 @@ export default function PropertyDrawer({ isOpen, onClose, propertyId, onSuccess 
     const { toast, showToast, hideToast } = useToast();
     const imageUrl = watch('image');
 
-    const handleUploadSuccess = (url) => {
+    const handleUploadSuccess = useCallback((url) => {
         setValue('image', url, { shouldValidate: false });
-    };
+    }, [setValue]);
 
     const { uploading, uploadImage } = useImageUpload(token, handleUploadSuccess);
 
