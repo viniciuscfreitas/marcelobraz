@@ -5,18 +5,18 @@ export default function StepInfo() {
     const tipo = watch('tipo');
 
     return (
-        <div className="space-y-8 animate-fade-in">
+        <div className="space-y-6 md:space-y-8 animate-fade-in pb-4 md:pb-0">
             {/* Seção 1: Informações Principais */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Informações Principais</h3>
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Informações Principais</h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="col-span-2">
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Título do Anúncio *</label>
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">Título do Anúncio *</label>
                         <input
                             id="title"
                             {...register('title', { required: 'Título é obrigatório' })}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="Ex: Apartamento com 3 suítes no Gonzaga"
                         />
                         {errors.title && <span className="text-red-600 text-xs mt-1 block">{errors.title.message}</span>}
@@ -24,22 +24,22 @@ export default function StepInfo() {
                     </div>
 
                     <div className="col-span-2">
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Descrição</label>
                         <textarea
                             id="description"
                             {...register('description')}
                             rows={4}
-                            className="input-field"
+                            className="input-field w-full resize-y"
                             placeholder="Conte-nos sobre seu imóvel. Inclua todos os detalhes que o tornam mais atraente..."
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1">Tipo de Imóvel *</label>
+                        <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1.5">Tipo de Imóvel *</label>
                         <select
                             id="tipo"
                             {...register('tipo', { required: 'Tipo é obrigatório' })}
-                            className="input-field"
+                            className="input-field w-full"
                         >
                             <option value="">Selecione...</option>
                             <option value="Apartamento">Apartamento</option>
@@ -52,11 +52,11 @@ export default function StepInfo() {
                     </div>
 
                     <div>
-                        <label htmlFor="subtype" className="block text-sm font-medium text-gray-700 mb-1">Subtipo</label>
+                        <label htmlFor="subtype" className="block text-sm font-medium text-gray-700 mb-1.5">Subtipo</label>
                         <select
                             id="subtype"
                             {...register('subtype')}
-                            className="input-field"
+                            className="input-field w-full"
                         >
                             <option value="">Selecione...</option>
                             <option value="Padrão">Padrão</option>
@@ -71,11 +71,11 @@ export default function StepInfo() {
                     </div>
 
                     <div>
-                        <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">Idade do Imóvel</label>
+                        <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1.5">Idade do Imóvel</label>
                         <select
                             id="age"
                             {...register('age')}
-                            className="input-field"
+                            className="input-field w-full"
                         >
                             <option value="">Selecione...</option>
                             <option value="Breve Lançamento">Breve Lançamento</option>
@@ -90,11 +90,11 @@ export default function StepInfo() {
                     </div>
 
                     <div>
-                        <label htmlFor="ref_code" className="block text-sm font-medium text-gray-700 mb-1">Código de Referência</label>
+                        <label htmlFor="ref_code" className="block text-sm font-medium text-gray-700 mb-1.5">Código de Referência</label>
                         <input
                             id="ref_code"
                             {...register('ref_code')}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="Ex: REF-1234"
                         />
                     </div>
@@ -103,64 +103,64 @@ export default function StepInfo() {
 
             {/* Seção 2: Detalhes */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Detalhes</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Detalhes</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div>
-                        <label htmlFor="quartos" className="block text-sm font-medium text-gray-700 mb-1">Quartos</label>
-                        <input type="number" id="quartos" {...register('quartos')} className="input-field" min="0" />
+                        <label htmlFor="quartos" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Quartos</label>
+                        <input type="number" id="quartos" {...register('quartos')} className="input-field w-full" min="0" />
                     </div>
                     <div>
-                        <label htmlFor="suites" className="block text-sm font-medium text-gray-700 mb-1">Suítes</label>
-                        <input type="number" id="suites" {...register('suites')} className="input-field" min="0" />
+                        <label htmlFor="suites" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Suítes</label>
+                        <input type="number" id="suites" {...register('suites')} className="input-field w-full" min="0" />
                     </div>
                     <div>
-                        <label htmlFor="banheiros" className="block text-sm font-medium text-gray-700 mb-1">Banheiros</label>
-                        <input type="number" id="banheiros" {...register('banheiros')} className="input-field" min="0" />
+                        <label htmlFor="banheiros" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Banheiros</label>
+                        <input type="number" id="banheiros" {...register('banheiros')} className="input-field w-full" min="0" />
                     </div>
                     <div>
-                        <label htmlFor="vagas" className="block text-sm font-medium text-gray-700 mb-1">Vagas</label>
-                        <input type="number" id="vagas" {...register('vagas')} className="input-field" min="0" />
+                        <label htmlFor="vagas" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Vagas</label>
+                        <input type="number" id="vagas" {...register('vagas')} className="input-field w-full" min="0" />
                     </div>
                     <div>
-                        <label htmlFor="area_util" className="block text-sm font-medium text-gray-700 mb-1">Área Útil (m²)</label>
-                        <input type="number" id="area_util" {...register('area_util')} className="input-field" min="0" step="0.01" />
+                        <label htmlFor="area_util" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Área Útil (m²)</label>
+                        <input type="number" id="area_util" {...register('area_util')} className="input-field w-full" min="0" step="0.01" />
                     </div>
                     <div>
-                        <label htmlFor="area_total" className="block text-sm font-medium text-gray-700 mb-1">Área Total (m²)</label>
-                        <input type="number" id="area_total" {...register('area_total')} className="input-field" min="0" step="0.01" />
+                        <label htmlFor="area_total" className="block text-xs md:text-sm font-medium text-gray-700 mb-1.5">Área Total (m²)</label>
+                        <input type="number" id="area_total" {...register('area_total')} className="input-field w-full" min="0" step="0.01" />
                     </div>
                 </div>
             </section>
 
             {/* Seção 3: Valores */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Valores</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Valores</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Valor de Venda *</label>
+                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1.5">Valor de Venda *</label>
                         <input
                             id="price"
                             {...register('price', { required: 'Preço é obrigatório' })}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="R$ 0,00"
                         />
                         {errors.price && <span className="text-red-600 text-xs mt-1 block">{errors.price.message}</span>}
                     </div>
                     <div>
-                        <label htmlFor="condominio" className="block text-sm font-medium text-gray-700 mb-1">Condomínio</label>
+                        <label htmlFor="condominio" className="block text-sm font-medium text-gray-700 mb-1.5">Condomínio</label>
                         <input
                             id="condominio"
                             {...register('condominio')}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="R$ 0,00"
                         />
                     </div>
                     <div>
-                        <label htmlFor="iptu" className="block text-sm font-medium text-gray-700 mb-1">IPTU</label>
+                        <label htmlFor="iptu" className="block text-sm font-medium text-gray-700 mb-1.5">IPTU</label>
                         <input
                             id="iptu"
                             {...register('iptu')}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="R$ 0,00"
                         />
                     </div>
@@ -169,37 +169,37 @@ export default function StepInfo() {
 
             {/* Seção 4: Localização */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Localização</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Localização</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
-                        <label htmlFor="cep" className="block text-sm font-medium text-gray-700 mb-1">CEP</label>
-                        <input id="cep" {...register('cep')} className="input-field" placeholder="00000-000" />
+                        <label htmlFor="cep" className="block text-sm font-medium text-gray-700 mb-1.5">CEP</label>
+                        <input id="cep" {...register('cep')} className="input-field w-full" placeholder="00000-000" />
                     </div>
                     <div>
-                        <label htmlFor="bairro" className="block text-sm font-medium text-gray-700 mb-1">Bairro *</label>
+                        <label htmlFor="bairro" className="block text-sm font-medium text-gray-700 mb-1.5">Bairro *</label>
                         <input
                             id="bairro"
                             {...register('bairro', { required: 'Bairro é obrigatório' })}
-                            className="input-field"
+                            className="input-field w-full"
                             placeholder="Ex: Gonzaga"
                         />
                         {errors.bairro && <span className="text-red-600 text-xs mt-1 block">{errors.bairro.message}</span>}
                     </div>
                     <div>
-                        <label htmlFor="cidade" className="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                        <input id="cidade" {...register('cidade')} className="input-field" placeholder="Ex: Santos" />
+                        <label htmlFor="cidade" className="block text-sm font-medium text-gray-700 mb-1.5">Cidade</label>
+                        <input id="cidade" {...register('cidade')} className="input-field w-full" placeholder="Ex: Santos" />
                     </div>
                     <div>
-                        <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                        <input id="estado" {...register('estado')} className="input-field" placeholder="Ex: SP" />
+                        <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
+                        <input id="estado" {...register('estado')} className="input-field w-full" placeholder="Ex: SP" />
                     </div>
                     <div className="col-span-2">
-                        <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
-                        <input id="endereco" {...register('endereco')} className="input-field" placeholder="Rua, Número" />
+                        <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-1.5">Endereço</label>
+                        <input id="endereco" {...register('endereco')} className="input-field w-full" placeholder="Rua, Número" />
                     </div>
                     <div className="col-span-2">
-                        <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-                        <input id="complemento" {...register('complemento')} className="input-field" placeholder="Apto, Bloco" />
+                        <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-1.5">Complemento</label>
+                        <input id="complemento" {...register('complemento')} className="input-field w-full" placeholder="Apto, Bloco" />
                     </div>
                     <div className="col-span-2">
                         <div className="flex items-center gap-2">

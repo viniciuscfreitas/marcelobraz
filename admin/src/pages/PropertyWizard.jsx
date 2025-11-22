@@ -81,33 +81,42 @@ export default function PropertyWizard() {
 
     return (
         <Layout showSearch={false} fabButton={fabButton}>
-            <div className="flex-1 overflow-y-auto bg-background pb-12 px-4 md:px-6 py-8">
-                <WizardHeader isEditing={isEditing} currentStep={currentStep} />
+            {/* Header fixo no mobile */}
+            <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-30 px-4 py-3 shadow-sm">
+                <WizardHeader 
+                    isEditing={isEditing} 
+                    currentStep={currentStep}
+                    onBack={prevStep}
+                    canGoBack={currentStep > 1}
+                />
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-background pb-24 md:pb-12 px-4 md:px-6 pt-20 md:pt-8">
+                {/* Header desktop - não fixo */}
+                <div className="hidden md:block">
+                    <WizardHeader 
+                        isEditing={isEditing} 
+                        currentStep={currentStep}
+                        onBack={prevStep}
+                        canGoBack={currentStep > 1}
+                    />
+                </div>
 
                 <main className="max-w-4xl mx-auto">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-6 border-b border-gray-200 bg-gray-50">
-                            <h2 className="text-lg font-semibold text-gray-800">
+                        <div className="p-4 md:p-6 border-b border-gray-200 bg-gray-50">
+                            <h2 className="text-base md:text-lg font-semibold text-gray-800">
                                 {STEPS[currentStep - 1].title}
                             </h2>
-                            <p className="text-sm text-gray-500">Passo {currentStep} de {STEPS.length}</p>
+                            <p className="text-xs md:text-sm text-gray-500">Passo {currentStep} de {STEPS.length}</p>
                         </div>
 
                         <FormProvider {...methods}>
-                            <form ref={formRef} onSubmit={methods.handleSubmit(handleSubmit)} className="p-6">
+                            <form ref={formRef} onSubmit={methods.handleSubmit(handleSubmit)} className="p-4 md:p-6">
                                 <CurrentComponent />
 
-                                <div className="flex justify-between pt-8 mt-8 border-t border-gray-100">
-                                    <button
-                                        type="button"
-                                        onClick={prevStep}
-                                        disabled={currentStep === 1}
-                                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium transition-colors
-                                            ${currentStep === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 hover:text-primary'}`}
-                                    >
-                                        Voltar
-                                    </button>
-
+                                {/* Botões apenas no desktop - mobile usa bottom nav */}
+                                <div className="hidden md:flex justify-end pt-8 mt-8 border-t border-gray-100">
                                     {currentStep < STEPS.length ? (
                                         <button
                                             type="button"
