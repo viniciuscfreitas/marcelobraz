@@ -100,7 +100,7 @@ export default function Layout({ children, searchTerm, setSearchTerm, showSearch
                                         <input
                                             id="search-bar-input"
                                             type="text"
-                                            placeholder="Busque por título, bairro, tipo ou preço..."
+                                            placeholder="Busque por título, bairro, tipo, código ou descrição..."
                                             className="w-full outline-none text-sm font-medium text-gray-700 placeholder-gray-400 bg-transparent transition-all h-full"
                                             style={{ outline: 'none', boxShadow: 'none' }}
                                             value={searchTerm}

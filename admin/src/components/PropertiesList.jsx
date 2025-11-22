@@ -17,6 +17,9 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     const sentinelRef = useRef(null);
     const loadingRef = useRef(false);
     const lastPageLoadedRef = useRef(0); // Rastrear última página carregada
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+    const debounceTimeoutRef = useRef(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     // Helper para gerar slug SEO-friendly (mesma lógica do frontend - Grug gosta: consistência!)
     const generateSlug = (text) => {
@@ -78,7 +81,7 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         setLoading(true);
         
         try {
-            const url = `${API_URL}/api/properties?page=${pageNum}&limit=20${searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : ''}`;
+            const url = `${API_URL}/api/properties?page=${pageNum}&limit=20${debouncedSearchTerm ? `&search=${encodeURIComponent(debouncedSearchTerm)}` : ''}`;
             const res = await fetch(url);
             
             if (!res.ok) {
@@ -137,14 +140,38 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     // Throttle persistente (Grug gosta: simples, direto)
     const lastCallTimeRef = useRef(0);
 
-    // Reset quando refreshTrigger ou searchTerm muda
+    // Debounce da busca (Grug gosta: simples, 300ms é suficiente)
+    useEffect(() => {
+        // Se há termo de busca e é diferente do debounced, mostrar indicador
+        if (searchTerm && searchTerm !== debouncedSearchTerm) {
+            setIsSearching(true);
+        }
+        
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+        }
+        
+        debounceTimeoutRef.current = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+            setIsSearching(false);
+        }, 300);
+        
+        return () => {
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+        };
+    }, [searchTerm, debouncedSearchTerm]);
+
+    // Reset quando refreshTrigger ou debouncedSearchTerm muda
     useEffect(() => {
         setProperties([]);
         setPage(1);
         setHasMore(true);
         lastPageLoadedRef.current = 0;
+        setIsSearching(false);
         fetchProperties(1, false);
-    }, [refreshTrigger, searchTerm]);
+    }, [refreshTrigger, debouncedSearchTerm]);
 
     // Intersection Observer para scroll infinito
     // Grug gosta: lógica simples, sem abstrações desnecessárias
@@ -174,7 +201,7 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
 
         observer.observe(sentinelRef.current);
         return () => observer.disconnect();
-    }, [hasMore, loading, searchTerm]);
+    }, [hasMore, loading, debouncedSearchTerm]);
 
     const handleDeleteClick = (property) => {
         setDeleteConfirm({ isOpen: true, property });
@@ -231,7 +258,13 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     // Busca já é feita na API, não precisa filtrar localmente
     const filteredProperties = properties;
 
-    if (loading && properties.length === 0) return <div className="p-12 text-center text-gray-500" role="status">Carregando imóveis...</div>;
+    if (loading && properties.length === 0) {
+        return (
+            <div className="p-12 text-center text-gray-500" role="status">
+                {isSearching ? 'Buscando...' : 'Carregando imóveis...'}
+            </div>
+        );
+    }
 
     return (
         <>
@@ -434,7 +467,9 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
             {/* Sentinel único para scroll infinito (Grug gosta: um só!) */}
             {hasMore && <div ref={sentinelRef} className="h-20" />}
             {loading && properties.length > 0 && (
-                <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
+                <div className="text-center py-4 text-gray-500 text-sm">
+                    {isSearching ? 'Buscando...' : 'Carregando mais imóveis...'}
+                </div>
             )}
 
             {/* Dialog de Confirmação */}

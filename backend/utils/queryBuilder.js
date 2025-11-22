@@ -6,11 +6,11 @@ function buildPropertyQuery(filters) {
     const whereConditions = [];
     const params = [];
 
-    // Busca (LIKE em múltiplos campos)
+    // Busca (LIKE em múltiplos campos) - Grug gosta: busca completa e simples
     if (filters.search) {
         const searchTerm = `%${filters.search}%`;
-        whereConditions.push(`(title LIKE ? OR subtitle LIKE ? OR description LIKE ? OR bairro LIKE ? OR cidade LIKE ?)`);
-        params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+        whereConditions.push(`(title LIKE ? OR subtitle LIKE ? OR description LIKE ? OR bairro LIKE ? OR cidade LIKE ? OR tipo LIKE ? OR ref_code LIKE ?)`);
+        params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
     }
 
     // Filtros numéricos
