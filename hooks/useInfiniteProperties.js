@@ -16,6 +16,7 @@ export const useInfiniteProperties = ({ search = '', filters = {} } = {}) => {
     const [error, setError] = useState(null);
     const [page, setPage] = useState(1);
     const loadingRef = useRef(false);
+    const lastPageLoadedRef = useRef(0); // Rastrear última página carregada
 
     // Construir URL da API com query params
     const buildUrl = useCallback((pageNum) => {
@@ -45,9 +46,16 @@ export const useInfiniteProperties = ({ search = '', filters = {} } = {}) => {
 
     // Buscar página
     const fetchPage = useCallback(async (pageNum, append = false) => {
+        // Grug gosta: proteção simples contra duplicatas
         if (loadingRef.current) return;
         
+        // Proteção: não carregar mesma página duas vezes
+        if (append && pageNum === lastPageLoadedRef.current) {
+            return;
+        }
+        
         loadingRef.current = true;
+        lastPageLoadedRef.current = pageNum;
         setLoading(true);
         setError(null);
 
@@ -76,6 +84,8 @@ export const useInfiniteProperties = ({ search = '', filters = {} } = {}) => {
             console.error('Erro na API:', err);
             setError(err);
             if (!append) setItems([]);
+            // Resetar lastPageLoaded em caso de erro
+            lastPageLoadedRef.current = 0;
         } finally {
             setLoading(false);
             loadingRef.current = false;
@@ -95,6 +105,7 @@ export const useInfiniteProperties = ({ search = '', filters = {} } = {}) => {
         setItems([]);
         setPage(1);
         setHasMore(true);
+        lastPageLoadedRef.current = 0; // Resetar rastreamento
         fetchPage(1, false);
     }, [fetchPage]);
 

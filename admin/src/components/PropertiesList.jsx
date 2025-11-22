@@ -16,15 +16,21 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     const { toast, showToast, hideToast } = useToast();
     const sentinelRef = useRef(null);
     const loadingRef = useRef(false);
+    const lastPageLoadedRef = useRef(0); // Rastrear última página carregada
 
     const fetchProperties = async (pageNum = 1, append = false) => {
-        // Grug gosta: proteção simples contra múltiplas chamadas
+        // Grug gosta: proteção simples contra múltiplas chamadas e duplicatas
         if (loadingRef.current) {
-            console.log('⏸️ Já carregando, ignorando requisição duplicada');
+            return; // Silencioso, não logar
+        }
+        
+        // Proteção: não carregar mesma página duas vezes
+        if (append && pageNum === lastPageLoadedRef.current) {
             return;
         }
         
         loadingRef.current = true;
+        lastPageLoadedRef.current = pageNum;
         setLoading(true);
         
         try {
@@ -33,8 +39,8 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
             
             if (!res.ok) {
                 if (res.status === 429) {
-                    console.warn('⚠️ Rate limit atingido, aguardando...');
-                    // Não fazer nada, aguardar rate limit resetar
+                    // Resetar lastPageLoaded para permitir retry depois
+                    lastPageLoadedRef.current = 0;
                     return;
                 }
                 throw new Error('Falha na conexão');
@@ -62,7 +68,8 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         } catch (error) {
             console.error('Erro ao buscar imóveis:', error);
             if (!append) setProperties([]);
-            // Se erro 429, não atualizar hasMore para não tentar mais
+            // Resetar lastPageLoaded em caso de erro
+            lastPageLoadedRef.current = 0;
             if (error.message?.includes('429')) {
                 setHasMore(false);
             }
@@ -75,20 +82,29 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
         }
     };
 
+    // Scroll infinito com Intersection Observer
+    // Grug gosta: proteção simples contra flood e duplicatas
+    const lastCallTimeRef = useRef(0);
+    const currentPageRef = useRef(1);
+    
     useEffect(() => {
-        // Reset quando refreshTrigger muda
+        currentPageRef.current = page;
+    }, [page]);
+
+    // Reset quando refreshTrigger ou searchTerm muda
+    useEffect(() => {
         setProperties([]);
         setPage(1);
         setHasMore(true);
+        lastPageLoadedRef.current = 0; // Resetar rastreamento
+        currentPageRef.current = 1;
         fetchProperties(1, false);
-    }, [refreshTrigger]);
+    }, [refreshTrigger, searchTerm]);
 
-    // Scroll infinito com Intersection Observer
-    // Grug gosta: proteção simples contra flood
+    // Intersection Observer para scroll infinito
     useEffect(() => {
-        if (!hasMore || loading || loadingRef.current || !sentinelRef.current) return;
+        if (!hasMore || loading || !sentinelRef.current) return;
 
-        let lastCallTime = 0;
         const throttleDelay = 500; // 500ms entre chamadas
 
         const observer = new IntersectionObserver(
@@ -97,27 +113,23 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                 if (loadingRef.current) return;
                 
                 const now = Date.now();
-                if (now - lastCallTime < throttleDelay) return;
-                lastCallTime = now;
+                if (now - lastCallTimeRef.current < throttleDelay) return;
+                lastCallTimeRef.current = now;
 
-                const nextPage = page + 1;
+                // Proteção: não carregar mesma página duas vezes
+                const nextPage = currentPageRef.current + 1;
+                if (nextPage <= lastPageLoadedRef.current) return;
+                
+                currentPageRef.current = nextPage;
                 setPage(nextPage);
                 fetchProperties(nextPage, true);
             },
-            { threshold: 0.1, rootMargin: '100px' } // Reduzido de 200px para 100px
+            { threshold: 0.1, rootMargin: '100px' }
         );
 
         observer.observe(sentinelRef.current);
         return () => observer.disconnect();
-    }, [hasMore, loading, searchTerm]); // Removido 'page' das dependências
-
-    // Recarregar quando searchTerm muda
-    useEffect(() => {
-        setProperties([]);
-        setPage(1);
-        setHasMore(true);
-        fetchProperties(1, false);
-    }, [searchTerm]);
+    }, [hasMore, loading, searchTerm]);
 
     const handleDeleteClick = (property) => {
         setDeleteConfirm({ isOpen: true, property });

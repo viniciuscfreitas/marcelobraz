@@ -14,14 +14,14 @@ import { PropertyCard } from './PropertyCard.jsx';
  */
 export const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loading }) => {
     const sentinelRef = useRef(null);
-    const [visibleItems, setVisibleItems] = useState(12); // Renderizar apenas primeiros 12 inicialmente
+    const [visibleItems, setVisibleItems] = useState(12);
+    const lastCallTimeRef = useRef(0); // Throttle persistente
 
     // Intersection Observer para scroll infinito
-    // Grug gosta: proteção simples contra flood
+    // Grug gosta: proteção simples contra flood e duplicatas
     useEffect(() => {
         if (!hasMore || loading || !sentinelRef.current) return;
 
-        let lastCallTime = 0;
         const throttleDelay = 500; // 500ms entre chamadas
 
         const observer = new IntersectionObserver(
@@ -29,12 +29,12 @@ export const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loa
                 if (!entries[0].isIntersecting) return;
                 
                 const now = Date.now();
-                if (now - lastCallTime < throttleDelay) return;
-                lastCallTime = now;
+                if (now - lastCallTimeRef.current < throttleDelay) return;
+                lastCallTimeRef.current = now;
 
                 loadMore();
             },
-            { threshold: 0.1, rootMargin: '100px' } // Reduzido de 200px
+            { threshold: 0.1, rootMargin: '100px' }
         );
 
         observer.observe(sentinelRef.current);
