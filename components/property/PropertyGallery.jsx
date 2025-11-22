@@ -12,9 +12,13 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
     const goToPrevious = () => setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     const goToNext = () => setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
 
-    // Navegação por teclado no lightbox (Grug gosta: simples!)
+    // Navegação por teclado e bloqueio de scroll no lightbox (Grug gosta: simples!)
     useEffect(() => {
         if (!isLightboxOpen) return;
+
+        // Bloquear scroll do body quando lightbox está aberto
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
 
         const handleKeyPress = (e) => {
             if (e.key === 'ArrowLeft') {
@@ -29,7 +33,13 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
         };
 
         window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
+        
+        return () => {
+            // Restaurar scroll quando fechar
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            window.removeEventListener('keydown', handleKeyPress);
+        };
     }, [isLightboxOpen, images.length]);
 
     const currentImage = images[activeImage] || property.image || '';
@@ -156,7 +166,8 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
             {/* Lightbox Fullscreen - Estilo Imovelweb */}
             {isLightboxOpen && (
                 <div
-                    className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
+                    style={{ top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}
                     onClick={() => setIsLightboxOpen(false)}
                     role="dialog"
                     aria-modal="true"
@@ -172,12 +183,13 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
                     </button>
 
                     {/* Imagem em Fullscreen */}
-                    <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+                    <div className="relative w-full h-full flex items-center justify-center p-4">
                         <img
                             src={currentImage}
                             alt={`Imagem ${activeImage + 1} de ${images.length} - ${property.title}`}
                             className="max-w-full max-h-full object-contain"
                             onClick={(e) => e.stopPropagation()}
+                            style={{ maxWidth: '100%', maxHeight: '100%' }}
                         />
 
                         {/* Contador */}
