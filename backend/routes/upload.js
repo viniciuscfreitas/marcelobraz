@@ -43,9 +43,10 @@ router.post('/', authenticateToken, (req, res, next) => {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
-        // Grug fix: HTTPS em produção (proxy reverso passa http, mas site é https)
-        const protocol = process.env.NODE_ENV === 'production' ? 'https' : (req.protocol || 'http');
+        // Grug fix: HTTPS em produção (verifica host, não localhost)
         const host = req.get('host') || req.hostname;
+        const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1') || host.includes(':3001');
+        const protocol = isLocalhost ? (req.protocol || 'http') : 'https';
         const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
         res.json({ url: imageUrl });
     } catch (error) {
