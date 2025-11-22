@@ -6,7 +6,15 @@ export default {
     "./**/*.jsx",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "#0f172a", // Slate 900
+        secondary: "#1e293b", // Slate 800
+        gold: "#d4af37",
+        "gold-light": "#f0e6b3",
+        "gold-dark": "#b4942b",
+      },
+    },
   },
   plugins: [],
 }

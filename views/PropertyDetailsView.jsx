@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar } from 'lucide-react';
 import { Button } from '../components/Button';
 import { LeadModal } from '../components/LeadModal';
 import { BROKER_INFO, COLORS } from '../data/constants';
@@ -67,18 +67,6 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
 
     return (
         <div className="min-h-screen bg-gray-50 pt-20 pb-12 font-sans">
-            {/* Breadcrumb / Back */}
-            <div className="container mx-auto px-4 md:px-6 mb-6">
-                <button
-                    onClick={() => navigateTo('portfolio')}
-                    className="flex items-center text-gray-500 hover:text-primary transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px]"
-                    aria-label="Voltar para o portfólio de imóveis"
-                >
-                    <ArrowLeft size={20} className="mr-2" />
-                    Voltar para o Portfólio
-                </button>
-            </div>
-
             {/* Main Content Grid */}
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
