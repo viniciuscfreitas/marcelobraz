@@ -29,13 +29,20 @@ const upload = multer({
 });
 
 // Rota de upload (Protegida)
-router.post('/', authenticateToken, upload.single('image'), (req, res) => {
+router.post('/', authenticateToken, (req, res, next) => {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            // Erro do multer é tratado no error handler global
+            return next(err);
+        }
+        next();
+    });
+}, (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
-        // Retorna a URL da imagem
         const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
         res.json({ url: imageUrl });
     } catch (error) {

@@ -39,10 +39,28 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Grug backend is alive! 🦖' });
 });
 
-// Error handler (Grug style - simples!)
+// Error handler (Grug style - melhorado mas ainda simples!)
 app.use((err, req, res, next) => {
     console.error('❌ Error:', err);
-    res.status(500).json({ error: 'Algo deu errado! Grug vai investigar.' });
+
+    // Erro do Multer (upload)
+    if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'Arquivo muito grande. Tamanho máximo: 5MB.' });
+    }
+    if (err.message && err.message.includes('imagens')) {
+        return res.status(400).json({ error: err.message });
+    }
+
+    // Erro de JSON inválido
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ error: 'JSON inválido' });
+    }
+
+    // Erro padrão
+    res.status(err.status || 500).json({
+        error: err.message || 'Algo deu errado! Grug vai investigar.',
+        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
 });
 
 app.listen(PORT, () => {

@@ -13,8 +13,15 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('broker_user');
 
         if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+            try {
+                setToken(storedToken);
+                setUser(JSON.parse(storedUser));
+            } catch (error) {
+                console.error('Error parsing stored user:', error);
+                // Limpar dados corrompidos
+                localStorage.removeItem('broker_token');
+                localStorage.removeItem('broker_user');
+            }
         }
         setLoading(false);
     }, []);

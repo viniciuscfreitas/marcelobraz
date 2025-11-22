@@ -2,23 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { parseProperty, parseProperties, preparePropertyData } = require('../utils/propertyHelpers');
+const { validateProperty, handleValidationErrors } = require('../validators/propertyValidator');
 
 // GET /api/properties - Listar todas as propriedades (público)
 router.get('/', (req, res) => {
     try {
-        // Ordenar: featured primeiro, depois por data
         const properties = db.prepare('SELECT * FROM properties ORDER BY featured DESC, created_at DESC').all();
-
-        // Parser tags de JSON string para array
-        const parsedProperties = properties.map(prop => ({
-            ...prop,
-            tags: prop.tags ? JSON.parse(prop.tags) : [],
-            features: prop.features ? JSON.parse(prop.features) : {},
-            multimedia: prop.multimedia ? JSON.parse(prop.multimedia) : {},
-            featured: prop.featured === 1 // Converter INTEGER para boolean
-        }));
-
-        res.json(parsedProperties);
+        res.json(parseProperties(properties));
     } catch (error) {
         console.error('Error fetching properties:', error);
         res.status(500).json({ error: 'Erro ao buscar imóveis' });
@@ -34,11 +25,7 @@ router.get('/:id', (req, res) => {
             return res.status(404).json({ error: 'Imóvel não encontrado' });
         }
 
-        property.tags = property.tags ? JSON.parse(property.tags) : [];
-        property.features = property.features ? JSON.parse(property.features) : {};
-        property.multimedia = property.multimedia ? JSON.parse(property.multimedia) : {};
-        property.featured = property.featured === 1;
-        res.json(property);
+        res.json(parseProperty(property));
     } catch (error) {
         console.error('Error fetching property:', error);
         res.status(500).json({ error: 'Erro ao buscar imóvel' });
@@ -46,79 +33,25 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/properties - Criar propriedade (protegido)
-router.post('/', requireAuth, (req, res) => {
+router.post('/', requireAuth, validateProperty, handleValidationErrors, (req, res) => {
     try {
-        const {
-            title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-            description, subtype, age, quartos, vagas, banheiros, suites,
-            condominio, iptu, area_util, area_total,
-            cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
-            aceita_permuta, aceita_fgts, posicao_apto, andares,
-            features, multimedia
-        } = req.body;
-
-        // Validação básica
-        if (!title || !price || !bairro || !tipo) {
-            return res.status(400).json({ error: 'Campos obrigatórios: title, price, bairro, tipo' });
-        }
-
-        // Inserir no banco
         const insert = db.prepare(`
-      INSERT INTO properties (
-        title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-        description, subtype, age, quartos, vagas, banheiros, suites,
-        condominio, iptu, area_util, area_total,
-        cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
-        aceita_permuta, aceita_fgts, posicao_apto, andares,
-        features, multimedia
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+            INSERT INTO properties (
+                title, subtitle, price, image, bairro, tipo, specs, tags, featured,
+                description, subtype, age, quartos, vagas, banheiros, suites,
+                condominio, iptu, area_util, area_total,
+                cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
+                aceita_permuta, aceita_fgts, posicao_apto, andares,
+                features, multimedia
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
 
-        const result = insert.run(
-            title,
-            subtitle || null,
-            price,
-            image || null,
-            bairro,
-            tipo,
-            specs || null,
-            tags ? JSON.stringify(tags) : null,
-            featured ? 1 : 0,
-            description || null,
-            subtype || null,
-            age || null,
-            quartos || 0,
-            vagas || 0,
-            banheiros || 0,
-            suites || 0,
-            condominio || null,
-            iptu || null,
-            area_util || 0,
-            area_total || 0,
-            cep || null,
-            estado || null,
-            cidade || null,
-            endereco || null,
-            complemento || null,
-            mostrar_endereco !== undefined ? (mostrar_endereco ? 1 : 0) : 1,
-            ref_code || null,
-            aceita_permuta ? 1 : 0,
-            aceita_fgts ? 1 : 0,
-            posicao_apto || null,
-            andares || null,
-            features ? JSON.stringify(features) : '{}',
-            multimedia ? JSON.stringify(multimedia) : '{}'
-        );
+        const values = preparePropertyData(req.body);
+        const result = insert.run(...values);
 
-        // Buscar o imóvel criado
         const newProperty = db.prepare('SELECT * FROM properties WHERE id = ?').get(result.lastInsertRowid);
-        newProperty.tags = newProperty.tags ? JSON.parse(newProperty.tags) : [];
-        newProperty.features = newProperty.features ? JSON.parse(newProperty.features) : {};
-        newProperty.multimedia = newProperty.multimedia ? JSON.parse(newProperty.multimedia) : {};
-        newProperty.featured = newProperty.featured === 1;
-
-        res.status(201).json(newProperty);
+        res.status(201).json(parseProperty(newProperty));
     } catch (error) {
         console.error('Error creating property:', error);
         res.status(500).json({ error: 'Erro ao criar imóvel' });
@@ -126,81 +59,30 @@ router.post('/', requireAuth, (req, res) => {
 });
 
 // PUT /api/properties/:id - Atualizar propriedade (protegido)
-router.put('/:id', requireAuth, (req, res) => {
+router.put('/:id', requireAuth, validateProperty, handleValidationErrors, (req, res) => {
     try {
-        const {
-            title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-            description, subtype, age, quartos, vagas, banheiros, suites,
-            condominio, iptu, area_util, area_total,
-            cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
-            aceita_permuta, aceita_fgts, posicao_apto, andares,
-            features, multimedia
-        } = req.body;
-
-        // Verificar se existe
         const existing = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
         if (!existing) {
             return res.status(404).json({ error: 'Imóvel não encontrado' });
         }
 
-        // Atualizar
         const update = db.prepare(`
-      UPDATE properties
-      SET title = ?, subtitle = ?, price = ?, image = ?, bairro = ?, tipo = ?, specs = ?, tags = ?, featured = ?,
-          description = ?, subtype = ?, age = ?, quartos = ?, vagas = ?, banheiros = ?, suites = ?,
-          condominio = ?, iptu = ?, area_util = ?, area_total = ?,
-          cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
-          aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
-          features = ?, multimedia = ?,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `);
+            UPDATE properties
+            SET title = ?, subtitle = ?, price = ?, image = ?, bairro = ?, tipo = ?, specs = ?, tags = ?, featured = ?,
+                description = ?, subtype = ?, age = ?, quartos = ?, vagas = ?, banheiros = ?, suites = ?,
+                condominio = ?, iptu = ?, area_util = ?, area_total = ?,
+                cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
+                aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
+                features = ?, multimedia = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `);
 
-        update.run(
-            title,
-            subtitle || null,
-            price,
-            image || null,
-            bairro,
-            tipo,
-            specs || null,
-            tags ? JSON.stringify(tags) : null,
-            featured ? 1 : 0,
-            description || null,
-            subtype || null,
-            age || null,
-            quartos || 0,
-            vagas || 0,
-            banheiros || 0,
-            suites || 0,
-            condominio || null,
-            iptu || null,
-            area_util || 0,
-            area_total || 0,
-            cep || null,
-            estado || null,
-            cidade || null,
-            endereco || null,
-            complemento || null,
-            mostrar_endereco !== undefined ? (mostrar_endereco ? 1 : 0) : 1,
-            ref_code || null,
-            aceita_permuta ? 1 : 0,
-            aceita_fgts ? 1 : 0,
-            posicao_apto || null,
-            andares || null,
-            features ? JSON.stringify(features) : '{}',
-            multimedia ? JSON.stringify(multimedia) : '{}',
-            req.params.id
-        );
+        const values = [...preparePropertyData(req.body), req.params.id];
+        update.run(...values);
 
-        // Retornar atualizado
         const updated = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
-        updated.tags = updated.tags ? JSON.parse(updated.tags) : [];
-        updated.features = updated.features ? JSON.parse(updated.features) : {};
-        updated.multimedia = updated.multimedia ? JSON.parse(updated.multimedia) : {};
-        updated.featured = updated.featured === 1;
-
-        res.json(updated);
+        res.json(parseProperty(updated));
     } catch (error) {
         console.error('Error updating property:', error);
         res.status(500).json({ error: 'Erro ao atualizar imóvel' });
@@ -211,7 +93,6 @@ router.put('/:id', requireAuth, (req, res) => {
 router.patch('/:id/featured', requireAuth, (req, res) => {
     try {
         const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
-
         if (!property) {
             return res.status(404).json({ error: 'Imóvel não encontrado' });
         }
@@ -223,24 +104,19 @@ router.patch('/:id/featured', requireAuth, (req, res) => {
         if (newFeatured) {
             const featuredCount = db.prepare('SELECT COUNT(*) as count FROM properties WHERE featured = 1').get();
             if (featuredCount.count >= 4) {
-                return res.status(400).json({ error: 'Limite de 4 imóveis na Curadoria da Semana atingido. Desmarque um imóvel primeiro.' });
+                return res.status(409).json({
+                    error: 'Limite de 4 imóveis na Curadoria da Semana atingido. Desmarque um imóvel primeiro.'
+                });
             }
         }
 
-        // Atualizar
         db.prepare('UPDATE properties SET featured = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
             newFeatured ? 1 : 0,
             req.params.id
         );
 
-        // Retornar atualizado
         const updated = db.prepare('SELECT * FROM properties WHERE id = ?').get(req.params.id);
-        updated.tags = updated.tags ? JSON.parse(updated.tags) : [];
-        updated.features = updated.features ? JSON.parse(updated.features) : {};
-        updated.multimedia = updated.multimedia ? JSON.parse(updated.multimedia) : {};
-        updated.featured = updated.featured === 1;
-
-        res.json(updated);
+        res.json(parseProperty(updated));
     } catch (error) {
         console.error('Error toggling featured:', error);
         res.status(500).json({ error: 'Erro ao atualizar curadoria' });

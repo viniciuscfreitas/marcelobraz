@@ -21,13 +21,25 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
     if (!property) return null;
 
     // Parse features if string (legacy/safety check)
-    const features = typeof property.features === 'string'
-        ? JSON.parse(property.features || '{}')
-        : property.features || {};
+    let features = {};
+    try {
+        features = typeof property.features === 'string'
+            ? JSON.parse(property.features || '{}')
+            : property.features || {};
+    } catch (error) {
+        console.error('Error parsing features:', error);
+        features = {};
+    }
 
-    const multimedia = typeof property.multimedia === 'string'
-        ? JSON.parse(property.multimedia || '{}')
-        : property.multimedia || {};
+    let multimedia = {};
+    try {
+        multimedia = typeof property.multimedia === 'string'
+            ? JSON.parse(property.multimedia || '{}')
+            : property.multimedia || {};
+    } catch (error) {
+        console.error('Error parsing multimedia:', error);
+        multimedia = {};
+    }
 
     // Mock images if none provided (fallback)
     const images = property.images || [property.image];

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { validateLead, handleValidationErrors } = require('../validators/leadValidator');
 
 // GET /api/leads - Listar todos os leads (protegido)
 router.get('/', requireAuth, (req, res) => {
@@ -15,29 +16,24 @@ router.get('/', requireAuth, (req, res) => {
 });
 
 // POST /api/leads - Criar lead (público - vem do site)
-router.post('/', (req, res) => {
+router.post('/', validateLead, handleValidationErrors, (req, res) => {
     try {
         const { name, phone, property_id, property_title, type } = req.body;
 
-        if (!name || !phone) {
-            return res.status(400).json({ error: 'Nome e telefone obrigatórios' });
-        }
-
         const insert = db.prepare(`
-      INSERT INTO leads (name, phone, property_id, property_title, type)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+            INSERT INTO leads (name, phone, property_id, property_title, type)
+            VALUES (?, ?, ?, ?, ?)
+        `);
 
         const result = insert.run(
-            name,
-            phone,
+            name.trim(),
+            phone.trim(),
             property_id || null,
             property_title || null,
             type || 'gate'
         );
 
         const newLead = db.prepare('SELECT * FROM leads WHERE id = ?').get(result.lastInsertRowid);
-
         res.status(201).json(newLead);
     } catch (error) {
         console.error('Error creating lead:', error);
