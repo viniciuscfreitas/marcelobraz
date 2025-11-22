@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Eye, Map as MapIcon, MessageCircle, Mail, Calendar, Lock } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize, Car, Check, Share2, Eye, Map as MapIcon, MessageCircle, Mail, Calendar, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/Button';
 import { LeadModal } from '../components/LeadModal';
 import { BROKER_INFO, COLORS } from '../data/constants';
@@ -164,27 +164,20 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
 
     // Coletar todas as imagens disponíveis (Grug gosta: simples, direto)
     const allImages = [];
-    // Imagem principal
-    if (property.image) allImages.push(property.image);
-    // Array de imagens (se existir)
-    if (property.images && Array.isArray(property.images)) {
-        property.images.forEach(img => {
-            if (img && !allImages.includes(img)) allImages.push(img);
-        });
-    }
-    // Imagens do multimedia (se existir)
-    if (multimedia.photos && Array.isArray(multimedia.photos)) {
-        multimedia.photos.forEach(img => {
-            if (img && !allImages.includes(img)) allImages.push(img);
-        });
-    }
-    if (multimedia.images && Array.isArray(multimedia.images)) {
-        multimedia.images.forEach(img => {
-            if (img && !allImages.includes(img)) allImages.push(img);
-        });
-    }
-    // Fallback: pelo menos uma imagem
+    const addUnique = (img) => {
+        if (img && !allImages.includes(img)) allImages.push(img);
+    };
+    
+    if (property.image) addUnique(property.image);
+    if (Array.isArray(property.images)) property.images.forEach(addUnique);
+    if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
+    if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
+    
     const images = allImages.length > 0 ? allImages : [property.image].filter(Boolean);
+
+    // Helpers de navegação (Grug gosta: funções pequenas, sem over-engineering)
+    const goToPrevious = () => setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    const goToNext = () => setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
 
     // Format currency
     const formatPrice = (val) => {
@@ -248,22 +241,18 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                                 {images.length > 1 && (
                                     <>
                                         <button
-                                            onClick={() => setActiveImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                                            onClick={goToPrevious}
                                             className="absolute left-4 top-1/2 -translate-y-1/2 p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
                                             aria-label="Imagem anterior"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                            </svg>
+                                            <ChevronLeft size={20} />
                                         </button>
                                         <button
-                                            onClick={() => setActiveImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                                            onClick={goToNext}
                                             className="absolute right-4 top-1/2 -translate-y-1/2 p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
                                             aria-label="Próxima imagem"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            <ChevronRight size={20} />
                                         </button>
                                     </>
                                 )}
