@@ -6,9 +6,15 @@ const { parseProperty, parseProperties, preparePropertyData } = require('../util
 const { validateProperty, handleValidationErrors } = require('../validators/propertyValidator');
 
 // GET /api/properties - Listar todas as propriedades (público)
+// Grug gosta: SELECT específico para performance (não SELECT *)
 router.get('/', (req, res) => {
     try {
-        const properties = db.prepare('SELECT * FROM properties ORDER BY featured DESC, created_at DESC').all();
+        const properties = db.prepare(`
+            SELECT id, title, subtitle, price, image, bairro, tipo, specs, tags, featured,
+                   quartos, vagas, banheiros, area_util, cidade, created_at
+            FROM properties 
+            ORDER BY featured DESC, created_at DESC
+        `).all();
         res.json(parseProperties(properties));
     } catch (error) {
         console.error('Error fetching properties:', error);

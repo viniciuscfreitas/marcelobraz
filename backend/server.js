@@ -14,15 +14,29 @@ const PORT = process.env.PORT || 3001;
 
 const morgan = require('morgan');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting (Grug gosta: proteção simples contra DDoS)
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // máximo 100 requests por IP
+    message: 'Muitas requisições deste IP, tente novamente em 15 minutos.',
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
 // Middleware
 app.use(helmet()); // Security headers
 app.use(morgan('dev')); // Logging (Grug likes logs)
-app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*', // Allow configuration
+app.use('/api/', limiter); // Rate limit em todas as rotas API
+// CORS: Grug gosta de segurança! Sem '*' em produção
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : (process.env.NODE_ENV === 'development' ? '*' : false),
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Servir uploads estaticamente
