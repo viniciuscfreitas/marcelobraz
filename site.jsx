@@ -23,25 +23,38 @@ export default function RealEstateSite() {
   const { properties } = useProperties();
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [hasInitializedFromUrl, setHasInitializedFromUrl] = useState(false);
 
-  // Verificar URL para navegar para imóvel específico (Grug gosta: simples, direto)
   useEffect(() => {
+    if (hasInitializedFromUrl || properties.length === 0) return;
+    
     const urlParams = new URLSearchParams(window.location.search);
     const propertyId = urlParams.get('property');
     
-    if (propertyId && properties.length > 0) {
+    if (propertyId) {
       const property = properties.find(p => p.id === parseInt(propertyId));
       if (property) {
         setSelectedProperty(property);
         nav.navigateTo('property');
+        window.history.replaceState({}, '', window.location.pathname);
+        setHasInitializedFromUrl(true);
       }
+    } else {
+      setHasInitializedFromUrl(true);
     }
-  }, [properties, nav]);
+  }, [properties, hasInitializedFromUrl, nav]);
 
   const handlePropertyClick = (prop) => {
     setSelectedProperty(prop);
     nav.navigateTo('property');
-    // openModal('gate'); // Removido: agora vai para a página de detalhes
+  };
+
+  // Handler para navegação do header - limpa selectedProperty quando sai da página de detalhes
+  const handleNavigate = (view, sectionId) => {
+    if (view !== 'property') {
+      setSelectedProperty(null);
+    }
+    nav.navigateTo(view, sectionId);
   };
 
   const handleModalSuccess = (msg) => {
@@ -102,7 +115,7 @@ export default function RealEstateSite() {
         isScrolled={nav.isScrolled}
         mobileMenuOpen={nav.mobileMenuOpen}
         setMobileMenuOpen={nav.setMobileMenuOpen}
-        navigateTo={nav.navigateTo}
+        navigateTo={handleNavigate}
         currentView={nav.currentView}
       />
 
