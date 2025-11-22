@@ -54,7 +54,7 @@ export default function StepFeatures() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
                         <label htmlFor="posicao_apto" className="block text-sm font-medium text-gray-700 mb-1.5">Posição do Imóvel</label>
-                        <select id="posicao_apto" {...register('posicao_apto')} className="input-field w-full">
+                        <select id="posicao_apto" {...register('posicao_apto')} className="input-field">
                             <option value="">Selecione...</option>
                             <option value="Frente">Frente</option>
                             <option value="Fundos">Fundos</option>
@@ -64,7 +64,7 @@ export default function StepFeatures() {
                     </div>
                     <div>
                         <label htmlFor="andares" className="block text-sm font-medium text-gray-700 mb-1.5">Andares</label>
-                        <input id="andares" {...register('andares')} className="input-field w-full" placeholder="Ex: 12 andares" />
+                        <input id="andares" {...register('andares')} className="input-field" placeholder="Ex: 12 andares" />
                     </div>
                 </div>
             </section>

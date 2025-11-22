@@ -90,7 +90,7 @@ export default function StepMultimedia() {
                         </label>
                         <input
                             {...register('multimedia.video_url')}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="https://youtube.com/watch?v=..."
                         />
                     </div>
@@ -102,7 +102,7 @@ export default function StepMultimedia() {
                         </label>
                         <input
                             {...register('multimedia.tour_url')}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="https://matterport.com/..."
                         />
                     </div>

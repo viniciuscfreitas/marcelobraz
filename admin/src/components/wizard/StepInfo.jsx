@@ -16,7 +16,7 @@ export default function StepInfo() {
                         <input
                             id="title"
                             {...register('title', { required: 'Título é obrigatório' })}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="Ex: Apartamento com 3 suítes no Gonzaga"
                         />
                         {errors.title && <span className="text-red-600 text-xs mt-1 block">{errors.title.message}</span>}
@@ -29,7 +29,7 @@ export default function StepInfo() {
                             id="description"
                             {...register('description')}
                             rows={4}
-                            className="input-field w-full resize-y"
+                            className="input-field resize-y"
                             placeholder="Conte-nos sobre seu imóvel. Inclua todos os detalhes que o tornam mais atraente..."
                         />
                     </div>
@@ -39,7 +39,7 @@ export default function StepInfo() {
                         <select
                             id="tipo"
                             {...register('tipo', { required: 'Tipo é obrigatório' })}
-                            className="input-field w-full"
+                            className="input-field"
                         >
                             <option value="">Selecione...</option>
                             <option value="Apartamento">Apartamento</option>
@@ -56,7 +56,7 @@ export default function StepInfo() {
                         <select
                             id="subtype"
                             {...register('subtype')}
-                            className="input-field w-full"
+                            className="input-field"
                         >
                             <option value="">Selecione...</option>
                             <option value="Padrão">Padrão</option>
@@ -75,7 +75,7 @@ export default function StepInfo() {
                         <select
                             id="age"
                             {...register('age')}
-                            className="input-field w-full"
+                            className="input-field"
                         >
                             <option value="">Selecione...</option>
                             <option value="Breve Lançamento">Breve Lançamento</option>
@@ -94,7 +94,7 @@ export default function StepInfo() {
                         <input
                             id="ref_code"
                             {...register('ref_code')}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="Ex: REF-1234"
                         />
                     </div>
@@ -141,7 +141,7 @@ export default function StepInfo() {
                         <input
                             id="price"
                             {...register('price', { required: 'Preço é obrigatório' })}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="R$ 0,00"
                         />
                         {errors.price && <span className="text-red-600 text-xs mt-1 block">{errors.price.message}</span>}
@@ -151,7 +151,7 @@ export default function StepInfo() {
                         <input
                             id="condominio"
                             {...register('condominio')}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="R$ 0,00"
                         />
                     </div>
@@ -160,7 +160,7 @@ export default function StepInfo() {
                         <input
                             id="iptu"
                             {...register('iptu')}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="R$ 0,00"
                         />
                     </div>
@@ -180,7 +180,7 @@ export default function StepInfo() {
                         <input
                             id="bairro"
                             {...register('bairro', { required: 'Bairro é obrigatório' })}
-                            className="input-field w-full"
+                            className="input-field"
                             placeholder="Ex: Gonzaga"
                         />
                         {errors.bairro && <span className="text-red-600 text-xs mt-1 block">{errors.bairro.message}</span>}
