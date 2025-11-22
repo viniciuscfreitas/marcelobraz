@@ -26,10 +26,22 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
 
     // Format currency
     const formatPrice = (val) => {
+        if (!val) return 'R$ 0,00';
+
+        // If already formatted (contains R$), return as is
+        if (typeof val === 'string' && val.includes('R$')) {
+            return val;
+        }
+
+        // Try to parse if string number
+        const num = typeof val === 'string' ? parseFloat(val) : val;
+
+        if (isNaN(num)) return val; // Fallback to original if NaN
+
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
-        }).format(val);
+        }).format(num);
     };
 
     return (
