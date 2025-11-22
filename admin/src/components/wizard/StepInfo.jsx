@@ -211,8 +211,8 @@ export default function StepInfo() {
             {/* Seção 4: Localização */}
             <section className="space-y-4">
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Localização</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6">
+                    <div className="md:col-span-3">
                         <label htmlFor="cep" className="block text-sm font-medium text-gray-700 mb-1.5">
                             CEP
                             {cepLoading && <span className="ml-2 text-xs text-gray-500">(buscando...)</span>}
@@ -230,7 +230,7 @@ export default function StepInfo() {
                         />
                         <p className="text-xs text-gray-500 mt-1">Digite o CEP para preencher automaticamente</p>
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
                         <label htmlFor="bairro" className="block text-sm font-medium text-gray-700 mb-1.5">Bairro *</label>
                         <input
                             id="bairro"
@@ -240,23 +240,23 @@ export default function StepInfo() {
                         />
                         {errors.bairro && <span className="text-red-600 text-xs mt-1 block">{errors.bairro.message}</span>}
                     </div>
-                    <div>
+                    <div className="md:col-span-3">
                         <label htmlFor="cidade" className="block text-sm font-medium text-gray-700 mb-1.5">Cidade</label>
                         <input id="cidade" {...register('cidade')} className="input-field" placeholder="Ex: Santos" />
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
                         <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
                         <input id="estado" {...register('estado')} className="input-field" placeholder="Ex: SP" maxLength={2} />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-5">
                         <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-1.5">Endereço</label>
                         <input id="endereco" {...register('endereco')} className="input-field" placeholder="Rua, Número" />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-5">
                         <label htmlFor="complemento" className="block text-sm font-medium text-gray-700 mb-1.5">Complemento</label>
                         <input id="complemento" {...register('complemento')} className="input-field" placeholder="Apto, Bloco" />
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-1 md:col-span-5">
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
