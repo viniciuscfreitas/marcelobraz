@@ -90,14 +90,14 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                             <div className="aspect-video relative bg-gray-100">
                                 <img
                                     src={images[activeImage] || property.image}
-                                    alt={property.title}
+                                    alt={`Imagem ${activeImage + 1} de ${images.length} - ${property.title}`}
                                     className="w-full h-full object-cover transition-transform duration-500"
                                 />
                                 <div className="absolute top-4 right-4 flex gap-2">
-                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm">
+                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm" aria-label="Compartilhar este imóvel">
                                         <Share2 size={20} />
                                     </button>
-                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-red-500 shadow-sm">
+                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-red-500 shadow-sm" aria-label="Adicionar aos favoritos">
                                         <Heart size={20} />
                                     </button>
                                 </div>
@@ -113,10 +113,12 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         <button
                                             key={idx}
                                             onClick={() => setActiveImage(idx)}
+                                            aria-label={`Ver imagem ${idx + 1} de ${images.length}`}
+                                            aria-current={activeImage === idx ? "true" : "false"}
                                             className={`relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all
                                                 ${activeImage === idx ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                         >
-                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                            <img src={img} alt={`Miniatura ${idx + 1} de ${images.length}`} className="w-full h-full object-cover" />
                                         </button>
                                     ))}
                                 </div>
@@ -140,7 +142,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                     <h1 className="text-2xl md:text-4xl font-serif font-bold text-gray-900 mb-2 leading-tight">
                                         {property.title}
                                     </h1>
-                                    <div className="flex items-center text-gray-500 font-medium">
+                                    <div className="flex items-center text-gray-600 font-medium">
                                         <MapPin size={18} className="mr-1 text-primary" />
                                         <p>{property.bairro}, {property.cidade}</p>
                                     </div>
@@ -263,6 +265,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                 <p className="text-gray-600 mb-4">{property.endereco} - {property.bairro}, {property.cidade} - {property.estado}</p>
                                 <div className="aspect-[21/9] rounded-xl overflow-hidden bg-gray-100 relative">
                                     <iframe
+                                        title={`Mapa de localização: ${property.endereco}, ${property.bairro}, ${property.cidade}`}
                                         width="100%"
                                         height="100%"
                                         frameBorder="0"
@@ -288,7 +291,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         width="100%"
                                         height="100%"
                                         src={multimedia.video_url.replace('watch?v=', 'embed/')}
-                                        title="Property Video"
+                                        title={`Vídeo do imóvel: ${property.title}`}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
@@ -349,7 +352,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                             <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden ring-2 ring-primary ring-offset-2">
-                                        <img src="https://ui-avatars.com/api/?name=Marcelo+Braz&background=0D8ABC&color=fff" alt="Broker" className="w-full h-full object-cover" />
+                                        <img src="https://ui-avatars.com/api/?name=Marcelo+Braz&background=0D8ABC&color=fff" alt="Foto de Marcelo Braz, Corretor Especialista CRECI 12345-F" className="w-full h-full object-cover" />
                                     </div>
                                     <div>
                                         <p className="font-bold text-gray-900 text-lg">Marcelo Braz</p>
