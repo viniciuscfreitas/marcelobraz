@@ -122,24 +122,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Top 3 Imóveis Mais Vistos - Compacto */}
-                {stats?.top_properties && stats.top_properties.length > 0 && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2 mb-3 flex-shrink-0">
-                        <h3 className="text-xs font-bold text-gray-700 mb-2 px-2">Top 3 Mais Vistos</h3>
-                        <div className="grid grid-cols-3 gap-2">
-                            {stats.top_properties.map((prop, idx) => (
-                                <div key={prop.id} className="p-2 bg-gray-50 rounded-lg text-center">
-                                    <p className="text-xs font-bold text-primary mb-1">#{idx + 1}</p>
-                                    <p className="text-xs font-semibold text-gray-900 truncate mb-1" title={prop.title}>{prop.title}</p>
-                                    <p className="text-[10px] text-gray-500">
-                                        {prop.views} views • {prop.conversion_rate}%
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
                 {/* Properties Section - Grug gosta: renderizar só um componente! */}
                 {isDesktop ? (
                     <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" role="region" aria-labelledby="properties-heading">

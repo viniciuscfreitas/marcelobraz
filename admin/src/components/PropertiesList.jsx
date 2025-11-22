@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Edit, Trash2, Search, MapPin, Home, Star } from 'lucide-react';
+import { Edit, Trash2, Search, MapPin, Home, Star, Eye, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { API_URL } from '../config';
+import { API_URL, SITE_URL } from '../config';
 import ConfirmDialog from './ConfirmDialog';
 import { useToast } from '../hooks/useToast';
 import Toast from './Toast';
@@ -17,6 +17,15 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
     const sentinelRef = useRef(null);
     const loadingRef = useRef(false);
     const lastPageLoadedRef = useRef(0); // Rastrear última página carregada
+
+    // Helper para gerar URL do site público (Grug gosta: simples!)
+    const getPropertyPublicUrl = (property) => {
+        if (!property) return SITE_URL;
+        const slug = property.tipo?.toLowerCase().replace(/\s+/g, '-') || 'imovel';
+        const quartos = property.quartos ? `${property.quartos}q-` : '';
+        const bairro = property.bairro?.toLowerCase().replace(/\s+/g, '-') || '';
+        return `${SITE_URL}/imovel/${slug}-${quartos}${bairro}-${property.id}`;
+    };
 
     const fetchProperties = async (pageNum = 1, append = false) => {
         // Grug gosta: proteção simples contra múltiplas chamadas e duplicatas
@@ -208,6 +217,7 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                                 <th scope="col" className="p-3">Localização</th>
                                 <th scope="col" className="p-3">Valor</th>
                                 <th scope="col" className="p-3">Tipo</th>
+                                <th scope="col" className="p-3 text-center">Views</th>
                                 <th scope="col" className="p-3 text-center">Curadoria</th>
                                 <th scope="col" className="p-3 text-right">Ações</th>
                             </tr>
@@ -225,7 +235,15 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                                                 />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-primary text-base leading-tight">{property.title}</p>
+                                                <a
+                                                    href={getPropertyPublicUrl(property)}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="font-bold text-primary text-base leading-tight hover:text-primary/80 hover:underline flex items-center gap-1 group/link"
+                                                >
+                                                    {property.title}
+                                                    <ExternalLink size={14} className="opacity-0 group-hover/link:opacity-60 transition-opacity" />
+                                                </a>
                                                 <p className="text-xs text-gray-600 mt-0.5 truncate max-w-[200px]">{property.subtitle}</p>
                                             </div>
                                         </div>
@@ -246,6 +264,12 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                                             <span className="px-2 py-1 bg-primary/5 text-primary rounded-full text-xs font-bold uppercase tracking-wide border border-primary/10">
                                                 {property.tipo}
                                             </span>
+                                        </div>
+                                    </td>
+                                    <td className="p-3 text-center">
+                                        <div className="flex items-center justify-center gap-1 text-gray-600">
+                                            <Eye size={14} className="text-gray-400" />
+                                            <span className="text-sm font-semibold">{property.views || 0}</span>
                                         </div>
                                     </td>
                                     <td className="p-3 text-center">

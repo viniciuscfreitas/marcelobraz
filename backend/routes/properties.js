@@ -32,10 +32,10 @@ router.get('/', (req, res) => {
         
         const baseQuery = `
             SELECT id, title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-                   quartos, vagas, banheiros, area_util, cidade, created_at, description, transaction_type
+                   quartos, vagas, banheiros, area_util, cidade, created_at, description, transaction_type, views
             FROM properties 
             ${whereClause}
-            ORDER BY featured DESC, created_at DESC
+            ORDER BY featured DESC, views DESC, created_at DESC
         `;
 
         // Se não tem paginação, retorna tudo (compatibilidade)
