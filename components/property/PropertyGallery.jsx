@@ -49,11 +49,21 @@ export const PropertyGallery = ({ property, images = [], onShare }) => {
                             onClick={() => setIsLightboxOpen(true)}
                         />
 
-                        {/* Overlay ao hover - indicador de clique */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+                        {/* Overlay ao hover - botão fullscreen clicável */}
+                        <div 
+                            className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center cursor-pointer"
+                            onClick={() => setIsLightboxOpen(true)}
+                        >
+                            <button
+                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white hover:scale-110 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsLightboxOpen(true);
+                                }}
+                                aria-label="Abrir galeria em tela cheia"
+                            >
                                 <Maximize2 size={24} className="text-primary" />
-                            </div>
+                            </button>
                         </div>
 
                         {/* Contador de fotos */}

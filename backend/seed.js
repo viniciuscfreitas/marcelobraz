@@ -29,19 +29,28 @@ const FEATURES_LIST = {
     ]
 };
 
-const IMAGES = [
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600596542815-22519fec27e6?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80",
-    "https://images.unsplash.com/photo-1600607687644-c7171b42498b?auto=format&fit=crop&w=1000&q=80"
+// Pool de imagens para gerar múltiplas fotos por imóvel
+const IMAGE_POOL = [
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600596542815-22519fec27e6?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600607687644-c7171b42498b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1578898885115-4ae2f43e2f3b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1600585152915-d208bec867a1?auto=format&fit=crop&w=1200&q=80"
 ];
 
 function getRandom(arr) {
@@ -60,6 +69,13 @@ function getRandomFeatures(list) {
     return result;
 }
 
+// Gera array de múltiplas imagens (Grug gosta: simples e direto!)
+function getMultipleImages(min = 5, max = 15) {
+    const count = getRandomInt(min, max);
+    const shuffled = [...IMAGE_POOL].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+}
+
 function generateProperty(index) {
     const tipo = getRandom(TYPES);
     const bairro = getRandom(NEIGHBORHOODS);
@@ -76,11 +92,16 @@ function generateProperty(index) {
 
     const transactionTypes = ['Venda', 'Aluguel', 'Temporada', 'Leilão'];
     
+    // Gerar múltiplas imagens (entre 5 e 15 fotos)
+    const images = getMultipleImages(5, 15);
+    const mainImage = images[0]; // Primeira imagem é a capa
+    
     return {
         title: `${tipo} ${getRandom(['Incrível', 'Espaçoso', 'Moderno', 'Luxuoso', 'Aconchegante'])} no ${bairro}`,
         subtitle: `Oportunidade única com ${quartos} quartos e ${vagas} vagas`,
         price: `R$ ${price.toLocaleString('pt-BR')}`,
-        image: getRandom(IMAGES),
+        image: mainImage, // Imagem principal (compatibilidade)
+        images: JSON.stringify(images), // Array de múltiplas imagens
         bairro: bairro,
         tipo: tipo,
         specs: `${quartos} Dorms • ${area}m²`,
@@ -129,14 +150,14 @@ function seed() {
         description, subtype, age, quartos, vagas, banheiros, suites,
         condominio, iptu, area_util, area_total, cep, estado, cidade,
         endereco, complemento, mostrar_endereco, ref_code, aceita_permuta,
-        aceita_fgts, posicao_apto, andares, features, multimedia, transaction_type
+        aceita_fgts, posicao_apto, andares, features, multimedia, transaction_type, images
     )
     VALUES (
         ?, ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?, ?
     )
   `);
 
@@ -151,7 +172,7 @@ function seed() {
                 prop.description, prop.subtype, prop.age, prop.quartos, prop.vagas, prop.banheiros, prop.suites,
                 prop.condominio, prop.iptu, prop.area_util, prop.area_total, prop.cep, prop.estado, prop.cidade,
                 prop.endereco, prop.complemento, prop.mostrar_endereco, prop.ref_code, prop.aceita_permuta,
-                prop.aceita_fgts, prop.posicao_apto, prop.andares, prop.features, prop.multimedia, prop.transaction_type
+                prop.aceita_fgts, prop.posicao_apto, prop.andares, prop.features, prop.multimedia, prop.transaction_type, prop.images
             );
             count++;
         }
