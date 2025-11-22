@@ -141,26 +141,20 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
 
     if (!property) return null;
 
-    // Parse features if string (legacy/safety check)
-    let features = {};
-    try {
-        features = typeof property.features === 'string'
-            ? JSON.parse(property.features || '{}')
-            : property.features || {};
-    } catch (error) {
-        console.error('Error parsing features:', error);
-        features = {};
-    }
+    // Helper simples para parsing JSON (Grug gosta: evita repetição, sem over-engineering)
+    const parseJsonField = (field, defaultValue = {}) => {
+        if (!field) return defaultValue;
+        if (typeof field !== 'string') return field || defaultValue;
+        try {
+            return JSON.parse(field) || defaultValue;
+        } catch (error) {
+            console.error('Error parsing field:', error);
+            return defaultValue;
+        }
+    };
 
-    let multimedia = {};
-    try {
-        multimedia = typeof property.multimedia === 'string'
-            ? JSON.parse(property.multimedia || '{}')
-            : property.multimedia || {};
-    } catch (error) {
-        console.error('Error parsing multimedia:', error);
-        multimedia = {};
-    }
+    const features = parseJsonField(property.features, {});
+    const multimedia = parseJsonField(property.multimedia, {});
 
     // Coletar todas as imagens disponíveis (Grug gosta: simples, direto)
     const allImages = [];
@@ -285,9 +279,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                                                 {activeImage === idx && (
                                                     <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
                                                         <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                                                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                            </svg>
+                                                            <Check size={16} className="text-white" />
                                                         </div>
                                                     </div>
                                                 )}
@@ -306,7 +298,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                                         <span className="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-wider shadow-sm">
                                             {property.tipo}
                                         </span>
-                                        {property.tags && (typeof property.tags === 'string' ? JSON.parse(property.tags) : property.tags).map(tag => (
+                                        {property.tags && (Array.isArray(property.tags) ? property.tags : []).map(tag => (
                                             <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full uppercase tracking-wider">
                                                 {tag}
                                             </span>
@@ -507,10 +499,8 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                                 <div className="space-y-3">
                                     <Button
                                         variant="primary"
-                                        className="w-full justify-center py-4 text-lg shadow-lg border-none"
+                                        className="w-full justify-center py-4 text-lg shadow-lg border-none hover:opacity-90 transition-opacity"
                                         style={{ backgroundColor: COLORS.WHATSAPP }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.WHATSAPP_HOVER}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.WHATSAPP}
                                         onClick={() => onOpenLeadModal('whatsapp')}
                                         ariaLabel="Abrir conversa no WhatsApp"
                                     >
