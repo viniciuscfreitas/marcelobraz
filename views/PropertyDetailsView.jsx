@@ -21,7 +21,32 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     const [showLeadModal, setShowLeadModal] = useState(false);
     const viewTrackedRef = useRef(false);
 
-    // Função de compartilhar (Grug gosta: simples e direto, sempre funciona)
+    // Helper: copiar URL para clipboard (fallback)
+    const copyToClipboard = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch {
+            // Fallback: método antigo
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;opacity:0;';
+            textArea.readOnly = true;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const success = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return success;
+            } catch {
+                document.body.removeChild(textArea);
+                return false;
+            }
+        }
+    };
+
+    // Função de compartilhar (Grug gosta: simples, direto, sempre funciona)
     const handleShare = async () => {
         if (!property?.id) {
             alert('Erro: Imóvel não encontrado');
@@ -35,6 +60,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             url: shareUrl
         };
 
+        // Tentar Web Share API primeiro
         if (navigator.share) {
             try {
                 if (navigator.canShare && !navigator.canShare(shareData)) {
@@ -44,58 +70,21 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                 if (onShareSuccess) onShareSuccess('Link compartilhado!');
                 return;
             } catch (err) {
-                if (err.name === 'AbortError' || err.name === 'NotAllowedError') {
-                    return;
-                }
+                if (err.name === 'AbortError' || err.name === 'NotAllowedError') return;
+                // Continuar para fallback se erro não for de cancelamento
             }
         }
 
         // Fallback: copiar para clipboard
-        try {
-            await navigator.clipboard.writeText(shareUrl);
+        const copied = await copyToClipboard(shareUrl);
+        if (copied) {
             if (onShareSuccess) {
                 onShareSuccess('Link copiado para área de transferência!');
             } else {
                 alert('Link copiado!');
             }
-        } catch (err) {
-            // Fallback final: método antigo
-            const textArea = document.createElement('textarea');
-            textArea.value = shareUrl;
-            textArea.style.position = 'fixed';
-            textArea.style.top = '0';
-            textArea.style.left = '0';
-            textArea.style.width = '2em';
-            textArea.style.height = '2em';
-            textArea.style.padding = '0';
-            textArea.style.border = 'none';
-            textArea.style.outline = 'none';
-            textArea.style.boxShadow = 'none';
-            textArea.style.background = 'transparent';
-            textArea.style.opacity = '0';
-            textArea.readOnly = true;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            textArea.setSelectionRange(0, shareUrl.length);
-
-            try {
-                const success = document.execCommand('copy');
-                document.body.removeChild(textArea);
-
-                if (success) {
-                    if (onShareSuccess) {
-                        onShareSuccess('Link copiado!');
-                    } else {
-                        alert('Link copiado!');
-                    }
-                } else {
-                    prompt('Copie o link:', shareUrl);
-                }
-            } catch (fallbackErr) {
-                document.body.removeChild(textArea);
-                prompt('Copie o link:', shareUrl);
-            }
+        } else {
+            prompt('Copie o link:', shareUrl);
         }
     };
 
@@ -215,7 +204,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     const images = allImages.length > 0 ? allImages : [property.image].filter(Boolean);
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 pb-12 font-sans">
+        <div className="min-h-screen bg-[#f8fafc] pt-20 pb-12 font-sans">
             {seoMeta}
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
