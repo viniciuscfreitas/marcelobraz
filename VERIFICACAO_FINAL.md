@@ -114,3 +114,4 @@ A implementação está **100% alinhada** com os princípios do Grug Brain e Cur
 
 **Pronto para**: Build ✅ → Push ✅
 
+

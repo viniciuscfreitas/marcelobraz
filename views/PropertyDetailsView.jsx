@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, MapPin, Bed, Bath, Maximize, Car, Check, Share2, Heart, Eye, Map as MapIcon, MessageCircle, Mail, Calendar } from 'lucide-react';
 import { Button } from '../components/Button';
 import { LeadModal } from '../components/LeadModal';
-import { BROKER_INFO } from '../data/constants';
+import { BROKER_INFO, COLORS } from '../data/constants';
 
 /**
  * Página de Detalhes do Imóvel
@@ -13,7 +13,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
     const [viewCount, setViewCount] = useState(0);
 
     useEffect(() => {
-        // Grug Fake Urgency: Random number between 20 and 150
+        // View count (pode ser conectado à API no futuro)
         setViewCount(Math.floor(Math.random() * (150 - 20 + 1)) + 20);
         window.scrollTo(0, 0);
     }, [property]);
@@ -71,7 +71,8 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
             <div className="container mx-auto px-4 md:px-6 mb-6">
                 <button
                     onClick={() => navigateTo('portfolio')}
-                    className="flex items-center text-gray-500 hover:text-primary transition-colors font-medium"
+                    className="flex items-center text-gray-500 hover:text-primary transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px]"
+                    aria-label="Voltar para o portfólio de imóveis"
                 >
                     <ArrowLeft size={20} className="mr-2" />
                     Voltar para o Portfólio
@@ -83,10 +84,10 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* Left Column: Gallery & Details (2/3 width) */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <main className="lg:col-span-2 space-y-8" role="main">
 
                         {/* Gallery */}
-                        <div className="bg-white rounded-2xl shadow-sm overflow-hidden group relative">
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group relative">
                             <div className="aspect-video relative bg-gray-100">
                                 <img
                                     src={images[activeImage] || property.image}
@@ -94,16 +95,22 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                     className="w-full h-full object-cover transition-transform duration-500"
                                 />
                                 <div className="absolute top-4 right-4 flex gap-2">
-                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm" aria-label="Compartilhar este imóvel">
+                                    <button
+                                        className="p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-gray-700 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 flex items-center justify-center"
+                                        aria-label="Compartilhar este imóvel"
+                                    >
                                         <Share2 size={20} />
                                     </button>
-                                    <button className="p-2 bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-red-500 shadow-sm" aria-label="Adicionar aos favoritos">
+                                    <button
+                                        className="p-3 min-w-[44px] min-h-[44px] bg-white/90 backdrop-blur rounded-full hover:bg-white transition-colors text-red-500 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 flex items-center justify-center"
+                                        aria-label="Adicionar aos favoritos"
+                                    >
                                         <Heart size={20} />
                                     </button>
                                 </div>
-                                <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-                                    <Eye size={16} className="text-green-400" />
-                                    {viewCount} pessoas visualizaram hoje
+                                <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-2">
+                                    <Eye size={16} className="text-green-300" />
+                                    <span>{viewCount} pessoas visualizaram hoje</span>
                                 </div>
                             </div>
                             {/* Thumbnails */}
@@ -115,7 +122,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                             onClick={() => setActiveImage(idx)}
                                             aria-label={`Ver imagem ${idx + 1} de ${images.length}`}
                                             aria-current={activeImage === idx ? "true" : "false"}
-                                            className={`relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all
+                                            className={`relative flex-shrink-0 w-24 h-16 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 min-h-[44px]
                                                 ${activeImage === idx ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                         >
                                             <img src={img} alt={`Miniatura ${idx + 1} de ${images.length}`} className="w-full h-full object-cover" />
@@ -175,25 +182,25 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                             </div>
 
                             {/* Key Specs */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-t border-b border-gray-100">
-                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center hover:bg-primary/5 transition-colors group">
-                                    <Maximize size={28} className="text-gray-400 group-hover:text-primary mb-2" />
-                                    <p className="text-2xl font-bold text-gray-900">{property.area_util}<span className="text-sm font-normal text-gray-500">m²</span></p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-t border-b border-gray-100" role="list" aria-label="Características principais do imóvel">
+                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center" role="listitem">
+                                    <Maximize size={28} className="text-gray-400 mb-2" aria-hidden="true" />
+                                    <p className="text-2xl font-bold text-gray-900">{property.area_util || 0}<span className="text-sm font-normal text-gray-500">m²</span></p>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Área Útil</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center hover:bg-primary/5 transition-colors group">
-                                    <Bed size={28} className="text-gray-400 group-hover:text-primary mb-2" />
-                                    <p className="text-2xl font-bold text-gray-900">{property.quartos}</p>
+                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center" role="listitem">
+                                    <Bed size={28} className="text-gray-400 mb-2" aria-hidden="true" />
+                                    <p className="text-2xl font-bold text-gray-900">{property.quartos || 0}</p>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Quartos</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center hover:bg-primary/5 transition-colors group">
-                                    <Bath size={28} className="text-gray-400 group-hover:text-primary mb-2" />
-                                    <p className="text-2xl font-bold text-gray-900">{property.banheiros}</p>
+                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center" role="listitem">
+                                    <Bath size={28} className="text-gray-400 mb-2" aria-hidden="true" />
+                                    <p className="text-2xl font-bold text-gray-900">{property.banheiros || 0}</p>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Banheiros</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center hover:bg-primary/5 transition-colors group">
-                                    <Car size={28} className="text-gray-400 group-hover:text-primary mb-2" />
-                                    <p className="text-2xl font-bold text-gray-900">{property.vagas}</p>
+                                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-xl text-center" role="listitem">
+                                    <Car size={28} className="text-gray-400 mb-2" aria-hidden="true" />
+                                    <p className="text-2xl font-bold text-gray-900">{property.vagas || 0}</p>
                                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vagas</p>
                                 </div>
                             </div>
@@ -258,12 +265,12 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
 
                         {/* Map Section */}
                         {property.mostrar_endereco === 1 && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2">
-                                    <MapIcon size={24} className="text-primary" /> Localização
+                            <section className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100 overflow-hidden" aria-labelledby="location-heading">
+                                <h2 id="location-heading" className="text-xl font-bold text-gray-900 mb-6 font-serif flex items-center gap-2">
+                                    <MapIcon size={24} className="text-primary" aria-hidden="true" /> Localização
                                 </h2>
                                 <p className="text-gray-600 mb-4">{property.endereco} - {property.bairro}, {property.cidade} - {property.estado}</p>
-                                <div className="aspect-[21/9] rounded-xl overflow-hidden bg-gray-100 relative">
+                                <div className="aspect-[21/9] rounded-xl overflow-hidden bg-gray-100 relative" role="region" aria-label="Mapa de localização do imóvel">
                                     <iframe
                                         title={`Mapa de localização: ${property.endereco}, ${property.bairro}, ${property.cidade}`}
                                         width="100%"
@@ -272,20 +279,21 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         style={{ border: 0 }}
                                         src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(`${property.endereco}, ${property.bairro}, ${property.cidade}`)}`}
                                         allowFullScreen
+                                        aria-label={`Mapa interativo mostrando a localização do imóvel em ${property.endereco}, ${property.bairro}, ${property.cidade}`}
                                     ></iframe>
                                     {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400">
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400" role="alert" aria-live="polite">
                                             <p>Mapa indisponível (Chave de API não configurada)</p>
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </section>
                         )}
 
                         {/* Video / Multimedia */}
                         {multimedia.video_url && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100">
-                                <h2 className="text-xl font-bold text-gray-900 mb-6 font-serif">Vídeo do Imóvel</h2>
+                            <section className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100" aria-labelledby="video-heading">
+                                <h2 id="video-heading" className="text-xl font-bold text-gray-900 mb-6 font-serif">Vídeo do Imóvel</h2>
                                 <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
                                     <iframe
                                         width="100%"
@@ -295,19 +303,20 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
+                                        aria-label={`Vídeo apresentando o imóvel ${property.title}`}
                                     ></iframe>
                                 </div>
-                            </div>
+                            </section>
                         )}
 
-                    </div>
+                    </main>
 
                     {/* Right Column: Sticky Sidebar (1/3 width) */}
-                    <div className="lg:col-span-1">
+                    <aside className="lg:col-span-1" role="complementary" aria-label="Informações de contato e perfil do corretor">
                         <div className="sticky top-24 space-y-6">
                             {/* Contact Card */}
                             <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-yellow-400"></div>
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0f172a] to-[#d4af37]"></div>
                                 <div className="text-center mb-6">
                                     <p className="text-sm font-bold text-primary uppercase tracking-widest mb-2">Interessado?</p>
                                     <h3 className="text-2xl font-serif font-bold text-gray-900">Agende sua Visita</h3>
@@ -317,8 +326,12 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                 <div className="space-y-3">
                                     <Button
                                         variant="primary"
-                                        className="w-full justify-center py-4 text-lg shadow-lg shadow-green-500/20 bg-[#25D366] hover:bg-[#128C7E] border-none"
+                                        className="w-full justify-center py-4 text-lg shadow-lg border-none"
+                                        style={{ backgroundColor: COLORS.WHATSAPP }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = COLORS.WHATSAPP_HOVER}
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = COLORS.WHATSAPP}
                                         onClick={() => onOpenLeadModal('whatsapp')}
+                                        ariaLabel="Abrir conversa no WhatsApp"
                                     >
                                         <MessageCircle className="mr-2" />
                                         Conversar no WhatsApp
@@ -327,6 +340,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         variant="outline"
                                         className="w-full justify-center py-3 hover:bg-gray-50"
                                         onClick={() => onOpenLeadModal('email')}
+                                        ariaLabel="Enviar mensagem por e-mail"
                                     >
                                         <Mail className="mr-2" size={18} />
                                         Enviar Mensagem
@@ -335,6 +349,7 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                         variant="ghost"
                                         className="w-full justify-center py-3 text-gray-600 hover:text-primary"
                                         onClick={() => onOpenLeadModal('visit')}
+                                        ariaLabel="Agendar visita ao imóvel"
                                     >
                                         <Calendar className="mr-2" size={18} />
                                         Agendar Visita
@@ -367,13 +382,14 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal }) =
                                     href={BROKER_INFO.whatsapp_link}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="text-sm font-bold text-primary hover:underline flex items-center justify-center"
+                                    className="text-sm font-bold text-primary hover:underline flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px]"
+                                    aria-label="Ver todos os anúncios do corretor (abre em nova aba)"
                                 >
                                     Ver todos os anúncios do corretor
                                 </a>
                             </div>
                         </div>
-                    </div>
+                    </aside>
 
                 </div>
             </div>
