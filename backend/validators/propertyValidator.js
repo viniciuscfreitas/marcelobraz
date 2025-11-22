@@ -47,6 +47,11 @@ const validateProperty = [
     body('cep')
         .optional({ checkFalsy: true })
         .matches(/^\d{5}-?\d{3}$/).withMessage('CEP inválido'),
+    
+    body('transaction_type')
+        .optional({ checkFalsy: true })
+        .trim()
+        .isIn(['Venda', 'Aluguel', 'Temporada', 'Leilão']).withMessage('Tipo de transação inválido'),
 ];
 
 /**

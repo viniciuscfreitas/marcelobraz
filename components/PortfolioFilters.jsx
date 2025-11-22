@@ -54,7 +54,7 @@ export const PortfolioFilters = ({
                 <div className="flex items-center gap-2 text-[#0f172a] font-bold whitespace-nowrap">
                     <Filter size={20} /> Filtros:
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
                     <div className="relative">
                         <label className="text-xs font-bold text-gray-400 uppercase mb-1 block ml-1">
                             Bairro
@@ -79,6 +79,23 @@ export const PortfolioFilters = ({
                             aria-label="Filtrar por tipo de imóvel"
                         >
                             {types.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
+                    <div className="relative">
+                        <label className="text-xs font-bold text-gray-400 uppercase mb-1 block ml-1">
+                            Anúncio
+                        </label>
+                        <select
+                            className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 text-[#0f172a] focus:outline-none focus:ring-2 focus:ring-[#0f172a]"
+                            value={filters.transaction_type || 'Todos'}
+                            onChange={(e) => handleFilterChange('transaction_type', e.target.value === 'Todos' ? undefined : e.target.value)}
+                            aria-label="Filtrar por tipo de anúncio"
+                        >
+                            <option value="Todos">Todos</option>
+                            <option value="Venda">Venda</option>
+                            <option value="Aluguel">Aluguel</option>
+                            <option value="Temporada">Temporada</option>
+                            <option value="Leilão">Leilão</option>
                         </select>
                     </div>
                     <div className="relative flex items-end gap-2">

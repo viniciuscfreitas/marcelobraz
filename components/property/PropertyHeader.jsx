@@ -25,6 +25,14 @@ export const PropertyHeader = ({ property, leadCaptured, onUnlockPrice }) => {
     const iptuVal = parseValue(property.iptu);
     const totalVal = priceVal + condoVal + iptuVal;
 
+    const getTransactionLabel = (transactionType) => {
+        const type = transactionType || 'Venda';
+        if (type === 'Aluguel') return 'Locação';
+        if (type === 'Temporada') return 'Temporada';
+        if (type === 'Leilão') return 'Leilão';
+        return 'Venda';
+    };
+
     return (
         <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-gray-100">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-8">
@@ -64,7 +72,7 @@ export const PropertyHeader = ({ property, leadCaptured, onUnlockPrice }) => {
                             </Button>
                         </div>
                     )}
-                    <p className="text-sm text-gray-500 mb-1">Valor de {property.tipo === 'Aluguel' ? 'Locação' : 'Venda'}</p>
+                    <p className="text-sm text-gray-500 mb-1">Valor de {getTransactionLabel(property.transaction_type)}</p>
                     <p className="text-3xl font-bold text-primary mb-2">
                         {leadCaptured ? formatPrice(property.price) : 'R$ ***,***'}
                     </p>

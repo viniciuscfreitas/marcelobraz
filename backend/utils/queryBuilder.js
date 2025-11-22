@@ -47,6 +47,12 @@ function buildPropertyQuery(filters) {
         params.push(filters.vagasMax);
     }
 
+    // Filtro por tipo de transação
+    if (filters.transaction_type) {
+        whereConditions.push('transaction_type = ?');
+        params.push(filters.transaction_type);
+    }
+
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
     
     return { whereClause, params };

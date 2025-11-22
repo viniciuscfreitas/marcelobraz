@@ -24,14 +24,15 @@ router.get('/', (req, res) => {
             banheirosMin: req.query.banheiros_min ? parseInt(req.query.banheiros_min) : null,
             banheirosMax: req.query.banheiros_max ? parseInt(req.query.banheiros_max) : null,
             vagasMin: req.query.vagas_min ? parseInt(req.query.vagas_min) : null,
-            vagasMax: req.query.vagas_max ? parseInt(req.query.vagas_max) : null
+            vagasMax: req.query.vagas_max ? parseInt(req.query.vagas_max) : null,
+            transaction_type: req.query.transaction_type?.trim() || null
         };
 
         const { whereClause, params } = buildPropertyQuery(filters);
         
         const baseQuery = `
             SELECT id, title, subtitle, price, image, bairro, tipo, specs, tags, featured,
-                   quartos, vagas, banheiros, area_util, cidade, created_at, description
+                   quartos, vagas, banheiros, area_util, cidade, created_at, description, transaction_type
             FROM properties 
             ${whereClause}
             ORDER BY featured DESC, created_at DESC
@@ -94,9 +95,9 @@ router.post('/', requireAuth, validateProperty, handleValidationErrors, (req, re
                 condominio, iptu, area_util, area_total,
                 cep, estado, cidade, endereco, complemento, mostrar_endereco, ref_code,
                 aceita_permuta, aceita_fgts, posicao_apto, andares,
-                features, multimedia
+                features, multimedia, transaction_type
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         const values = preparePropertyData(req.body);
@@ -125,7 +126,7 @@ router.put('/:id', requireAuth, validateProperty, handleValidationErrors, (req, 
                 condominio = ?, iptu = ?, area_util = ?, area_total = ?,
                 cep = ?, estado = ?, cidade = ?, endereco = ?, complemento = ?, mostrar_endereco = ?, ref_code = ?,
                 aceita_permuta = ?, aceita_fgts = ?, posicao_apto = ?, andares = ?,
-                features = ?, multimedia = ?,
+                features = ?, multimedia = ?, transaction_type = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
         `);

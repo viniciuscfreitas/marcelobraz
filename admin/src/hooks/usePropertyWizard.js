@@ -21,7 +21,8 @@ export const usePropertyWizard = () => {
             features: { common: {}, private: {} },
             multimedia: {},
             mostrar_endereco: true,
-            featured: false
+            featured: false,
+            transaction_type: 'Venda'
         }
     });
 

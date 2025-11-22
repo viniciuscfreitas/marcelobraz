@@ -17,7 +17,8 @@ function parseProperty(property) {
             tags: property.tags ? JSON.parse(property.tags) : [],
             features: property.features ? JSON.parse(property.features) : {},
             multimedia: property.multimedia ? JSON.parse(property.multimedia) : {},
-            featured: property.featured === 1
+            featured: property.featured === 1,
+            transaction_type: property.transaction_type || 'Venda'
         };
     } catch (error) {
         console.error('Error parsing property JSON fields:', error);
@@ -27,7 +28,8 @@ function parseProperty(property) {
             tags: [],
             features: {},
             multimedia: {},
-            featured: property.featured === 1
+            featured: property.featured === 1,
+            transaction_type: property.transaction_type || 'Venda'
         };
     }
 }
@@ -80,7 +82,8 @@ function preparePropertyData(data) {
         data.posicao_apto || null,
         data.andares || null,
         data.features ? JSON.stringify(data.features) : '{}',
-        data.multimedia ? JSON.stringify(data.multimedia) : '{}'
+        data.multimedia ? JSON.stringify(data.multimedia) : '{}',
+        data.transaction_type || 'Venda'
     ];
 }
 

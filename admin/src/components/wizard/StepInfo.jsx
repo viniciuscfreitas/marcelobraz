@@ -5,6 +5,7 @@ import { useViaCep } from '../../hooks/useViaCep';
 export default function StepInfo() {
     const { register, formState: { errors }, watch, setValue } = useFormContext();
     const tipo = watch('tipo');
+    const transactionType = watch('transaction_type') || 'Venda';
     const cepValue = watch('cep');
     const { buscarCep, loading: cepLoading } = useViaCep();
     const [cepProcessado, setCepProcessado] = useState('');
@@ -178,7 +179,24 @@ export default function StepInfo() {
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 border-b border-gray-100 pb-2">Valores</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1.5">Valor de Venda *</label>
+                        <label htmlFor="transaction_type" className="block text-sm font-medium text-gray-700 mb-1.5">Tipo de Anúncio *</label>
+                        <select
+                            id="transaction_type"
+                            {...register('transaction_type', { required: 'Tipo de anúncio é obrigatório' })}
+                            className="input-field"
+                            defaultValue="Venda"
+                        >
+                            <option value="Venda">Venda</option>
+                            <option value="Aluguel">Aluguel</option>
+                            <option value="Temporada">Temporada</option>
+                            <option value="Leilão">Leilão</option>
+                        </select>
+                        {errors.transaction_type && <span className="text-red-600 text-xs mt-1 block">{errors.transaction_type.message}</span>}
+                    </div>
+                    <div>
+                        <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1.5">
+                            Valor de {transactionType === 'Aluguel' ? 'Locação' : transactionType === 'Temporada' ? 'Temporada' : transactionType === 'Leilão' ? 'Leilão' : 'Venda'} *
+                        </label>
                         <input
                             id="price"
                             {...register('price', { required: 'Preço é obrigatório' })}

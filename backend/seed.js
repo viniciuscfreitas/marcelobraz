@@ -74,6 +74,8 @@ function generateProperty(index) {
         private: getRandomFeatures(FEATURES_LIST.private)
     };
 
+    const transactionTypes = ['Venda', 'Aluguel', 'Temporada', 'Leilão'];
+    
     return {
         title: `${tipo} ${getRandom(['Incrível', 'Espaçoso', 'Moderno', 'Luxuoso', 'Aconchegante'])} no ${bairro}`,
         subtitle: `Oportunidade única com ${quartos} quartos e ${vagas} vagas`,
@@ -110,7 +112,8 @@ function generateProperty(index) {
         multimedia: JSON.stringify({
             video_url: Math.random() > 0.7 ? "https://www.youtube.com/watch?v=dQw4w9WgXcQ" : "",
             tour_url: ""
-        })
+        }),
+        transaction_type: getRandom(transactionTypes)
     };
 }
 
@@ -126,14 +129,14 @@ function seed() {
         description, subtype, age, quartos, vagas, banheiros, suites,
         condominio, iptu, area_util, area_total, cep, estado, cidade,
         endereco, complemento, mostrar_endereco, ref_code, aceita_permuta,
-        aceita_fgts, posicao_apto, andares, features, multimedia
+        aceita_fgts, posicao_apto, andares, features, multimedia, transaction_type
     )
     VALUES (
         ?, ?, ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?
+        ?, ?, ?, ?, ?, ?
     )
   `);
 
@@ -148,7 +151,7 @@ function seed() {
                 prop.description, prop.subtype, prop.age, prop.quartos, prop.vagas, prop.banheiros, prop.suites,
                 prop.condominio, prop.iptu, prop.area_util, prop.area_total, prop.cep, prop.estado, prop.cidade,
                 prop.endereco, prop.complemento, prop.mostrar_endereco, prop.ref_code, prop.aceita_permuta,
-                prop.aceita_fgts, prop.posicao_apto, prop.andares, prop.features, prop.multimedia
+                prop.aceita_fgts, prop.posicao_apto, prop.andares, prop.features, prop.multimedia, prop.transaction_type
             );
             count++;
         }

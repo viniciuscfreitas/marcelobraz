@@ -84,7 +84,8 @@ function initDatabase() {
     { name: 'posicao_apto', type: 'TEXT' },
     { name: 'andares', type: 'TEXT' },
     { name: 'features', type: 'TEXT' },
-    { name: 'multimedia', type: 'TEXT' }
+    { name: 'multimedia', type: 'TEXT' },
+    { name: 'transaction_type', type: "TEXT DEFAULT 'Venda'" }
   ];
 
   columnsToAdd.forEach(col => {

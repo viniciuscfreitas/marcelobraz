@@ -15,7 +15,7 @@ import { BROKER_INFO } from '../data/constants.js';
  * @param {Function} props.onPropertyClick - Callback quando imóvel é clicado
  */
 export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
-    const [filters, setFilters] = useState({ bairro: 'Todos', tipo: 'Todos' });
+    const [filters, setFilters] = useState({ bairro: 'Todos', tipo: 'Todos', transaction_type: 'Todos' });
     const [searchInput, setSearchInput] = useState('');
     const [search, setSearch] = useState(''); // Debounced search
     
@@ -37,6 +37,9 @@ export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
     if (filters.banheiros_max) apiFilters.banheiros_max = filters.banheiros_max;
     if (filters.vagas_min) apiFilters.vagas_min = filters.vagas_min;
     if (filters.vagas_max) apiFilters.vagas_max = filters.vagas_max;
+    if (filters.transaction_type && filters.transaction_type !== 'Todos') {
+        apiFilters.transaction_type = filters.transaction_type;
+    }
     
     // Usar hook de scroll infinito
     const { items, loading, hasMore, loadMore } = useInfiniteProperties({
@@ -45,7 +48,7 @@ export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
     });
 
     // Filtros básicos (bairro e tipo) - ainda aplicados localmente por enquanto
-    // TODO: Mover para API quando filtros avançados estiverem prontos
+    // transaction_type já é filtrado na API
     const filteredItems = items.filter(prop => {
         const bairroMatch = filters.bairro === 'Todos' || prop.bairro === filters.bairro;
         const tipoMatch = filters.tipo === 'Todos' || prop.tipo === filters.tipo;
@@ -57,7 +60,7 @@ export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
     const availableTypes = ['Todos', ...new Set(items.map(p => p.tipo).filter(Boolean))];
 
     const handleClearFilters = () => {
-        setFilters({ bairro: 'Todos', tipo: 'Todos' });
+        setFilters({ bairro: 'Todos', tipo: 'Todos', transaction_type: 'Todos' });
         setSearchInput('');
         setSearch('');
     };
