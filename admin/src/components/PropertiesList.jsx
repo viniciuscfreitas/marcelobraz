@@ -299,11 +299,6 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                         </tbody>
                     </table>
                 </div>
-                {/* Sentinel para scroll infinito */}
-                {hasMore && <div ref={sentinelRef} className="h-20" />}
-                {loading && properties.length > 0 && (
-                    <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
-                )}
             </div>
 
             {/* Mobile: Cards diretos na tela */}
@@ -366,12 +361,6 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                     </div>
                 ))}
 
-                {/* Sentinel para scroll infinito (mobile) */}
-                {hasMore && <div ref={sentinelRef} className="h-20" />}
-                {loading && properties.length > 0 && (
-                    <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
-                )}
-
                 {filteredProperties.length === 0 && !loading && (
                     <div className="p-8 text-center">
                         <div className="flex flex-col items-center justify-center text-gray-400">
@@ -382,6 +371,12 @@ export default function PropertiesList({ onEdit, refreshTrigger, searchTerm = ''
                     </div>
                 )}
             </div>
+
+            {/* Sentinel único para scroll infinito (Grug gosta: um só!) */}
+            {hasMore && <div ref={sentinelRef} className="h-20" />}
+            {loading && properties.length > 0 && (
+                <div className="text-center py-4 text-gray-500 text-sm">Carregando mais imóveis...</div>
+            )}
 
             {/* Dialog de Confirmação */}
             <ConfirmDialog

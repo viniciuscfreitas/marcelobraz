@@ -5,6 +5,7 @@ import PropertiesList from '../components/PropertiesList';
 import Layout from '../components/Layout';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 export default function Dashboard() {
     const { token } = useAuth();
@@ -13,6 +14,7 @@ export default function Dashboard() {
     const [searchTerm, setSearchTerm] = useState('');
     const [totalProperties, setTotalProperties] = useState(0);
     const [totalLeads, setTotalLeads] = useState(0);
+    const isDesktop = useMediaQuery('(min-width: 768px)'); // Grug gosta: renderizar só um componente
 
     // Buscar apenas leads (imóveis vem do PropertiesList via onTotalChange)
     // Grug gosta: uma requisição a menos!
@@ -89,15 +91,26 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Properties Section */}
-                <section className="hidden md:block bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden md:flex md:flex-col md:flex-1 md:min-h-0" role="region" aria-labelledby="properties-heading">
-                    <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
-                        <div>
-                            <h3 id="properties-heading" className="text-lg md:text-xl font-bold text-gray-900">Seus Imóveis</h3>
-                            <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">Gerencie sua lista de propriedades exclusivas.</p>
+                {/* Properties Section - Grug gosta: renderizar só um componente! */}
+                {isDesktop ? (
+                    <section className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col flex-1 min-h-0" role="region" aria-labelledby="properties-heading">
+                        <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
+                            <div>
+                                <h3 id="properties-heading" className="text-lg md:text-xl font-bold text-gray-900">Seus Imóveis</h3>
+                                <p className="text-xs md:text-sm text-gray-500 mt-1">Gerencie sua lista de propriedades exclusivas.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="p-0 md:flex-1 md:min-h-0 md:overflow-hidden">
+                        <div className="p-0 flex-1 min-h-0 overflow-hidden">
+                            <PropertiesList
+                                onEdit={handleEdit}
+                                refreshTrigger={refreshTrigger}
+                                searchTerm={searchTerm}
+                                onTotalChange={setTotalProperties}
+                            />
+                        </div>
+                    </section>
+                ) : (
+                    <div>
                         <PropertiesList
                             onEdit={handleEdit}
                             refreshTrigger={refreshTrigger}
@@ -105,17 +118,7 @@ export default function Dashboard() {
                             onTotalChange={setTotalProperties}
                         />
                     </div>
-                </section>
-
-                {/* Mobile: Cards diretos na tela */}
-                <div className="md:hidden">
-                    <PropertiesList
-                        onEdit={handleEdit}
-                        refreshTrigger={refreshTrigger}
-                        searchTerm={searchTerm}
-                        onTotalChange={setTotalProperties}
-                    />
-                </div>
+                )}
             </div>
         </Layout>
     );
