@@ -4,6 +4,17 @@ import { BROKER_INFO } from '../data/constants.js';
 import { Button } from './Button.jsx';
 import { NavLink } from './NavLink.jsx';
 
+// Helper: valida e retorna link do WhatsApp seguro
+const getWhatsAppLink = () => {
+  const link = BROKER_INFO?.whatsapp_link;
+  if (!link || typeof link !== 'string') return '#';
+  // Valida se é URL válida do WhatsApp
+  if (link.startsWith('https://wa.me/') || link.startsWith('http://wa.me/')) {
+    return link;
+  }
+  return '#';
+};
+
 export const Header = ({ isScrolled, mobileMenuOpen, setMobileMenuOpen, navigateTo, currentView }) => (
   <>
     <header className={`fixed w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm text-[#0f172a] py-3' : 'bg-gradient-to-b from-black/60 to-transparent py-6 text-white'}`}>
@@ -33,7 +44,10 @@ export const Header = ({ isScrolled, mobileMenuOpen, setMobileMenuOpen, navigate
             isMobile={false}
           />
 
-          <Button variant={isScrolled ? "primary" : "gold"} className="px-6 py-2 text-xs" onClick={() => window.open(BROKER_INFO.whatsapp_link)}>
+          <Button variant={isScrolled ? "primary" : "gold"} className="px-6 py-2 text-xs" onClick={() => {
+            const link = getWhatsAppLink();
+            if (link !== '#') window.open(link, '_blank', 'noopener,noreferrer');
+          }}>
              Falar no WhatsApp
           </Button>
         </nav>
@@ -51,7 +65,10 @@ export const Header = ({ isScrolled, mobileMenuOpen, setMobileMenuOpen, navigate
             {NAV_LINKS.map((item) => (
                <NavLink key={item.id} item={item} onClick={() => navigateTo('home', item.id)} isMobile={true} />
             ))}
-            <Button variant="gold" fullWidth={true} onClick={() => window.open(BROKER_INFO.whatsapp_link)}>
+            <Button variant="gold" fullWidth={true} onClick={() => {
+              const link = getWhatsAppLink();
+              if (link !== '#') window.open(link, '_blank', 'noopener,noreferrer');
+            }}>
                 Chamar no WhatsApp
             </Button>
          </nav>

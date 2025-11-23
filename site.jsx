@@ -1,5 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Footer } from './components/Footer.jsx';
 import { Header } from './components/Header.jsx';
 import { LeadModal } from './components/LeadModal.jsx';
@@ -26,16 +26,22 @@ export default function RealEstateSite() {
   const [toastMessage, setToastMessage] = useState(null);
   const [hasInitializedFromUrl, setHasInitializedFromUrl] = useState(false);
 
-  useEffect(() => {
-    if (hasInitializedFromUrl || properties.length === 0) return;
+  // Função helper para sincronizar view com URL (Grug gosta: memoizada!)
+  const syncViewWithUrl = useCallback(() => {
+    if (properties.length === 0) return;
     
-    // Tentar ler URL amigável primeiro (Grug gosta: SEO primeiro!)
     const path = window.location.pathname;
+    const hash = window.location.hash.substring(1);
     let propertyId = null;
     
     if (path.startsWith('/imovel/')) {
       // URL amigável: /imovel/tipo-quartos-bairro-id
       propertyId = extractPropertyIdFromUrl(path);
+    } else if (path === '/portfolio') {
+      // URL para portfolio
+      nav.navigateTo('portfolio');
+      setSelectedProperty(null);
+      return;
     } else {
       // Fallback: query param antigo (?property=123)
       const urlParams = new URLSearchParams(window.location.search);
@@ -47,15 +53,32 @@ export default function RealEstateSite() {
       if (property) {
         setSelectedProperty(property);
         nav.navigateTo('property');
-        // Atualizar URL para amigável se estava usando query param
-        const friendlyUrl = generatePropertyUrl(property);
-        window.history.replaceState({}, '', friendlyUrl);
-        setHasInitializedFromUrl(true);
       }
     } else {
-      setHasInitializedFromUrl(true);
+      // Se não tem property na URL e não é /portfolio, é home
+      nav.navigateTo('home', hash || null);
+      setSelectedProperty(null);
     }
-  }, [properties, hasInitializedFromUrl, nav]);
+  }, [properties, nav]);
+
+  // Inicialização a partir da URL
+  useEffect(() => {
+    if (hasInitializedFromUrl || properties.length === 0) return;
+    syncViewWithUrl();
+    setHasInitializedFromUrl(true);
+  }, [properties, hasInitializedFromUrl, syncViewWithUrl]);
+
+  // Listener para botão voltar/avançar do navegador (popstate)
+  useEffect(() => {
+    if (!hasInitializedFromUrl) return;
+    
+    const handlePopState = () => {
+      syncViewWithUrl();
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [hasInitializedFromUrl, syncViewWithUrl]);
 
   const handlePropertyClick = (prop) => {
     setSelectedProperty(prop);
@@ -71,6 +94,16 @@ export default function RealEstateSite() {
       setSelectedProperty(null);
     }
     nav.navigateTo(view, sectionId);
+    
+    // Atualizar URL conforme a view (Grug gosta: URL sempre sincronizada!)
+    // Nota: property é atualizado em handlePropertyClick, não aqui
+    if (view === 'portfolio') {
+      window.history.pushState({}, '', '/portfolio');
+    } else if (view === 'home') {
+      // Para home, usar '/' ou '/' + hash se tiver sectionId
+      const url = sectionId ? `/#${sectionId}` : '/';
+      window.history.pushState({}, '', url);
+    }
   };
 
   const handleModalSuccess = (msg) => {
@@ -108,7 +141,10 @@ export default function RealEstateSite() {
             onOpenLeadModal={(type) => {
               // Se for whatsapp, abre direto. Se for email, abre modal.
               if (type === 'whatsapp') {
-                window.open(BROKER_INFO.whatsapp_link, '_blank');
+                const link = BROKER_INFO?.whatsapp_link;
+                if (link && typeof link === 'string' && (link.startsWith('https://wa.me/') || link.startsWith('http://wa.me/'))) {
+                  window.open(link, '_blank', 'noopener,noreferrer');
+                }
               } else {
                 openModal('contact'); // Reutilizando modal de contato/gate
               }
@@ -139,7 +175,7 @@ export default function RealEstateSite() {
 
       {nav.currentView !== 'property' && <Footer navigateTo={nav.navigateTo} />}
 
-      <a href={BROKER_INFO.whatsapp_link} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 group flex items-center justify-end focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400 rounded-full" aria-label="Falar no WhatsApp">
+      <a href={BROKER_INFO?.whatsapp_link || '#'} target="_blank" rel="noreferrer" className="fixed bottom-6 right-6 z-50 group flex items-center justify-end focus:outline-none focus-visible:ring-4 focus-visible:ring-green-400 rounded-full" aria-label="Falar no WhatsApp">
         <div className="absolute right-16 bg-white py-2 px-4 rounded-lg shadow-xl text-xs font-bold text-[#0f172a] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 mr-2 hidden md:block border border-gray-100" aria-hidden="true">Falar com Marcelo</div>
         <div className="bg-[#25D366] text-white p-4 rounded-full shadow-2xl shadow-green-500/30 hover:scale-110 transition-transform duration-300 flex items-center justify-center w-14 h-14"><MessageCircle size={30} /></div>
       </a>
