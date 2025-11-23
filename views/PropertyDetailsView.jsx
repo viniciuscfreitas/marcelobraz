@@ -86,10 +86,10 @@ const GalleryHero = ({ property, images, onShare }) => {
 
 const PropertyInfoCard = ({ property }) => {
     const formatPrice = (val) => {
-        if (!val) return 'R$ 0,00';
+        if (!val) return 'Sob Consulta';
         if (typeof val === 'string' && val.includes('R$')) return val;
         const num = typeof val === 'string' ? parseFloat(val.replace(/[^0-9,]/g, '').replace(',', '.')) : val;
-        if (isNaN(num)) return val;
+        if (isNaN(num) || num === 0) return 'Sob Consulta';
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
     };
 
@@ -174,6 +174,8 @@ const FeaturesGrid = ({ features }) => {
         }
     }
 
+    if (allFeatures.length === 0) return null;
+
     return (
         <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
             <h2 className="text-lg font-serif font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -181,11 +183,7 @@ const FeaturesGrid = ({ features }) => {
                 <div className="h-px flex-1 bg-gray-200 ml-4" aria-hidden="true"></div>
             </h2>
             <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
-                {(allFeatures.length > 0 ? allFeatures : [
-                    'Ar Condicionado', 'Piscina Privativa', 'Varanda Gourmet', 
-                    'Vista Panorâmica', 'Portaria 24h', 'Academia', 
-                    'Salão de Festas', 'Churrasqueira', 'Closet'
-                ]).map((item, idx) => (
+                {allFeatures.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3 group">
                         <div className="mt-1 min-w-[18px]">
                             <Icons.Check className="w-4 h-4 text-[#856404] group-hover:scale-110 transition-transform" />
@@ -199,32 +197,21 @@ const FeaturesGrid = ({ features }) => {
 };
 
 const LocationCard = ({ property, isLocked, onUnlock }) => {
-    const address = property?.endereco_completo || `${property?.endereco || ''} - ${property?.bairro || ''}, ${property?.cidade || ''} - ${property?.estado || 'SP'}`.replace(/^ - | - $/g, '').trim();
+    const address = property?.endereco_completo || 
+        `${property?.endereco || ''}${property?.endereco && property?.bairro ? ' - ' : ''}${property?.bairro || ''}${(property?.endereco || property?.bairro) && property?.cidade ? ', ' : ''}${property?.cidade || ''}${property?.estado ? ` - ${property.estado}` : ''}`.replace(/^[\s, -]+|[\s, -]+$/g, '').trim() || 
+        `${property?.bairro || ''}, ${property?.cidade || 'Santos'}`;
     
-    return (
-        <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
-            <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-serif font-bold text-gray-900">Localização</h2>
-                <p className="text-gray-600 text-sm mt-1">{address}</p>
-            </div>
-            
-            <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
-                {!isLocked && property?.mostrar_endereco === 1 ? (
-                    <iframe
-                        title={`Mapa de localização: ${address}`}
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        style={{ border: 0 }}
-                        src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
-                        allowFullScreen
-                        aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
-                    ></iframe>
-                ) : (
-                    <div className="absolute inset-0 opacity-50 bg-slate-200 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" role="img" aria-label="Mapa estático mostrando a região aproximada"></div>
-                )}
+    if (!property?.mostrar_endereco && isLocked) {
+        return (
+            <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
+                <div className="p-6 border-b border-gray-100">
+                    <h2 className="text-lg font-serif font-bold text-gray-900">Localização</h2>
+                    <p className="text-gray-600 text-sm mt-1">{address}</p>
+                </div>
                 
-                {isLocked ? (
+                <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
+                    <div className="absolute inset-0 opacity-50 bg-slate-200 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" role="img" aria-label="Mapa estático mostrando a região aproximada"></div>
+                    
                     <div className="absolute inset-0 backdrop-blur-sm bg-white/70 flex flex-col items-center justify-center p-6 text-center z-10">
                         <div className="bg-white p-4 rounded-full shadow-xl mb-4">
                             <Icons.Lock className="w-6 h-6 text-[#856404]" />
@@ -238,29 +225,55 @@ const LocationCard = ({ property, isLocked, onUnlock }) => {
                             Desbloquear Mapa
                         </button>
                     </div>
-                ) : !property?.mostrar_endereco ? (
-                    <div className="z-10 flex flex-col items-center">
-                        <Icons.MapPin className="w-10 h-10 text-[#e11d48] drop-shadow-xl animate-bounce" />
-                        <span className="bg-white px-3 py-1 rounded-full text-xs font-bold shadow-lg mt-2 text-gray-800">Localização Aproximada</span>
+                </div>
+            </section>
+        );
+    }
+    
+    if (property?.mostrar_endereco !== 1) {
+        return null;
+    }
+    
+    return (
+        <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
+            <div className="p-6 border-b border-gray-100">
+                <h2 className="text-lg font-serif font-bold text-gray-900">Localização</h2>
+                <p className="text-gray-600 text-sm mt-1">{address}</p>
+            </div>
+            
+            <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
+                <iframe
+                    title={`Mapa de localização: ${address}`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
+                    allowFullScreen
+                    aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
+                ></iframe>
+                {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400" role="alert" aria-live="polite">
+                        <p>Mapa indisponível (Chave de API não configurada)</p>
                     </div>
-                ) : null}
+                )}
             </div>
         </section>
     );
 };
 
-const SidebarContact = ({ property, onContact }) => (
+const SidebarContact = ({ property, onContact, onOpenLeadModal }) => (
     <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 space-y-6 sticky top-24">
         <div>
             <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Consultor Responsável</p>
             <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-gray-200 rounded-full overflow-hidden border-2 border-white shadow-md">
-                    <img src="https://ui-avatars.com/api/?name=Marcelo+Braz&background=0D8ABC&color=fff" alt="Foto do Corretor Marcelo Braz" className="w-full h-full object-cover" />
+                    <img src={BROKER_INFO.intro_video || "https://ui-avatars.com/api/?name=Marcelo+Braz&background=0D8ABC&color=fff"} alt={`Foto do Corretor ${BROKER_INFO.name}`} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                    <h4 className="font-bold text-gray-900">Marcelo Braz</h4>
-                    <p className="text-xs text-[#856404] font-bold">Especialista em Luxo</p>
-                    <p className="text-xs text-gray-500 mt-0.5">CRECI 12345-F</p>
+                    <h4 className="font-bold text-gray-900">{BROKER_INFO.name}</h4>
+                    <p className="text-xs text-[#856404] font-bold">{BROKER_INFO.role}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{BROKER_INFO.creci}</p>
                 </div>
             </div>
         </div>
@@ -547,13 +560,15 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                         
                         <FeaturesGrid features={features} />
                         
-                        <div className="h-[400px]">
-                            <LocationCard 
-                                property={property}
-                                isLocked={!leadCaptured} 
-                                onUnlock={() => setShowLeadModal(true)} 
-                            />
-                        </div>
+                        {property?.mostrar_endereco === 1 && (
+                            <div className="h-[400px]">
+                                <LocationCard 
+                                    property={property}
+                                    isLocked={!leadCaptured} 
+                                    onUnlock={() => setShowLeadModal(true)} 
+                                />
+                            </div>
+                        )}
                         
                         <PropertyMultimedia multimedia={multimedia} property={property} />
                     </main>
@@ -562,7 +577,8 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                         <div className="sticky top-24 space-y-6">
                             <SidebarContact 
                                 property={property} 
-                                onContact={handleContact} 
+                                onContact={handleContact}
+                                onOpenLeadModal={onOpenLeadModal}
                             />
                             <PropertyBrokerProfile />
                         </div>
