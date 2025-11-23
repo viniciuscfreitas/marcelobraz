@@ -23,7 +23,9 @@ const Icons = {
 
 const GalleryHero = ({ property, images, onShare }) => {
     const displayImages = images && images.length > 0 ? images : [property?.image || "https://via.placeholder.com/1200x800?text=Sem+Foto"];
-    const gridImages = [...displayImages, ...Array(5).fill("https://via.placeholder.com/800?text=Foto")].slice(0, 5);
+    const totalImages = displayImages.length;
+    const hasMoreThan5 = totalImages > 5;
+    const gridImages = hasMoreThan5 ? displayImages.slice(0, 5) : displayImages;
 
     return (
         <section aria-label="Galeria de fotos" className="relative mb-8 group">
@@ -40,28 +42,35 @@ const GalleryHero = ({ property, images, onShare }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
                 </button>
 
-                {[1, 2, 3].map((idx) => (
-                    <button 
-                        key={idx}
-                        className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
-                        aria-label={`Ver foto ${idx + 1}`}
-                    >
-                        <img src={gridImages[idx]} alt={`Foto do imóvel ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                    </button>
-                ))}
+                {gridImages.length > 1 && [1, 2, 3].map((idx) => {
+                    if (idx >= gridImages.length) return null;
+                    return (
+                        <button 
+                            key={idx}
+                            className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
+                            aria-label={`Ver foto ${idx + 1}`}
+                        >
+                            <img src={gridImages[idx]} alt={`Foto do imóvel ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                        </button>
+                    );
+                })}
                 
-                <button 
-                    className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
-                    aria-label="Ver todas as fotos"
-                >
-                    <img src={gridImages[4]} alt="Ver mais fotos" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] hover:bg-black/50 transition-colors">
-                        <span className="text-white font-bold flex items-center gap-2 text-lg">
-                            <Icons.Image className="w-5 h-5" />
-                            Ver todas
-                        </span>
-                    </div>
-                </button>
+                {gridImages.length > 4 && (
+                    <button 
+                        className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
+                        aria-label={hasMoreThan5 ? `Ver todas as ${totalImages} fotos` : "Ver todas as fotos"}
+                    >
+                        <img src={gridImages[4]} alt="Ver mais fotos" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                        {hasMoreThan5 && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px] hover:bg-black/50 transition-colors">
+                                <span className="text-white font-bold flex items-center gap-2 text-lg">
+                                    <Icons.Image className="w-5 h-5" />
+                                    +{totalImages - 5} mais
+                                </span>
+                            </div>
+                        )}
+                    </button>
+                )}
             </div>
 
             <div className="absolute top-4 right-4 flex gap-2">
