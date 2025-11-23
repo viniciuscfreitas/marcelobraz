@@ -29,12 +29,13 @@ const GalleryHero = ({ property, images, onShare }) => {
     const gridImages = hasMoreThan5 ? displayImages.slice(0, 5) : displayImages;
     const hasOnlyOne = totalImages === 1;
     const secondaryImages = gridImages.slice(1, 4);
+    const mainImageClasses = hasOnlyOne ? 'md:col-span-4 md:row-span-2' : 'md:col-span-2 md:row-span-2';
 
     return (
         <section aria-label="Galeria de fotos" className="relative mb-8 group">
             <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-2 h-[40vh] min-h-[300px] md:h-[500px] rounded-xl overflow-hidden shadow-sm">
                 <button 
-                    className={`${hasOnlyOne ? 'md:col-span-4 md:row-span-2' : 'md:col-span-2 md:row-span-2'} relative overflow-hidden cursor-pointer group/img focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572] w-full h-full p-0 border-0`}
+                    className={`${mainImageClasses} relative overflow-hidden cursor-pointer group/img focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572] w-full h-full p-0 border-0`}
                     aria-label="Ver foto principal em tela cheia"
                 >
                     <img 
@@ -130,7 +131,7 @@ const PropertyInfoCard = ({ property }) => {
                 <div className="text-left md:text-right mt-2 md:mt-0 bg-gray-50 md:bg-transparent p-4 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-gray-100">
                     <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold mb-1">Valor de {getTransactionLabel(property?.transaction_type)}</p>
                     <div className="text-3xl md:text-4xl font-bold text-[#856404] tracking-tight">
-                        {property?.price || 'Sob Consulta'}
+                        {formatPrice(property?.price)}
                     </div>
                 </div>
             </div>
@@ -219,6 +220,9 @@ const LocationCard = ({ property, isLocked, onUnlock }) => {
         address = parts.length > 0 ? parts.join(', ') : `${property?.bairro || ''}, ${property?.cidade || 'Santos'}`;
     }
     
+    const mapsKey = import.meta.env.VITE_GOOGLE_MAPS_KEY || '';
+    const mapsUrl = `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${encodeURIComponent(address)}`;
+    
     return (
         <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
             <div className="p-6 border-b border-gray-100">
@@ -252,11 +256,11 @@ const LocationCard = ({ property, isLocked, onUnlock }) => {
                             height="100%"
                             frameBorder="0"
                             style={{ border: 0 }}
-                            src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
+                            src={mapsUrl}
                             allowFullScreen
                             aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
                         ></iframe>
-                        {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
+                        {!mapsKey && (
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400" role="alert" aria-live="polite">
                                 <p>Mapa indisponível (Chave de API não configurada)</p>
                             </div>
@@ -288,10 +292,7 @@ const SidebarContact = ({ property, onContact, onOpenLeadModal }) => (
 
         <div className="space-y-3">
             <button 
-                onClick={() => {
-                    const whatsappUrl = generateWhatsAppLink(property);
-                    window.open(whatsappUrl, '_blank');
-                }}
+                onClick={() => window.open(generateWhatsAppLink(property), '_blank')}
                 className="w-full bg-[#128c7e] hover:bg-[#075e54] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#128c7e]"
                 aria-label="Conversar com corretor no WhatsApp"
             >
@@ -489,11 +490,19 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
     }, [property?.id]);
 
     // Renderizar SEO (Grug gosta: componente dentro do render!)
+    const seoDescription = property.description
+        ? property.description.substring(0, 155)
+        : (() => {
+            const location = `${property.bairro || ''}, ${property.cidade || 'Santos'}`;
+            const transaction = getTransactionLabel(property.tipo);
+            const rooms = property.quartos ? `${property.quartos} quartos` : '';
+            const area = property.area_util ? `${property.area_util}m²` : '';
+            return `${property.title} em ${location}. ${transaction}. ${rooms} ${area}`.trim();
+        })();
+    
     const seoMeta = useSEO({
         title: property.title,
-        description: property.description
-            ? property.description.substring(0, 155)
-            : `${property.title} em ${property.bairro || ''}, ${property.cidade || 'Santos'}. ${getTransactionLabel(property.tipo)}. ${property.quartos ? `${property.quartos} quartos` : ''} ${property.area_util ? `${property.area_util}m²` : ''}`.trim(),
+        description: seoDescription,
         image: property.image,
         url: window.location.href,
         property: property // Passa property inteira para gerar Schema.org
@@ -529,9 +538,9 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
         property.images.forEach(addUnique);
     } else {
         // Fallback: usar image principal se não tem array
-    if (property.image) addUnique(property.image);
-    if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
-    if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
+        if (property.image) addUnique(property.image);
+        if (Array.isArray(multimedia.photos)) multimedia.photos.forEach(addUnique);
+        if (Array.isArray(multimedia.images)) multimedia.images.forEach(addUnique);
     }
 
     // Garantir pelo menos uma imagem
