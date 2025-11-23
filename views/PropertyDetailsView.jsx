@@ -5,7 +5,6 @@ import { PropertyMap } from '../components/property/PropertyMap';
 import { PropertyMultimedia } from '../components/property/PropertyMultimedia';
 import { PropertyContact } from '../components/property/PropertyContact';
 import { PropertyBrokerProfile } from '../components/property/PropertyBrokerProfile';
-import { FinancingCalculator } from '../components/property/FinancingCalculator';
 import { useSEO } from '../hooks/useSEO.jsx';
 import { BROKER_INFO } from '../data/constants';
 import { generateShareUrl } from '../utils/urlHelpers';
@@ -16,8 +15,6 @@ import { generateWhatsAppLink } from '../utils/whatsappHelpers';
 // ==================================================================================
 
 const Icons = {
-    ChevronRight: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>,
-    Home: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
     Phone: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
     MessageCircle: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>,
     Share: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>,
@@ -30,27 +27,6 @@ const Icons = {
     Lock: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
     Image: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
 };
-
-const Breadcrumbs = ({ property, navigateTo }) => (
-    <nav aria-label="Breadcrumb" className="text-xs font-medium text-gray-500 mb-6 flex items-center flex-wrap gap-2">
-        <button 
-            onClick={() => navigateTo && navigateTo('/')} 
-            className="hover:text-[#856404] transition-colors flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a572] rounded-sm px-1"
-            aria-label="Voltar para página inicial"
-        >
-            <Icons.Home className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" /> 
-            <span className="underline decoration-transparent group-hover:decoration-[#856404] underline-offset-4 transition-all">Início</span>
-        </button>
-        <Icons.ChevronRight className="w-3 h-3 text-gray-400" />
-        <span className="text-gray-600 hover:text-gray-900">{property?.cidade || 'Cidade'}</span>
-        <Icons.ChevronRight className="w-3 h-3 text-gray-400" />
-        <span className="text-gray-600 hover:text-gray-900">{property?.bairro || 'Bairro'}</span>
-        <Icons.ChevronRight className="w-3 h-3 text-gray-400" />
-        <span className="text-gray-900 font-semibold truncate max-w-[200px] md:max-w-xs" aria-current="page">
-            {property?.title || property?.id}
-        </span>
-    </nav>
-);
 
 const GalleryHero = ({ property, images, onShare }) => {
     const displayImages = images && images.length > 0 ? images : [property?.image || "https://via.placeholder.com/1200x800?text=Sem+Foto"];
@@ -431,8 +407,6 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
             <div className="h-4 md:hidden" aria-hidden="true"></div>
 
             <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-                <Breadcrumbs property={property} navigateTo={navigateTo} />
-
                 <GalleryHero property={property} images={images} onShare={handleShare} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
@@ -445,8 +419,6 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                         />
                         
                         <PropertyFeatures features={features} />
-                        
-                        <FinancingCalculator property={property} />
                         
                         {leadCaptured && <PropertyMap property={property} />}
                         
