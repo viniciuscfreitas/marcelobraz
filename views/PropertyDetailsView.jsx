@@ -27,13 +27,14 @@ const GalleryHero = ({ property, images, onShare }) => {
     const totalImages = displayImages.length;
     const hasMoreThan5 = totalImages > 5;
     const gridImages = hasMoreThan5 ? displayImages.slice(0, 5) : displayImages;
+    const hasOnlyOne = totalImages === 1;
     const secondaryImages = gridImages.slice(1, 4);
 
     return (
         <section aria-label="Galeria de fotos" className="relative mb-8 group">
             <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-2 h-[40vh] min-h-[300px] md:h-[500px] rounded-xl overflow-hidden shadow-sm">
                 <button 
-                    className="md:col-span-2 md:row-span-2 relative overflow-hidden cursor-pointer group/img focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572] w-full h-full p-0 border-0"
+                    className={`${hasOnlyOne ? 'md:col-span-4 md:row-span-2' : 'md:col-span-2 md:row-span-2'} relative overflow-hidden cursor-pointer group/img focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572] w-full h-full p-0 border-0`}
                     aria-label="Ver foto principal em tela cheia"
                 >
                     <img 
@@ -44,7 +45,7 @@ const GalleryHero = ({ property, images, onShare }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
                 </button>
 
-                {secondaryImages.map((img, idx) => {
+                {!hasOnlyOne && secondaryImages.map((img, idx) => {
                     const actualIdx = idx + 1;
                     return (
                         <button 
@@ -57,7 +58,7 @@ const GalleryHero = ({ property, images, onShare }) => {
                     );
                 })}
                 
-                {gridImages.length > 4 && (
+                {!hasOnlyOne && gridImages.length > 4 && (
                     <button 
                         className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
                         aria-label={hasMoreThan5 ? `Ver todas as ${totalImages} fotos` : "Ver todas as fotos"}
