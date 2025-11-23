@@ -1,18 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { LeadModal } from '../components/LeadModal';
-import { PropertyFeatures } from '../components/property/PropertyFeatures';
-import { PropertyMap } from '../components/property/PropertyMap';
 import { PropertyMultimedia } from '../components/property/PropertyMultimedia';
-import { PropertyContact } from '../components/property/PropertyContact';
 import { PropertyBrokerProfile } from '../components/property/PropertyBrokerProfile';
 import { useSEO } from '../hooks/useSEO.jsx';
 import { BROKER_INFO } from '../data/constants';
 import { generateShareUrl } from '../utils/urlHelpers';
 import { generateWhatsAppLink } from '../utils/whatsappHelpers';
-
-// ==================================================================================
-// 🎨 COMPONENTES VISUAIS INLINE (UI/UX Premium)
-// ==================================================================================
 
 const Icons = {
     Phone: ({ className }) => <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
@@ -91,7 +84,7 @@ const GalleryHero = ({ property, images, onShare }) => {
     );
 };
 
-const PropertyInfoCard = ({ property, leadCaptured, onUnlockPrice }) => {
+const PropertyInfoCard = ({ property }) => {
     const formatPrice = (val) => {
         if (!val) return 'R$ 0,00';
         if (typeof val === 'string' && val.includes('R$')) return val;
@@ -125,7 +118,7 @@ const PropertyInfoCard = ({ property, leadCaptured, onUnlockPrice }) => {
                 <div className="text-left md:text-right mt-2 md:mt-0 bg-gray-50 md:bg-transparent p-4 md:p-0 rounded-xl w-full md:w-auto border md:border-0 border-gray-100">
                     <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold mb-1">Valor de {getTransactionLabel(property?.transaction_type)}</p>
                     <div className="text-3xl md:text-4xl font-bold text-[#856404] tracking-tight">
-                        {leadCaptured ? (formatPrice(property?.price) || 'Sob Consulta') : 'Sob Consulta'}
+                        {property?.price || 'Sob Consulta'}
                     </div>
                 </div>
             </div>
@@ -165,6 +158,144 @@ const PropertyInfoCard = ({ property, leadCaptured, onUnlockPrice }) => {
         </div>
     );
 };
+
+const FeaturesGrid = ({ features }) => {
+    const allFeatures = [];
+    if (features && typeof features === 'object') {
+        if (features.private && typeof features.private === 'object') {
+            Object.entries(features.private).filter(([, v]) => v).forEach(([key]) => {
+                allFeatures.push(key.replace(/_/g, ' '));
+            });
+        }
+        if (features.common && typeof features.common === 'object') {
+            Object.entries(features.common).filter(([, v]) => v).forEach(([key]) => {
+                allFeatures.push(key.replace(/_/g, ' '));
+            });
+        }
+    }
+
+    return (
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-serif font-bold text-gray-900 mb-6 flex items-center gap-2">
+                Comodidades e Diferenciais
+                <div className="h-px flex-1 bg-gray-200 ml-4" aria-hidden="true"></div>
+            </h2>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
+                {(allFeatures.length > 0 ? allFeatures : [
+                    'Ar Condicionado', 'Piscina Privativa', 'Varanda Gourmet', 
+                    'Vista Panorâmica', 'Portaria 24h', 'Academia', 
+                    'Salão de Festas', 'Churrasqueira', 'Closet'
+                ]).map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3 group">
+                        <div className="mt-1 min-w-[18px]">
+                            <Icons.Check className="w-4 h-4 text-[#856404] group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span className="text-gray-700 text-sm group-hover:text-gray-900 transition-colors font-medium capitalize">{item}</span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const LocationCard = ({ property, isLocked, onUnlock }) => {
+    const address = property?.endereco_completo || `${property?.endereco || ''} - ${property?.bairro || ''}, ${property?.cidade || ''} - ${property?.estado || 'SP'}`.replace(/^ - | - $/g, '').trim();
+    
+    return (
+        <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
+            <div className="p-6 border-b border-gray-100">
+                <h2 className="text-lg font-serif font-bold text-gray-900">Localização</h2>
+                <p className="text-gray-600 text-sm mt-1">{address}</p>
+            </div>
+            
+            <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
+                {!isLocked && property?.mostrar_endereco === 1 ? (
+                    <iframe
+                        title={`Mapa de localização: ${address}`}
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        style={{ border: 0 }}
+                        src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
+                        allowFullScreen
+                        aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
+                    ></iframe>
+                ) : (
+                    <div className="absolute inset-0 opacity-50 bg-slate-200 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" role="img" aria-label="Mapa estático mostrando a região aproximada"></div>
+                )}
+                
+                {isLocked ? (
+                    <div className="absolute inset-0 backdrop-blur-sm bg-white/70 flex flex-col items-center justify-center p-6 text-center z-10">
+                        <div className="bg-white p-4 rounded-full shadow-xl mb-4">
+                            <Icons.Lock className="w-6 h-6 text-[#856404]" />
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-2">Localização Exata Protegida</h3>
+                        <p className="text-xs text-gray-600 mb-4 max-w-xs">Cadastre-se gratuitamente para visualizar o endereço exato.</p>
+                        <button 
+                            onClick={onUnlock}
+                            className="bg-[#0f172a] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
+                        >
+                            Desbloquear Mapa
+                        </button>
+                    </div>
+                ) : !property?.mostrar_endereco ? (
+                    <div className="z-10 flex flex-col items-center">
+                        <Icons.MapPin className="w-10 h-10 text-[#e11d48] drop-shadow-xl animate-bounce" />
+                        <span className="bg-white px-3 py-1 rounded-full text-xs font-bold shadow-lg mt-2 text-gray-800">Localização Aproximada</span>
+                    </div>
+                ) : null}
+            </div>
+        </section>
+    );
+};
+
+const SidebarContact = ({ property, onContact }) => (
+    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 space-y-6 sticky top-24">
+        <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Consultor Responsável</p>
+            <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-gray-200 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <img src="https://ui-avatars.com/api/?name=Marcelo+Braz&background=0D8ABC&color=fff" alt="Foto do Corretor Marcelo Braz" className="w-full h-full object-cover" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-gray-900">Marcelo Braz</h4>
+                    <p className="text-xs text-[#856404] font-bold">Especialista em Luxo</p>
+                    <p className="text-xs text-gray-500 mt-0.5">CRECI 12345-F</p>
+                </div>
+            </div>
+        </div>
+
+        <div className="h-px bg-gray-100 w-full" aria-hidden="true"></div>
+
+        <div className="space-y-3">
+            <button 
+                onClick={() => {
+                    const whatsappUrl = generateWhatsAppLink(property);
+                    window.open(whatsappUrl, '_blank');
+                }}
+                className="w-full bg-[#128c7e] hover:bg-[#075e54] text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95 group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#128c7e]"
+                aria-label="Conversar com corretor no WhatsApp"
+            >
+                <Icons.MessageCircle className="w-5 h-5" />
+                Conversar no WhatsApp
+            </button>
+            <button 
+                onClick={onContact}
+                className="w-full bg-[#0f172a] hover:bg-slate-800 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0f172a]"
+            >
+                <Icons.Phone className="w-5 h-5" />
+                Agendar Visita
+            </button>
+        </div>
+
+        <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+            <p className="text-xs text-gray-600 leading-relaxed">
+                <span className="font-bold text-gray-800">Gostou deste imóvel?</span><br/>
+                Agende uma visita hoje mesmo.
+            </p>
+        </div>
+    </div>
+);
 
 const MobileActionBar = ({ onWhatsApp, onContact }) => (
     <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 p-4 z-50 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] safe-area-bottom">
@@ -412,22 +543,27 @@ export const PropertyDetailsView = ({ property, navigateTo, onOpenLeadModal, onS
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
                     
                     <main className="lg:col-span-8 space-y-8" role="main">
-                        <PropertyInfoCard 
-                            property={property} 
-                            leadCaptured={leadCaptured}
-                            onUnlockPrice={() => setShowLeadModal(true)} 
-                        />
+                        <PropertyInfoCard property={property} />
                         
-                        <PropertyFeatures features={features} />
+                        <FeaturesGrid features={features} />
                         
-                        {leadCaptured && <PropertyMap property={property} />}
+                        <div className="h-[400px]">
+                            <LocationCard 
+                                property={property}
+                                isLocked={!leadCaptured} 
+                                onUnlock={() => setShowLeadModal(true)} 
+                            />
+                        </div>
                         
                         <PropertyMultimedia multimedia={multimedia} property={property} />
                     </main>
 
                     <aside className="lg:col-span-4 relative" role="complementary" aria-label="Informações de contato e perfil do corretor">
                         <div className="sticky top-24 space-y-6">
-                            <PropertyContact property={property} onOpenLeadModal={onOpenLeadModal} />
+                            <SidebarContact 
+                                property={property} 
+                                onContact={handleContact} 
+                            />
                             <PropertyBrokerProfile />
                         </div>
                     </aside>
