@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '../components/Button.jsx';
 import { PortfolioEmptyState } from '../components/PortfolioEmptyState.jsx';
 import { PortfolioFilters } from '../components/PortfolioFilters.jsx';
@@ -91,6 +91,74 @@ const PropertyCard = ({ property, onClick }) => {
                 </div>
             </div>
         </article>
+    );
+};
+
+// Grid virtualizado com scroll infinito (Grug gosta: simples, direto, funciona bem)
+const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loading }) => {
+    const sentinelRef = useRef(null);
+    const [visibleItems, setVisibleItems] = useState(12);
+    const lastCallTimeRef = useRef(0);
+
+    // Intersection Observer para scroll infinito
+    useEffect(() => {
+        if (!hasMore || loading || !sentinelRef.current) return;
+
+        const throttleDelay = 500;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (!entries[0].isIntersecting) return;
+                if (loading) return;
+                
+                const now = Date.now();
+                if (now - lastCallTimeRef.current < throttleDelay) return;
+                lastCallTimeRef.current = now;
+
+                loadMore();
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        observer.observe(sentinelRef.current);
+        return () => observer.disconnect();
+    }, [hasMore, loading, loadMore]);
+
+    // Renderizar apenas itens visíveis (virtualização simples)
+    useEffect(() => {
+        if (items.length > visibleItems && !loading) {
+            const timer = setTimeout(() => {
+                setVisibleItems(prev => Math.min(prev + 12, items.length));
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [items.length, visibleItems, loading]);
+
+    const displayItems = items.slice(0, visibleItems);
+
+    if (items.length === 0 && !loading) {
+        return null;
+    }
+
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayItems.map((property) => (
+                    <PropertyCard key={property.id} property={property} onClick={onPropertyClick} />
+                ))}
+            </div>
+            
+            {/* Sentinel para detectar fim do scroll */}
+            {hasMore && <div ref={sentinelRef} className="h-20" />}
+            
+            {/* Loading indicator */}
+            {loading && (
+                <div className="text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#856404]"></div>
+                    <p className="text-sm text-gray-500 mt-2">Carregando mais imóveis...</p>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -190,33 +258,14 @@ export const PortfolioView = ({ navigateTo, onPropertyClick }) => {
 
             {/* Properties Grid or Empty State */}
             <div className="container mx-auto px-6 pb-24">
-                {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#856404]"></div>
-                    </div>
-                ) : filteredItems.length > 0 ? (
-                    <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {filteredItems.map(property => (
-                                <PropertyCard 
-                                    key={property.id} 
-                                    property={property} 
-                                    onClick={onPropertyClick} 
-                                />
-                            ))}
-                        </div>
-                        {hasMore && (
-                            <div className="flex justify-center mt-12">
-                                <Button
-                                    variant="outline"
-                                    onClick={loadMore}
-                                    className="px-8"
-                                >
-                                    Carregar Mais
-                                </Button>
-                            </div>
-                        )}
-                    </>
+                {filteredItems.length > 0 || loading ? (
+                    <VirtualizedGrid
+                        items={filteredItems}
+                        onPropertyClick={onPropertyClick}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        loading={loading}
+                    />
                 ) : (
                     <PortfolioEmptyState onClearFilters={handleClearFilters} />
                 )}
