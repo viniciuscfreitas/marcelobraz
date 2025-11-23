@@ -83,13 +83,6 @@ export const VirtualizedGrid = ({ items, onPropertyClick, loadMore, hasMore, loa
                     <p className="text-sm text-gray-500 mt-2">Carregando mais imóveis...</p>
                 </div>
             )}
-            
-            {/* Fim da lista */}
-            {!hasMore && items.length > 0 && (
-                <div className="text-center py-8 text-gray-500 text-sm">
-                    Todos os imóveis foram carregados
-                </div>
-            )}
         </div>
     );
 };
