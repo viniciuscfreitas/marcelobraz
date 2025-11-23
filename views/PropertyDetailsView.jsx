@@ -22,10 +22,12 @@ const Icons = {
 };
 
 const GalleryHero = ({ property, images, onShare }) => {
-    const displayImages = images && images.length > 0 ? images : [property?.image || "https://via.placeholder.com/1200x800?text=Sem+Foto"];
+    const fallbackImage = "https://via.placeholder.com/1200x800?text=Sem+Foto";
+    const displayImages = images && images.length > 0 ? images : [property?.image || fallbackImage];
     const totalImages = displayImages.length;
     const hasMoreThan5 = totalImages > 5;
     const gridImages = hasMoreThan5 ? displayImages.slice(0, 5) : displayImages;
+    const secondaryImages = gridImages.slice(1, 4);
 
     return (
         <section aria-label="Galeria de fotos" className="relative mb-8 group">
@@ -42,15 +44,15 @@ const GalleryHero = ({ property, images, onShare }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
                 </button>
 
-                {gridImages.length > 1 && [1, 2, 3].map((idx) => {
-                    if (idx >= gridImages.length) return null;
+                {secondaryImages.map((img, idx) => {
+                    const actualIdx = idx + 1;
                     return (
                         <button 
-                            key={idx}
+                            key={actualIdx}
                             className="hidden md:block relative overflow-hidden cursor-pointer w-full h-full p-0 border-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#c5a572]"
-                            aria-label={`Ver foto ${idx + 1}`}
+                            aria-label={`Ver foto ${actualIdx + 1}`}
                         >
-                            <img src={gridImages[idx]} alt={`Foto do imóvel ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                            <img src={img} alt={`Foto do imóvel ${actualIdx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                         </button>
                     );
                 })}
@@ -206,9 +208,15 @@ const FeaturesGrid = ({ features }) => {
 };
 
 const LocationCard = ({ property, isLocked, onUnlock }) => {
-    const address = property?.endereco_completo || 
-        `${property?.endereco || ''}${property?.endereco && property?.bairro ? ' - ' : ''}${property?.bairro || ''}${(property?.endereco || property?.bairro) && property?.cidade ? ', ' : ''}${property?.cidade || ''}${property?.estado ? ` - ${property.estado}` : ''}`.replace(/^[\s, -]+|[\s, -]+$/g, '').trim() || 
-        `${property?.bairro || ''}, ${property?.cidade || 'Santos'}`;
+    let address = property?.endereco_completo;
+    if (!address) {
+        const parts = [];
+        if (property?.endereco) parts.push(property.endereco);
+        if (property?.bairro) parts.push(property.bairro);
+        if (property?.cidade) parts.push(property.cidade);
+        if (property?.estado) parts.push(property.estado);
+        address = parts.length > 0 ? parts.join(', ') : `${property?.bairro || ''}, ${property?.cidade || 'Santos'}`;
+    }
     
     if (!property?.mostrar_endereco && isLocked) {
         return (
