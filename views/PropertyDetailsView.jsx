@@ -219,39 +219,6 @@ const LocationCard = ({ property, isLocked, onUnlock }) => {
         address = parts.length > 0 ? parts.join(', ') : `${property?.bairro || ''}, ${property?.cidade || 'Santos'}`;
     }
     
-    if (!property?.mostrar_endereco && isLocked) {
-        return (
-            <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
-                <div className="p-6 border-b border-gray-100">
-                    <h2 className="text-lg font-serif font-bold text-gray-900">Localização</h2>
-                    <p className="text-gray-600 text-sm mt-1">{address}</p>
-                </div>
-                
-                <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
-                    <div className="absolute inset-0 opacity-50 bg-slate-200 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" role="img" aria-label="Mapa estático mostrando a região aproximada"></div>
-                    
-                    <div className="absolute inset-0 backdrop-blur-sm bg-white/70 flex flex-col items-center justify-center p-6 text-center z-10">
-                        <div className="bg-white p-4 rounded-full shadow-xl mb-4">
-                            <Icons.Lock className="w-6 h-6 text-[#856404]" />
-                        </div>
-                        <h3 className="font-bold text-gray-900 mb-2">Localização Exata Protegida</h3>
-                        <p className="text-xs text-gray-600 mb-4 max-w-xs">Cadastre-se gratuitamente para visualizar o endereço exato.</p>
-                        <button 
-                            onClick={onUnlock}
-                            className="bg-[#0f172a] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
-                        >
-                            Desbloquear Mapa
-                        </button>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-    
-    if (property?.mostrar_endereco !== 1) {
-        return null;
-    }
-    
     return (
         <section aria-label="Mapa de localização" className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col h-full">
             <div className="p-6 border-b border-gray-100">
@@ -260,20 +227,41 @@ const LocationCard = ({ property, isLocked, onUnlock }) => {
             </div>
             
             <div className="relative w-full h-64 bg-slate-100 flex items-center justify-center group overflow-hidden">
-                <iframe
-                    title={`Mapa de localização: ${address}`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    style={{ border: 0 }}
-                    src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
-                    allowFullScreen
-                    aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
-                ></iframe>
-                {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400" role="alert" aria-live="polite">
-                        <p>Mapa indisponível (Chave de API não configurada)</p>
-                    </div>
+                {isLocked ? (
+                    <>
+                        <div className="absolute inset-0 opacity-50 bg-slate-200 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700" role="img" aria-label="Mapa estático mostrando a região aproximada"></div>
+                        <div className="absolute inset-0 backdrop-blur-sm bg-white/70 flex flex-col items-center justify-center p-6 text-center z-10">
+                            <div className="bg-white p-4 rounded-full shadow-xl mb-4">
+                                <Icons.Lock className="w-6 h-6 text-[#856404]" />
+                            </div>
+                            <h3 className="font-bold text-gray-900 mb-2">Localização Exata Protegida</h3>
+                            <p className="text-xs text-gray-600 mb-4 max-w-xs">Cadastre-se gratuitamente para visualizar o endereço exato.</p>
+                            <button 
+                                onClick={onUnlock}
+                                className="bg-[#0f172a] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shadow-lg active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
+                            >
+                                Desbloquear Mapa
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <iframe
+                            title={`Mapa de localização: ${address}`}
+                            width="100%"
+                            height="100%"
+                            frameBorder="0"
+                            style={{ border: 0 }}
+                            src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${encodeURIComponent(address)}`}
+                            allowFullScreen
+                            aria-label={`Mapa interativo mostrando a localização do imóvel em ${address}`}
+                        ></iframe>
+                        {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-400" role="alert" aria-live="polite">
+                                <p>Mapa indisponível (Chave de API não configurada)</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </section>
